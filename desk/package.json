@@ -1,0 +1,49 @@
+{
+  "name": "picsorter",
+  "version": "2.0.0",
+  "description": "sort your pictures better",
+  "main": "main.ts",
+  "author": "cynic",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "yarn build && nodemon --exec electron ./dist/main.js --watch ./ --ext .js,.css,.ts",
+    "app:dist": "yarn build && electron-builder"
+  },
+  "devDependencies": {
+    "@types/electron": "^1.6.12",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "electron": "^26.1.0",
+    "electron-builder": "^24.6.4",
+    "nodemon": "^3.0.1",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "image-size": "^1.0.2",
+    "wrap-ansi": "7.0.0"
+  },
+  "build": {
+    "files": [
+      "dist/main.js",
+      "dist/node_modules/**",
+      "dist/ipcHandler/**",
+      "dist/preload.js"
+    ],
+    "directories": {
+      "output": "deskdist"
+    },
+    "extraResources": [
+      {
+        "from": "assets",
+        "to": "assets"
+      }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
