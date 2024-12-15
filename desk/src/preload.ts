@@ -10,26 +10,6 @@ const Win_hide = () => {
 const Win_max = () => {
   ipcRenderer.invoke("Win_max" as WinApi);
 };
-ipcRenderer.on("set-app-container", (_event, isMaximized: boolean) => {
-  // 动态设置 body 的 margin
-  let el = document.querySelector(".app-container") as HTMLDivElement;
-  if (isMaximized) {
-    el.classList.add("max");
-  } else {
-    el.classList.remove("max");
-  }
-});
-ipcRenderer.on("hide-app-container", (_event, hide: boolean) => {
-  let el = document.querySelector(".app-container") as HTMLDivElement;
-
-  if (hide) {
-    el.classList.add("hide");
-    el.classList.remove("show");
-  } else {
-    el.classList.add("show");
-    el.classList.remove("hide");
-  }
-});
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,

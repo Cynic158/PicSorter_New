@@ -6,7 +6,7 @@
   "author": "cynic",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node copy.js",
     "start": "nodemon",
     "app:dist": "yarn build && electron-builder"
   },
