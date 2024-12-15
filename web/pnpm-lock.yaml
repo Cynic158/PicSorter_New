@@ -20,6 +20,9 @@ dependencies:
   react-dom:
     specifier: ^18.3.1
     version: 18.3.1(react@18.3.1)
+  react-text-overflow:
+    specifier: ^1.0.2
+    version: 1.0.2(react-dom@18.3.1)(react@18.3.1)
   react-zoom-pan-pinch:
     specifier: ^3.6.1
     version: 3.6.1(react-dom@18.3.1)(react@18.3.1)
@@ -1815,6 +1818,16 @@ packages:
       loose-envify: r2.cnpmjs.org/loose-envify@1.4.0
       react: 18.3.1
       scheduler: 0.23.2
+    dev: false
+
+  /react-text-overflow@1.0.2(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-NGCcGupT3yZVpPRcOHghBIFMgctLVGL6z1SXOoEoztMt9DHIHQzAy/gKsxh93jDdfmvP9VzS7ibixyliZexI7g==}
+    peerDependencies:
+      react: ^17.0.0 || ^18.0.0
+      react-dom: ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
     dev: false
 
   /react-zoom-pan-pinch@3.6.1(react-dom@18.3.1)(react@18.3.1):

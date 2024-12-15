@@ -1,0 +1,303 @@
+.controler-container {
+  height: 100%;
+  width: var(--controler-container-width);
+  background-color: var(--color-black1);
+  box-shadow: -6px 0 8px 2px rgba($color: #000000, $alpha: 0.2);
+  .controler-header-container {
+    width: 100%;
+    height: var(--controler-header-container-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-black4);
+    .controler-header {
+      height: 40px;
+      width: calc(100% - 24px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .controler-header-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        position: relative;
+        .controler-header-item-bg {
+          width: 100%;
+          height: 100%;
+          background-color: var(--color-blue2);
+          border-radius: 4px;
+          opacity: 0;
+          transform: scale(0);
+          transition: all 0.2s ease;
+        }
+        &:hover {
+          .controler-header-item-bg {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .controler-header-item-icon {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+  }
+  .controler-sort-container {
+    width: 100%;
+    height: calc(
+      100% - var(--controler-header-container-height) -
+        var(--controler-btn-container-height)
+    );
+    overflow-x: hidden;
+    position: relative;
+    .controler-sort-fold-container {
+      position: absolute;
+      z-index: var(--controler-sort-fold-container-index);
+      left: -12px;
+      top: calc(50% + calc(var(--controler-header-container-height) / 2));
+      background-color: var(--color-black4);
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateY(-50%) rotate(45deg);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      opacity: 0.6;
+      &:hover {
+        opacity: 1;
+      }
+      .controler-sort-fold {
+        transform: rotate(-45deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 8px;
+        margin-bottom: 8px;
+      }
+    }
+    .controler-sort {
+      width: 100%;
+      height: 100%;
+      overflow-y: scroll;
+      padding-top: 12px;
+      .controler-sort-item-container {
+        width: calc(100% - 24px);
+        height: 60px;
+        float: right;
+        margin-bottom: 12px;
+        background-color: var(--color-white5);
+        border-radius: 4px 0 0 4px;
+        border-left: 2px solid transparent;
+        border-top: 2px solid transparent;
+        border-bottom: 2px solid transparent;
+        border-right: 4px solid var(--color-white2);
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        &:hover {
+          width: calc(100% - 12px);
+          border-left: 2px solid var(--color-blue4);
+          border-top: 2px solid var(--color-blue4);
+          border-bottom: 2px solid var(--color-blue4);
+          .controler-sort-item-bg {
+            left: -200%;
+          }
+        }
+        &.active {
+          border-left: 2px solid var(--color-green2);
+          border-top: 2px solid var(--color-green2);
+          border-bottom: 2px solid var(--color-green2);
+          .controler-sort-item-bg {
+            left: -400%;
+          }
+        }
+        .controler-sort-item-bg {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 500%;
+          height: 100%;
+          transition: all 0.3s ease;
+          background: linear-gradient(
+            to right,
+            transparent,
+            transparent,
+            var(--color-blue3),
+            var(--color-blue3),
+            var(--color-green2),
+            var(--color-green2)
+          );
+        }
+        .controler-sort-item {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          left: 0;
+          top: 0;
+          z-index: var(--controler-sort-item-index);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          padding: 2px 2px;
+          .controler-sort-item-top {
+            width: 100%;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+            margin-top: -2px;
+            .controler-sort-item-top-left {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              max-width: 70%;
+              .name {
+                margin-left: 8px;
+                color: var(--color-white2);
+              }
+            }
+            .controler-sort-item-top-right {
+              display: flex;
+              align-items: center;
+              .top {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 8px;
+              }
+            }
+          }
+          .controler-sort-item-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 24px;
+            width: calc(100% - 32px);
+            margin-left: 32px;
+            margin-bottom: -2px;
+            padding-right: 12px;
+            border-top: 1px solid var(--color-white5);
+            color: var(--color-white4);
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+  .controler-btn-container {
+    width: 100%;
+    height: var(--controler-btn-container-height);
+    background-color: var(--color-black4);
+    padding: 12px;
+    .controler-btn {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      .controler-btn-left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+        width: 60px;
+        margin-right: 12px;
+        .controler-btn-left-item {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 60px;
+          border-radius: 6px;
+          background-color: var(--color-blue2);
+          transition: all 0.2s ease;
+          &:hover {
+            background-color: var(--color-blue4);
+          }
+          &:active {
+            background-color: var(--color-blue3);
+            transform: scale(0.8);
+          }
+        }
+      }
+      .controler-btn-right {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+        flex: 1;
+        .controler-btn-right-item {
+          height: 36px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          .controler-btn-right-item-left {
+            height: 100%;
+            width: calc(100% - 60px);
+            border-radius: 4px 0 0 4px;
+            border-right: 2px solid var(--color-white2);
+            background-color: var(--color-green2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            &:hover {
+              background-color: var(--color-green1);
+            }
+            &:active {
+              background-color: var(--color-green3);
+            }
+          }
+          .controler-btn-right-item-right {
+            height: 100%;
+            width: 60px;
+            border-radius: 0 4px 4px 0;
+            background-color: var(--color-green2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            &:hover {
+              background-color: var(--color-green1);
+            }
+            &:active {
+              background-color: var(--color-green3);
+            }
+          }
+          .controler-btn-right-item-delete {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            background-color: var(--color-red3);
+            transition: all 0.2s ease;
+            &:hover {
+              background-color: var(--color-red2);
+            }
+            &:active {
+              background-color: var(--color-red4);
+              transform: scale(0.8);
+            }
+          }
+        }
+      }
+    }
+  }
+}

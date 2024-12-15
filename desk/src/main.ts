@@ -1,5 +1,6 @@
 // import { app, BrowserWindow, Tray, ipcMain } from "electron";
 import { app, BrowserWindow } from "electron";
+import ipcHandler from "./ipcHandler";
 // import fs from "fs";
 import path from "path";
 // import express from "express";
@@ -27,7 +28,7 @@ function createMainWindow() {
 
   // 加载应用的 HTML 文件
   // mainWindow.loadURL("http://localhost:7777/");
-  mainWindow.loadURL("http://juustalkmomobiu.top");
+  mainWindow.loadURL("http://localhost:5173/");
   // mainWindow.loadFile("./index.html");
 
   // 打开开发者工具（可选）
@@ -37,12 +38,41 @@ function createMainWindow() {
     mainWindow.show();
   });
 
+  let isMinimizing = false;
+  let hidetimer: ReturnType<typeof setTimeout> | null;
+  mainWindow.on("restore", () => {
+    if (hidetimer) {
+      clearTimeout(hidetimer);
+      hidetimer = null;
+      isMinimizing = false;
+    }
+    mainWindow.webContents.send("hide-app-container", false);
+  });
+  mainWindow.on("minimize", () => {
+    // 如果已经处理过最小化，直接返回
+    if (isMinimizing) return;
+
+    let showtimer = setTimeout(() => {
+      mainWindow.show();
+      // 设置标志，防止重复处理
+      isMinimizing = true;
+      mainWindow.webContents.send("hide-app-container", true);
+      hidetimer = setTimeout(() => {
+        mainWindow.minimize();
+        isMinimizing = false;
+        clearTimeout(hidetimer!);
+      }, 300);
+      clearTimeout(showtimer);
+    }, 0);
+  });
+
   // 当窗口关闭时触发
   mainWindow.on("closed", () => {
     mainWindow = null as any;
   });
 
   // 导入ipc通信主入口
+  ipcHandler(mainWindow);
 
   // function createTray(mainWindow: BrowserWindow) {
   //   const tray = new Tray(path.resolve(app.getAppPath(), "../icon.png"));

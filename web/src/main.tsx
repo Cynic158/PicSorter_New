@@ -4,6 +4,8 @@ import "./styles/index.scss";
 import App from "./views/App";
 import store from "./store";
 import { Provider } from "mobx-react";
+// svg配置
+import "virtual:svg-icons-register";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

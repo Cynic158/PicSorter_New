@@ -14,7 +14,6 @@
 html {
   font-family: "TsangerYuYangT", Helvetica, Arial, "Microsoft Yahei",
     "Hiragino Sans GB", "Heiti SC", "WenQuanYi Micro Hei", sans-serif;
-  background: var(--main-nav-bg);
 }
 body {
   -webkit-transform: translate3d(0, 0, 0);
@@ -37,7 +36,6 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   border-radius: 3px;
-  background-color: var(--color-gray);
   opacity: 0.3;
 }
 ::-webkit-scrollbar-thumb:hover {

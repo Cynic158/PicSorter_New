@@ -1,9 +1,39 @@
 :root {
   /* 颜色变量 */
   --color-white1: #fff;
+  --color-white2: #efefef;
+  --color-white3: rgba(239, 239, 239, 0.15);
+  --color-white4: rgba(239, 239, 239, 0.45);
+  --color-white5: rgba(239, 239, 239, 0.2);
+
+  --color-black1: #4c4c4c;
+  --color-black2: #353535;
+  --color-black3: #777777;
+  --color-black4: #404040;
+
+  --color-blue1: #00a6ff;
+  --color-blue2: rgba(0, 166, 255, 0.7);
+  --color-blue3: rgba(0, 166, 255, 0.5);
+  --color-blue4: rgba(0, 166, 255, 0.9);
+
+  --color-green1: rgba(46, 206, 35, 0.9);
+  --color-green2: rgba(46, 206, 35, 0.7);
+  --color-green3: rgba(46, 206, 35, 0.5);
+
+  --color-red1: #d33d38;
+  --color-red2: rgba(211, 61, 56, 0.9);
+  --color-red3: rgba(211, 61, 56, 0.7);
+  --color-red4: rgba(211, 61, 56, 0.5);
 
   /* 层级变量 */
+  --header-container-index: 3;
+  --controler-sort-fold-container-index: 2;
+  --controler-sort-item-index: 2;
   /* 通用变量 */
   /* 组件变量 */
   /* 页面变量 */
+  --header-container-height: 32px;
+  --controler-container-width: 280px;
+  --controler-header-container-height: 60px;
+  --controler-btn-container-height: 160px;
 }
