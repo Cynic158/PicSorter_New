@@ -1,4 +1,45 @@
 .viewer-container {
   height: 100%;
   width: calc(100% - var(--controler-container-width));
+  position: relative;
+  transition: width 0.5s ease;
+  background-image: url("../../assets/images/99415661_p1.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  &.expend {
+    width: 100%;
+  }
+  .viewer-controler-unfold-container {
+    position: absolute;
+    z-index: var(--viewer-controler-unfold-container-index);
+    right: -12px;
+    top: 50%;
+    background-color: var(--color-black4);
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(100%, -50%) rotate(-45deg) scale(1);
+    transition: all 0.5s ease;
+    cursor: pointer;
+    opacity: 0.6;
+    &.show {
+      transform: translate(0, -50%) rotate(-45deg) scale(1);
+    }
+    &:hover {
+      opacity: 1;
+      transform: translate(0, -50%) rotate(-45deg) scale(1.2);
+    }
+    .viewer-controler-unfold {
+      transform: rotate(45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+  }
 }

@@ -1,4 +1,5 @@
-import { app, ipcMain, BrowserWindow } from "electron";
+import { app, ipcMain, BrowserWindow, clipboard } from "electron";
+import { generateErrorLog } from "../utils/index";
 
 const winHandler = (mainWindow: BrowserWindow) => {
   ipcMain.handle("Win_quit" as WinApi, () => {
@@ -14,6 +15,24 @@ const winHandler = (mainWindow: BrowserWindow) => {
       mainWindow.unmaximize();
     } else {
       mainWindow.maximize();
+    }
+  });
+
+  ipcMain.handle("Win_copy" as WinApi, async (_event, content: string) => {
+    try {
+      clipboard.writeText(content);
+      // 复制成功
+      return {
+        success: true,
+        data: "",
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
     }
   });
 };

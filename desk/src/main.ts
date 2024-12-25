@@ -2,11 +2,12 @@ import { app, BrowserWindow, Tray } from "electron";
 import ipcHandler from "./ipcHandler";
 // import fs from "fs";
 import path from "path";
+import pathManager from "./utils/path";
 // import express from "express";
 
 // 获取要读取的pic目录路径
 const appPath = app.getAppPath();
-const iconPath = "./assets/images/icon.png";
+const iconPath = pathManager.iconPath;
 
 let mainWindow: BrowserWindow;
 

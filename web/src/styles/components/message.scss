@@ -1,0 +1,26 @@
+.message-container {
+  position: absolute;
+  left: 50%;
+  top: var(--header-container-height);
+  transform: translateX(-50%);
+  z-index: var(--message-container-index);
+  border-radius: 4px;
+  padding: 6px 12px;
+  background-color: var(--color-green5);
+  color: var(--color-green4);
+  box-shadow: 0 0 4px 2px rgba($color: #000000, $alpha: 0.2);
+  max-width: 25%;
+  text-align: justify;
+  opacity: 0;
+  transition: top 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+  visibility: hidden;
+  &.show {
+    visibility: visible;
+    top: calc(var(--header-container-height) + 18px);
+    opacity: 1;
+  }
+  &.error {
+    background-color: var(--color-red5);
+    color: var(--color-red6);
+  }
+}
