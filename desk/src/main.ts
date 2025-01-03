@@ -1,4 +1,5 @@
 import { app, BrowserWindow, Tray } from "electron";
+import { cloneDeep } from "lodash";
 import ipcHandler from "./ipcHandler";
 // import fs from "fs";
 import path from "path";
@@ -44,8 +45,16 @@ function createMainWindow() {
     mainWindow = null as any;
   });
 
+  // 图片列表缓存
+  let picListSave: Array<PicInfo> = [];
+  const getPicListSave = () => {
+    return cloneDeep(picListSave);
+  };
+  const setPicListSave = (list: Array<PicInfo>) => {
+    picListSave = cloneDeep(list);
+  };
   // 导入ipc通信主入口
-  ipcHandler(mainWindow);
+  ipcHandler(mainWindow, getPicListSave, setPicListSave);
 
   function createTray(mainWindow: BrowserWindow) {
     const tray = new Tray(path.resolve(appPath, iconPath));

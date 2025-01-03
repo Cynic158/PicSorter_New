@@ -6,6 +6,7 @@ import Controler from "./Layout/Controler";
 import Message from "../components/Message";
 import ErrorDialog from "../components/ErrorDialog";
 import sortStore from "../store/modules/sort";
+import picStore from "../store/modules/pic";
 import { useEffect } from "react";
 
 const UI = {
@@ -19,6 +20,7 @@ const UI = {
 export default function App() {
   const initDesk = () => {
     sortStore.getSortFolderList();
+    picStore.getPicList(true);
   };
   useEffect(() => {
     initDesk();

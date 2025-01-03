@@ -15,21 +15,45 @@ const Win_copy = async (content: string) => {
   return res;
 };
 
+// picipc
+const Pic_getPicList = async (
+  mode: viewType,
+  refresh: boolean,
+  currentPic?: string
+) => {
+  const res = await ipcRenderer.invoke(
+    "Pic_getPicList" as PicApi,
+    mode,
+    refresh,
+    currentPic
+  );
+  return res;
+};
+
 // sortipc
 const Sort_getPicFolder = () => {
   ipcRenderer.invoke("Sort_getPicFolder" as SortApi);
 };
-const Sort_getPicFolderPath = () => {
-  ipcRenderer.invoke("Sort_getPicFolderPath" as SortApi);
+const Sort_getPicFolderPath = async (defaultPath: string) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_getPicFolderPath" as SortApi,
+    defaultPath
+  );
+  return res;
 };
-const Sort_setPicFolderPath = () => {
-  ipcRenderer.invoke("Sort_setPicFolderPath" as SortApi);
+const Sort_setPicFolderPath = async (folderConfig: PicFolderConfigType) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_setPicFolderPath" as SortApi,
+    folderConfig
+  );
+  return res;
 };
 const Sort_getPicFolderInfo = () => {
   ipcRenderer.invoke("Sort_getPicFolderInfo" as SortApi);
 };
-const Sort_openPicFolder = () => {
-  ipcRenderer.invoke("Sort_openPicFolder" as SortApi);
+const Sort_openPicFolder = async () => {
+  const res = await ipcRenderer.invoke("Sort_openPicFolder" as SortApi);
+  return res;
 };
 const Sort_getSortFolder = async () => {
   const res = await ipcRenderer.invoke("Sort_getSortFolder" as SortApi);
@@ -42,7 +66,7 @@ const Sort_getSortFolderPath = async (defaultPath: string) => {
   );
   return res;
 };
-const Sort_setSortFolderPath = async (folderConfig: SortFolderConfig) => {
+const Sort_setSortFolderPath = async (folderConfig: SortFolderConfigType) => {
   const res = await ipcRenderer.invoke(
     "Sort_setSortFolderPath" as SortApi,
     folderConfig
@@ -62,6 +86,7 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Win_hide,
   Win_max,
   Win_copy,
+  Pic_getPicList,
   Sort_getPicFolder,
   Sort_getPicFolderPath,
   Sort_setPicFolderPath,

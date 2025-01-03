@@ -8,6 +8,7 @@ import winStore from "../../store/modules/win";
 import { Observer } from "mobx-react";
 import "../../styles/dialog/sortfolderdialog.scss";
 import { cloneDeep } from "lodash";
+import Loader from "../../components/Loader";
 
 interface SortFolderDialogProps {
   show: boolean;
@@ -17,7 +18,7 @@ interface SortFolderDialogProps {
 const SortFolderDialog: React.FC<SortFolderDialogProps> = ({ show, hide }) => {
   const [sortTypeSelect, setSortTypeSelect] = useState(false);
   const [editingSortFolderConfig, setEditingSortFolderConfig] =
-    useState<SortConfigType>({
+    useState<SortFolderConfigType>({
       folderPath: "",
       sortType: "nameAsc",
     });
@@ -35,18 +36,20 @@ const SortFolderDialog: React.FC<SortFolderDialogProps> = ({ show, hide }) => {
     }
   };
   const setFolderPath = async () => {
-    setGettingPath(true);
-    let res = await sortStore.getSortFolderPath(
-      editingSortFolderConfig.folderPath
-    );
-    if (res) {
-      let config = {
-        folderPath: res,
-        sortType: editingSortFolderConfig.sortType,
-      };
-      setEditingSortFolderConfig(config);
+    if (!gettingPath) {
+      setGettingPath(true);
+      let res = await sortStore.getSortFolderPath(
+        editingSortFolderConfig.folderPath
+      );
+      if (res) {
+        let config = {
+          folderPath: res,
+          sortType: editingSortFolderConfig.sortType,
+        };
+        setEditingSortFolderConfig(config);
+      }
+      setGettingPath(false);
     }
-    setGettingPath(false);
   };
   const setSortType = (type: SortType) => {
     let config = {
@@ -206,11 +209,7 @@ const SortFolderDialog: React.FC<SortFolderDialogProps> = ({ show, hide }) => {
               >
                 <span className="sortfolderdialog-btn-text">设置完成</span>
                 <div className="sortfolderdialog-btn-loading">
-                  <SvgIcon
-                    svgName="loading"
-                    svgSize="22px"
-                    color="var(--color-white2)"
-                  ></SvgIcon>
+                  <Loader></Loader>
                 </div>
               </button>
             </div>

@@ -2,6 +2,7 @@ import { observable, action, runInAction } from "mobx";
 import SortApi from "../../api/sort";
 import winStore from "./win";
 import { generateErrorLog } from "../../utils";
+import picStore from "./pic";
 
 const sortStore = observable(
   {
@@ -55,14 +56,51 @@ const sortStore = observable(
       }
     },
 
+    // 未分类文件夹配置
+    picFolderConfig: {
+      folderPath: "",
+      sortType: "nameAsc",
+      deep: false,
+      selectConfig: {
+        name: {
+          type: "all",
+          value: "",
+        },
+        size: {
+          type: "all",
+          value: 0,
+        },
+        fileType: ["png", "jpg", "gif", "webp"],
+        resolution: {
+          width: {
+            type: "all",
+            value: 0,
+          },
+          height: {
+            type: "all",
+            value: 0,
+          },
+        },
+        createdAt: {
+          type: "all",
+          value: 0,
+        },
+        modifiedAt: {
+          type: "all",
+          value: 0,
+        },
+      },
+    } as PicFolderConfigType,
+    setPicFolderConfig(config: PicFolderConfigType) {
+      this.picFolderConfig = config;
+    },
     // 总分类文件夹配置
     sortFolderConfig: {
       folderPath: "",
       sortType: "nameAsc",
-    } as SortConfigType,
-    setSortFolderConfig(config: SortConfigType) {
+    } as SortFolderConfigType,
+    setSortFolderConfig(config: SortFolderConfigType) {
       this.sortFolderConfig = config;
-      // 获取一次总分类文件夹信息
     },
 
     // 正在选择的分类组
@@ -87,6 +125,31 @@ const sortStore = observable(
       this.selectedSortList = [];
     },
 
+    // 获取未分类文件夹路径
+    async getPicFolderPath(defaultPath: string) {
+      let funcAction = "获取未分类文件夹路径";
+      try {
+        let res = await SortApi.getPicFolderPath(defaultPath);
+        if (res.success) {
+          // 设置未分类文件夹目录
+          if (res.data) {
+            // 返回给对话框
+            return res.data;
+          } else {
+            return "";
+          }
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return "";
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return "";
+      }
+    },
     // 获取总分类文件夹路径
     async getSortFolderPath(defaultPath: string) {
       let funcAction = "获取总分类文件夹路径";
@@ -112,12 +175,43 @@ const sortStore = observable(
         return "";
       }
     },
+
+    picFolderPathLoading: false,
+    setPicFolderPathLoading(bool: boolean) {
+      this.picFolderPathLoading = bool;
+    },
     sortFolderPathLoading: false,
     setSortFolderPathLoading(bool: boolean) {
       this.sortFolderPathLoading = bool;
     },
+    // 设置未分类文件夹路径
+    async setPicFolderPath(config: PicFolderConfigType) {
+      let funcAction = "设置未分类文件夹路径";
+      try {
+        this.setPicFolderPathLoading(true);
+        let res = await SortApi.setPicFolderPath(config);
+        if (res.success) {
+          // 设置成功，获取一次图片列表
+          let GetRes = await picStore.getPicList(true);
+          // 清空当前选择图片列表
+          picStore.clearSelectingPicList();
+          return GetRes;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setPicFolderPathLoading(false);
+      }
+    },
     // 设置总分类文件夹路径
-    async setSortFolderPath(config: SortConfigType) {
+    async setSortFolderPath(config: SortFolderConfigType) {
       let funcAction = "设置总分类文件夹路径";
       try {
         this.setSortFolderPathLoading(true);
@@ -144,6 +238,21 @@ const sortStore = observable(
       }
     },
 
+    // 打开未分类文件夹
+    async openPicFolder() {
+      let funcAction = "打开未分类文件夹";
+      try {
+        let res = await SortApi.openPicFolder();
+        if (!res.success) {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+      }
+    },
     // 打开总分类文件夹
     async openSortFolder() {
       let funcAction = "打开总分类文件夹";
@@ -162,6 +271,7 @@ const sortStore = observable(
   },
   {
     setShowControler: action,
+    setPicFolderConfig: action,
     setSortFolderList: action,
     setSortFolderLoading: action,
     getSortFolderList: action,
@@ -170,9 +280,13 @@ const sortStore = observable(
     clearSelectingSortList: action,
     setSelectedSortList: action,
     clearSelectedSortList: action,
+    getPicFolderPath: action,
     getSortFolderPath: action,
+    setPicFolderPathLoading: action,
     setSortFolderPathLoading: action,
+    setPicFolderPath: action,
     setSortFolderPath: action,
+    openPicFolder: action,
     openSortFolder: action,
   }
 );

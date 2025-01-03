@@ -11,13 +11,125 @@ const sortHandler = () => {
 
   ipcMain.handle("Sort_getPicFolder" as SortApi, () => {});
 
-  ipcMain.handle("Sort_getPicFolderPath" as SortApi, () => {});
+  // 获取未分类文件夹路径
+  ipcMain.handle(
+    "Sort_getPicFolderPath" as SortApi,
+    async (_event, folderPath: string) => {
+      try {
+        let defaultPath = app.getPath("desktop");
+        if (folderPath) {
+          const checkRes = await checkPathsExist("folder", [folderPath]);
+          if (checkRes.success) {
+            defaultPath = folderPath;
+          }
+        }
 
-  ipcMain.handle("Sort_setPicFolderPath" as SortApi, () => {});
+        const result = await dialog.showOpenDialog({
+          defaultPath: defaultPath,
+          title: "请选择未分类文件夹",
+          properties: ["createDirectory", "openDirectory"], // 只允许选择文件夹
+          buttonLabel: "确定",
+          filters: [{ name: "Folders", extensions: [""] }],
+        });
+
+        if (result.canceled) {
+          return {
+            success: true,
+            data: "",
+          };
+        } else {
+          return {
+            success: true,
+            data: result.filePaths[0],
+          };
+        }
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
+
+  // 设置未分类文件夹路径
+  ipcMain.handle(
+    "Sort_setPicFolderPath" as SortApi,
+    async (_event, folderConfig: PicFolderConfigType) => {
+      try {
+        // 在sortconfig中设置未分类文件夹配置
+        // 检查对应文件夹存不存在
+        const checkRes = await checkPathsExist("folder", [
+          folderConfig.folderPath,
+        ]);
+        if (!checkRes.success) {
+          return {
+            success: false,
+            data: "onlymessage对应未分类文件夹不存在！",
+          };
+        }
+
+        // 获取sortConfig的完整路径
+        const configPath = path.resolve(appPath, sortConfigPath);
+        // 读取当前配置文件内容
+        const fileContent = await fs.promises.readFile(configPath, "utf-8");
+        // 解析JSON内容
+        const config: SortConfig = JSON.parse(fileContent);
+        // 更新配置
+        config.picFolderPath = folderConfig.folderPath;
+        config.picFolderType = folderConfig.sortType;
+        config.deep = folderConfig.deep;
+        config.selectConfig = folderConfig.selectConfig;
+        // 将更新后的配置内容写回文件
+        await fs.promises.writeFile(
+          configPath,
+          JSON.stringify(config, null, 2),
+          "utf-8"
+        );
+        // 设置完成
+        return {
+          success: true,
+          data: "",
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
 
   ipcMain.handle("Sort_getPicFolderInfo" as SortApi, () => {});
 
-  ipcMain.handle("Sort_openPicFolder" as SortApi, () => {});
+  ipcMain.handle("Sort_openPicFolder" as SortApi, async () => {
+    try {
+      // 获取sortConfig的完整路径
+      const configPath = path.resolve(appPath, sortConfigPath);
+      // 读取当前配置文件内容
+      const fileContent = await fs.promises.readFile(configPath, "utf-8");
+      // 解析JSON内容
+      const config: SortConfig = JSON.parse(fileContent);
+      // 未分类文件夹路径
+      let picFolderPath = config.picFolderPath;
+      await shell.openPath(picFolderPath);
+      return {
+        success: true,
+        data: "",
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
+    }
+  });
 
   // 获取总分类文件夹
   ipcMain.handle("Sort_getSortFolder" as SortApi, async () => {
@@ -41,11 +153,20 @@ const sortHandler = () => {
         return {
           success: true,
           data: {
-            folderPath: sortFolderPath,
+            folderPath: "",
             sortType: sortType,
             list: [],
             clearList: clearList,
           },
+        };
+      }
+
+      // 检查对应文件夹存不存在
+      const checkRes = await checkPathsExist("folder", [sortFolderPath]);
+      if (!checkRes.success) {
+        return {
+          success: false,
+          data: "onlymessage总分类文件夹丢失！",
         };
       }
       // 获取总分类文件夹下的文件夹列表
@@ -197,6 +318,7 @@ const sortHandler = () => {
     }
   });
 
+  // 获取总分类文件夹路径
   ipcMain.handle(
     "Sort_getSortFolderPath" as SortApi,
     async (_event, folderPath: string) => {
@@ -239,9 +361,10 @@ const sortHandler = () => {
     }
   );
 
+  // 设置总分类文件夹路径
   ipcMain.handle(
     "Sort_setSortFolderPath" as SortApi,
-    async (_event, folderConfig: SortFolderConfig) => {
+    async (_event, folderConfig: SortFolderConfigType) => {
       try {
         // 在sortconfig中设置总分类文件夹路径以及排序方式
         // 检查对应文件夹存不存在
@@ -251,7 +374,7 @@ const sortHandler = () => {
         if (!checkRes.success) {
           return {
             success: false,
-            data: "对应总分类文件夹不存在！",
+            data: "onlymessage对应总分类文件夹不存在！",
           };
         }
 

@@ -350,7 +350,7 @@
             &.disabled {
               cursor: not-allowed;
               * {
-                cursor: not-allowed;
+                cursor: not-allowed !important;
               }
               background-color: var(--color-green2) !important;
               .controler-btn-icon {

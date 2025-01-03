@@ -1,6 +1,7 @@
 import "../../styles/layout/controler.scss";
 import SvgIcon from "../../components/SvgIcon";
 import SortFolderDialog from "../Dialog/SortFolderDialog";
+import PicFolderDialog from "../Dialog/PicFolderDialog";
 import { useState } from "react";
 import sortStore from "../../store/modules/sort";
 import { Observer } from "mobx-react";
@@ -12,6 +13,13 @@ export default function ControlerBtn() {
   };
   const hideSortFolderDialog = () => {
     setSortFolderDialogShow(false);
+  };
+  const [picFolderDialogShow, setPicFolderDialogShow] = useState(false);
+  const showPicFolderDialog = () => {
+    setPicFolderDialogShow(true);
+  };
+  const hidePicFolderDialog = () => {
+    setPicFolderDialogShow(false);
   };
 
   return (
@@ -43,7 +51,12 @@ export default function ControlerBtn() {
             </div>
             <div className="controler-btn-right">
               <div className="controler-btn-right-item">
-                <button className="controler-btn-right-item-left">
+                <button
+                  onClick={() => {
+                    showPicFolderDialog();
+                  }}
+                  className="controler-btn-right-item-left"
+                >
                   <div
                     style={{
                       display: "flex",
@@ -62,7 +75,20 @@ export default function ControlerBtn() {
                     </div>
                   </div>
                 </button>
-                <button className="controler-btn-right-item-right">
+                <PicFolderDialog
+                  show={picFolderDialogShow}
+                  hide={hidePicFolderDialog}
+                ></PicFolderDialog>
+                <button
+                  onClick={() => {
+                    if (sortStore.picFolderConfig.folderPath) {
+                      sortStore.openPicFolder();
+                    }
+                  }}
+                  className={`controler-btn-right-item-right${
+                    !sortStore.picFolderConfig.folderPath ? " disabled" : ""
+                  }`}
+                >
                   <div className="controler-btn-icon">
                     <SvgIcon
                       svgName="folder"

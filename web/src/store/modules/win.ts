@@ -13,11 +13,19 @@ const winStore = observable(
     errorAction: "",
     // 显示报错对话框
     setErrorDialog(log: string, action: string) {
-      runInAction(() => {
-        this.errorLog = log;
-        this.errorAction = action;
-        this.showErrorDialog = true;
-      });
+      if (log.startsWith("onlymessage")) {
+        // 仅打印消息
+        this.setMessage({
+          msg: log.replace("onlymessage", ""),
+          type: "error",
+        });
+      } else {
+        runInAction(() => {
+          this.errorLog = log;
+          this.errorAction = action;
+          this.showErrorDialog = true;
+        });
+      }
     },
     // 隐藏报错对话框
     hideErrorDialog() {
