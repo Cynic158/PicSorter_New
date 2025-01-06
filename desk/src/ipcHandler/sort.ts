@@ -1,5 +1,9 @@
 import { ipcMain, dialog, app, shell } from "electron";
-import { generateErrorLog, checkPathsExist } from "../utils/index";
+import {
+  generateErrorLog,
+  checkPathsExist,
+  getFolderInfo,
+} from "../utils/index";
 import fs from "fs";
 import path from "path";
 import pathManager from "../utils/path";
@@ -104,8 +108,51 @@ const sortHandler = () => {
     }
   );
 
-  ipcMain.handle("Sort_getPicFolderInfo" as SortApi, () => {});
+  // 获取未分类文件夹信息
+  ipcMain.handle("Sort_getPicFolderInfo" as SortApi, async () => {
+    try {
+      // 获取sortConfig的完整路径
+      const configPath = path.resolve(appPath, sortConfigPath);
+      // 读取当前配置文件内容
+      const fileContent = await fs.promises.readFile(configPath, "utf-8");
+      // 解析JSON内容
+      const config: SortConfig = JSON.parse(fileContent);
+      // 未分类文件夹路径
+      let picFolderPath = config.picFolderPath;
+      // 是否穿透
+      let deepRead = config.deep;
+      if (picFolderPath == "") {
+        return {
+          success: false,
+          data: "onlymessage未指定未分类存储文件夹",
+        };
+      }
 
+      // 检查对应文件夹存不存在
+      const checkRes = await checkPathsExist("folder", [picFolderPath]);
+      if (!checkRes.success) {
+        return {
+          success: false,
+          data: "onlymessage未分类存储文件夹丢失！",
+        };
+      }
+
+      let infoRes = await getFolderInfo(picFolderPath, deepRead, "pic");
+      return {
+        success: true,
+        data: infoRes,
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
+    }
+  });
+
+  // 打开未分类文件夹
   ipcMain.handle("Sort_openPicFolder" as SortApi, async () => {
     try {
       // 获取sortConfig的完整路径
@@ -176,6 +223,13 @@ const sortHandler = () => {
       const topFolders: Array<SortFolderListType> = [];
       const nonTopFolders: Array<SortFolderListType> = [];
 
+      const validPicTypes: Array<picType> = ["png", "jpg", "gif", "webp"];
+
+      const isImage = (file: string): boolean => {
+        const ext = path.extname(file).toLowerCase().replace(".", "");
+        return validPicTypes.includes(ext as picType);
+      };
+
       // 获取文件夹信息
       for (const folder of folders) {
         const folderPath = path.join(sortFolderPath, folder);
@@ -184,16 +238,18 @@ const sortHandler = () => {
         // 仅处理文件夹，不处理文件
         if (stats.isDirectory()) {
           // 获取该文件夹内的文件数量和文件总大小
-          const files = await fs.promises.readdir(folderPath);
+          const files = await fs.promises.readdir(folderPath, {
+            withFileTypes: true,
+          });
           let totalSize = 0;
           let fileCount = 0;
 
           for (const file of files) {
-            const filePath = path.join(folderPath, file);
+            const filePath = path.join(folderPath, file.name);
             const fileStats = await fs.promises.stat(filePath);
 
             // 仅计算文件，不计算子文件夹
-            if (fileStats.isFile()) {
+            if (fileStats.isFile() && isImage(file.name)) {
               fileCount++;
               totalSize += fileStats.size;
             }
@@ -409,8 +465,49 @@ const sortHandler = () => {
     }
   );
 
-  ipcMain.handle("Sort_getSortFolderInfo" as SortApi, () => {});
+  // 获取总分类文件夹信息
+  ipcMain.handle("Sort_getSortFolderInfo" as SortApi, async () => {
+    try {
+      // 获取sortConfig的完整路径
+      const configPath = path.resolve(appPath, sortConfigPath);
+      // 读取当前配置文件内容
+      const fileContent = await fs.promises.readFile(configPath, "utf-8");
+      // 解析JSON内容
+      const config: SortConfig = JSON.parse(fileContent);
+      // 总分类文件夹路径
+      let sortFolderPath = config.sortFolderPath;
+      if (sortFolderPath == "") {
+        return {
+          success: false,
+          data: "onlymessage未指定总分类存储文件夹",
+        };
+      }
 
+      // 检查对应文件夹存不存在
+      const checkRes = await checkPathsExist("folder", [sortFolderPath]);
+      if (!checkRes.success) {
+        return {
+          success: false,
+          data: "onlymessage总分类存储文件夹丢失！",
+        };
+      }
+
+      let infoRes = await getFolderInfo(sortFolderPath, false, "sort");
+      return {
+        success: true,
+        data: infoRes,
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
+    }
+  });
+
+  // 打开总分类文件夹
   ipcMain.handle("Sort_openSortFolder" as SortApi, async () => {
     try {
       // 获取sortConfig的完整路径

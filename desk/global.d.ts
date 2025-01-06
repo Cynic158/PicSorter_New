@@ -119,6 +119,20 @@ declare global {
     size: number;
     top: boolean;
   }
+
+  interface FolderInfoType {
+    name: string;
+    path: string;
+    deep: boolean;
+    sortTotal: number;
+    picTotal: number;
+    sizeTotal: number;
+    sizeRange: Array<number>;
+    resolution: string;
+    picType: Array<picType>;
+    createdAt: string;
+    modifiedAt: string;
+  }
 }
 
 export {};

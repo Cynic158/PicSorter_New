@@ -238,6 +238,58 @@ const sortStore = observable(
       }
     },
 
+    // 获取文件夹信息
+    picFolderInfoLoading: false,
+    setPicFolderInfoLoading(bool: boolean) {
+      this.picFolderInfoLoading = bool;
+    },
+    sortFolderInfoLoading: false,
+    setSortFolderInfoLoading(bool: boolean) {
+      this.sortFolderInfoLoading = bool;
+    },
+    async getPicFolderInfo() {
+      let funcAction = "读取未分类存储文件夹信息";
+      try {
+        this.setPicFolderInfoLoading(true);
+        let res = await SortApi.getPicFolderInfo();
+        if (res.success) {
+          return res.data as FolderInfoType;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setPicFolderInfoLoading(false);
+      }
+    },
+    async getSortFolderInfo() {
+      let funcAction = "读取总分类存储文件夹信息";
+      try {
+        this.setSortFolderInfoLoading(true);
+        let res = await SortApi.getSortFolderInfo();
+        if (res.success) {
+          return res.data as FolderInfoType;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setSortFolderInfoLoading(false);
+      }
+    },
+
     // 打开未分类文件夹
     async openPicFolder() {
       let funcAction = "打开未分类文件夹";
@@ -286,6 +338,10 @@ const sortStore = observable(
     setSortFolderPathLoading: action,
     setPicFolderPath: action,
     setSortFolderPath: action,
+    setPicFolderInfoLoading: action,
+    setSortFolderInfoLoading: action,
+    getPicFolderInfo: action,
+    getSortFolderInfo: action,
     openPicFolder: action,
     openSortFolder: action,
   }

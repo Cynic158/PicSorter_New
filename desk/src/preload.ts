@@ -48,8 +48,9 @@ const Sort_setPicFolderPath = async (folderConfig: PicFolderConfigType) => {
   );
   return res;
 };
-const Sort_getPicFolderInfo = () => {
-  ipcRenderer.invoke("Sort_getPicFolderInfo" as SortApi);
+const Sort_getPicFolderInfo = async () => {
+  const res = await ipcRenderer.invoke("Sort_getPicFolderInfo" as SortApi);
+  return res;
 };
 const Sort_openPicFolder = async () => {
   const res = await ipcRenderer.invoke("Sort_openPicFolder" as SortApi);
@@ -73,8 +74,9 @@ const Sort_setSortFolderPath = async (folderConfig: SortFolderConfigType) => {
   );
   return res;
 };
-const Sort_getSortFolderInfo = () => {
-  ipcRenderer.invoke("Sort_getSortFolderInfo" as SortApi);
+const Sort_getSortFolderInfo = async () => {
+  const res = await ipcRenderer.invoke("Sort_getSortFolderInfo" as SortApi);
+  return res;
 };
 const Sort_openSortFolder = async () => {
   const res = await ipcRenderer.invoke("Sort_openSortFolder" as SortApi);

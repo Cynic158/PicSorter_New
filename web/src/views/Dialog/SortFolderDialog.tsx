@@ -142,6 +142,7 @@ const SortFolderDialog: React.FC<SortFolderDialogProps> = ({ show, hide }) => {
                   ></SvgIcon>
                   <div className="sortfolderdialog-form-item-main-path">
                     <TextOverflow
+                      truncatePosition="middle"
                       text={
                         editingSortFolderConfig.folderPath
                           ? editingSortFolderConfig.folderPath

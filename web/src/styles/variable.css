@@ -8,6 +8,7 @@
   --color-white6: #c0c0c0;
   --color-white7: #ababab;
   --color-white8: #d5d5d5;
+  --color-white9: rgba(239, 239, 239, 0.1);
 
   --color-black1: #4c4c4c;
   --color-black2: #353535;
@@ -53,6 +54,7 @@
   --sortfolderdialog-form-item-main-path-select-index: 6;
   --sortfolderdialog-btn-loading-index: 2;
   --picfolderdialog-block-index: 2;
+  --mainfolderdialog-form-item-folder-index: 2;
   --errordialog-container-index: 95;
   --message-container-index: 99;
   /* 通用变量 */

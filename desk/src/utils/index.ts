@@ -199,4 +199,175 @@ async function filterImages(
   return results.filter((item) => item !== null) as PicInfo[];
 }
 
-export { generateErrorLog, checkPathsExist, filterImages };
+const getFolderInfo = async (
+  folderPath: string,
+  deepRead: boolean,
+  type: "pic" | "sort"
+): Promise<FolderInfoType> => {
+  const validPicTypes: Array<picType> = ["png", "jpg", "gif", "webp"];
+
+  const isImage = (file: string): boolean => {
+    const ext = path.extname(file).toLowerCase().replace(".", "");
+    return validPicTypes.includes(ext as picType);
+  };
+
+  const getImageStats = (filePath: string) => {
+    try {
+      const dimensions = sizeOf(filePath);
+      const stats = fs.statSync(filePath);
+      return {
+        size: stats.size,
+        width: dimensions.width || 0,
+        height: dimensions.height || 0,
+        createdAt: stats.birthtime,
+        modifiedAt: stats.mtime,
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  const getFolderContentsForPic = (
+    dirPath: string,
+    deep: boolean
+  ): Array<string> => {
+    let files: string[] = [];
+    const items = fs.readdirSync(dirPath, { withFileTypes: true });
+    for (const item of items) {
+      const fullPath = path.join(dirPath, item.name);
+      if (item.isFile() && isImage(item.name)) {
+        files.push(fullPath);
+      } else if (item.isDirectory() && deep) {
+        files = files.concat(getFolderContentsForPic(fullPath, true));
+      }
+    }
+    return files;
+  };
+
+  const getFolderContentsForSort = (dirPath: string): Array<string> => {
+    let files: string[] = [];
+    const folders = fs.readdirSync(dirPath, { withFileTypes: true });
+    for (const folder of folders) {
+      const folderPath = path.join(dirPath, folder.name);
+      if (folder.isDirectory()) {
+        const folderFiles = fs.readdirSync(folderPath, {
+          withFileTypes: true,
+        });
+        for (const folderFile of folderFiles) {
+          const filePath = path.join(folderPath, folderFile.name);
+          if (folderFile.isFile() && isImage(folderFile.name)) {
+            files.push(filePath);
+          }
+        }
+      }
+    }
+    return files;
+  };
+
+  const name = path.basename(folderPath);
+  const sortTotal =
+    type === "sort"
+      ? fs
+          .readdirSync(folderPath, { withFileTypes: true })
+          .filter((item) => item.isDirectory()).length
+      : 0;
+
+  let picTotal = 0;
+  let sizeTotal = 0;
+  let sizeRange: Array<number> = [];
+  let resolution = "无";
+  let picType: Array<picType> = [];
+  let createdAt = "无";
+  let modifiedAt = "无";
+
+  let imageFiles: Array<string> = [];
+  if (type === "pic") {
+    imageFiles = getFolderContentsForPic(folderPath, deepRead);
+  } else {
+    imageFiles = getFolderContentsForSort(folderPath);
+  }
+  const sizes: Array<number> = [];
+  const widths: Array<number> = [];
+  const heights: Array<number> = [];
+  const createdDates: Array<Date> = [];
+  const modifiedDates: Array<Date> = [];
+
+  for (const file of imageFiles) {
+    const stats = getImageStats(file);
+    if (stats) {
+      picTotal++;
+      sizeTotal += stats.size;
+      sizes.push(stats.size);
+      widths.push(stats.width);
+      heights.push(stats.height);
+      createdDates.push(stats.createdAt);
+      modifiedDates.push(stats.modifiedAt);
+
+      const ext = path.extname(file).toLowerCase().replace(".", "");
+      if (!picType.includes(ext as picType)) {
+        picType.push(ext as picType);
+      }
+    }
+  }
+
+  if (sizes.length > 0) {
+    sizeRange = [Math.min(...sizes), Math.max(...sizes)];
+    const minWidth = Math.min(...widths);
+    const maxWidth = Math.max(...widths);
+    const minHeight = Math.min(...heights);
+    const maxHeight = Math.max(...heights);
+
+    resolution = `${minWidth}${
+      minWidth === maxWidth ? "" : ` - ${maxWidth}`
+    } x ${minHeight}${minHeight === maxHeight ? "" : ` - ${maxHeight}`}`;
+
+    createdAt = `${createdDates
+      .reduce((a, b) => (a < b ? a : b))
+      .toISOString()
+      .split("T")[0]
+      .replace(/-/g, "/")}`;
+    modifiedAt = `${modifiedDates
+      .reduce((a, b) => (a < b ? a : b))
+      .toISOString()
+      .split("T")[0]
+      .replace(/-/g, "/")}`;
+
+    if (createdDates.length > 1) {
+      let nextCreateAt = createdDates
+        .reduce((a, b) => (a > b ? a : b))
+        .toISOString()
+        .split("T")[0]
+        .replace(/-/g, "/");
+      if (createdAt != nextCreateAt) {
+        createdAt += ` - ${nextCreateAt}`;
+      }
+    }
+
+    if (modifiedDates.length > 1) {
+      let nextModifiedAt = modifiedDates
+        .reduce((a, b) => (a > b ? a : b))
+        .toISOString()
+        .split("T")[0]
+        .replace(/-/g, "/");
+      if (modifiedAt != nextModifiedAt) {
+        modifiedAt += ` - ${nextModifiedAt}`;
+      }
+    }
+  }
+
+  return {
+    name,
+    path: folderPath,
+    deep: deepRead,
+    sortTotal,
+    picTotal,
+    sizeTotal,
+    sizeRange,
+    resolution,
+    picType,
+    createdAt,
+    modifiedAt,
+  };
+};
+
+export { generateErrorLog, checkPathsExist, filterImages, getFolderInfo };

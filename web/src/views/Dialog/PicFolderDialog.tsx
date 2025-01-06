@@ -670,6 +670,7 @@ const PicFolderDialog: React.FC<PicFolderDialogProps> = ({ show, hide }) => {
                     ></SvgIcon>
                     <div className="picfolderdialog-form-item-main-path">
                       <TextOverflow
+                        truncatePosition="middle"
                         text={
                           editingPicFolderConfig.folderPath
                             ? editingPicFolderConfig.folderPath

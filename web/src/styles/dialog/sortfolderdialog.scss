@@ -73,8 +73,18 @@
           .sortfolderdialog-form-item-main-path {
             color: var(--color-white6);
             margin-left: 12px;
-            max-width: 80%;
-            text-decoration: underline;
+            max-width: 85%;
+            position: relative;
+            &::after {
+              content: "";
+              position: absolute;
+              bottom: 1px; /* 位置 */
+              left: 0;
+              right: 0;
+              height: 1.5px; /* 下划线粗细 */
+              background-color: var(--color-white6); /* 下划线颜色 */
+              pointer-events: none;
+            }
           }
         }
         .sortfolderdialog-form-item-tip {

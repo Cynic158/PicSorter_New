@@ -26,6 +26,9 @@ const generateErrorLog = (error: Error | unknown) => {
 };
 
 const getFileSize = (size: number): string => {
+  if (size == 0) {
+    return "0 KB";
+  }
   const units: Array<sizeType> = ["B", "KB", "MB", "GB"];
   let unitIndex = 0;
 

@@ -32,7 +32,10 @@ declare global {
       Sort_setPicFolderPath: (
         config: PicFolderConfigType
       ) => Promise<{ success: boolean; data: string }>;
-      Sort_getPicFolderInfo: () => void;
+      Sort_getPicFolderInfo: () => Promise<{
+        success: boolean;
+        data: FolderInfoType | string;
+      }>;
       Sort_openPicFolder: () => Promise<{ success: boolean; data: string }>;
       Sort_getSortFolder: () => Promise<{
         success: boolean;
@@ -44,7 +47,10 @@ declare global {
       Sort_setSortFolderPath: (
         config: SortFolderConfigType
       ) => Promise<{ success: boolean; data: string }>;
-      Sort_getSortFolderInfo: () => void;
+      Sort_getSortFolderInfo: () => Promise<{
+        success: boolean;
+        data: FolderInfoType | string;
+      }>;
       Sort_openSortFolder: () => Promise<{ success: boolean; data: string }>;
     };
   }
@@ -191,6 +197,20 @@ declare global {
   interface SortFolderConfigType {
     folderPath: string;
     sortType: SortType;
+  }
+
+  interface FolderInfoType {
+    name: string;
+    path: string;
+    deep: boolean;
+    sortTotal: number;
+    picTotal: number;
+    sizeTotal: number | string;
+    sizeRange: Array<number> | string;
+    resolution: string;
+    picType: Array<picType> | string;
+    createdAt: string;
+    modifiedAt: string;
   }
 }
 

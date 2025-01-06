@@ -16,6 +16,7 @@ const picHandler = (
   const picConfigPath = pathManager.picConfigPath;
   const sortConfigPath = pathManager.sortConfigPath;
 
+  // 获取图片列表
   ipcMain.handle(
     "Pic_getPicList" as PicApi,
     async (_event, mode: viewType, refresh: boolean, currentPic?: string) => {
