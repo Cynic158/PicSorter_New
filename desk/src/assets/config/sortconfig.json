@@ -1,0 +1,38 @@
+{
+  "picFolderPath": "",
+  "picFolderType": "nameAsc",
+  "deep": false,
+  "selectConfig": {
+    "name": {
+      "type": "all",
+      "value": ""
+    },
+    "size": {
+      "type": "all",
+      "value": 0
+    },
+    "fileType": ["png", "jpg", "gif", "webp"],
+    "resolution": {
+      "width": {
+        "type": "all",
+        "value": 0
+      },
+      "height": {
+        "type": "all",
+        "value": 0
+      }
+    },
+    "createdAt": {
+      "type": "all",
+      "value": 0
+    },
+    "modifiedAt": {
+      "type": "all",
+      "value": 0
+    }
+  },
+  "sortFolderPath": "",
+  "sortFolderType": "nameAsc",
+  "topList": [],
+  "clearList": true
+}

@@ -1,0 +1,318 @@
+.picfolderdialog-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: var(--sortfolderdialog-container-index);
+  background-color: var(--color-black5);
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+  &.show {
+    visibility: visible;
+    opacity: 1;
+    .picfolderdialog-main {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+  &.loading {
+    cursor: wait !important;
+    * {
+      cursor: wait !important;
+    }
+    .picfolderdialog-block {
+      display: block !important;
+    }
+  }
+  .picfolderdialog-main {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    transition: all 0.3s ease;
+    width: 868px;
+    padding: 14px 28px 24px 28px;
+    border-radius: 8px;
+    background-color: var(--color-black6);
+    box-shadow: 0 0 8px 4px rgba($color: #000000, $alpha: 0.2);
+    .picfolderdialog-block {
+      display: none;
+      background-color: transparent;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: var(--picfolderdialog-block-index);
+    }
+    .picfolderdialog-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-white6);
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+    .picfolderdialog-form-container {
+      width: 100%;
+      height: 336px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .picfolderdialog-config-container {
+      width: 456px;
+      height: 100%;
+      padding-bottom: 12px;
+      .picfolderdialog-config {
+        width: 100%;
+        height: 100%;
+        border-radius: 4px;
+        background-color: var(--color-white3);
+        border-left: 4px solid var(--color-blue2);
+        display: flex;
+        flex-direction: column;
+        padding: 8px 12px;
+        .picfolderdialog-config-title {
+          color: var(--color-white2);
+          margin-bottom: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          .picfolderdialog-config-title-btn {
+            color: var(--color-white6);
+            text-decoration: underline;
+            cursor: pointer;
+          }
+        }
+        .picfolderdialog-config-item {
+          display: flex;
+          align-items: center;
+          margin-bottom: 12px;
+          position: relative;
+          &:nth-last-of-type(1) {
+            margin-bottom: 0;
+          }
+          .picfolderdialog-config-item-left {
+            display: flex;
+            align-items: center;
+            height: 28px;
+          }
+          .picfolderdialog-config-item-right {
+            display: flex;
+            align-items: center;
+            position: absolute;
+            left: 160px;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateX(-8px);
+            transition: all 0.3s ease;
+            &.show {
+              visibility: visible;
+              opacity: 1;
+              transform: translateX(0);
+            }
+            .picfolderdialog-config-item-unit {
+              color: var(--color-white2);
+              text-decoration: underline;
+              margin-left: 4px;
+              width: 25px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .picfolderdialog-config-item-tag {
+              height: 28px;
+              padding: 0 12px;
+              margin-right: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 4px;
+              color: var(--color-black12);
+              background-color: var(--color-black11);
+              transition: color 0.3s ease, background-color 0.3s ease,
+                transform 0.2s ease;
+              cursor: pointer;
+              user-select: none;
+              &.active {
+                color: var(--color-white2);
+                background-color: var(--color-black6);
+              }
+              &:active {
+                transform: scale(0.8);
+              }
+            }
+          }
+          .picfolderdialog-config-item-label {
+            color: var(--color-white2);
+            margin-right: 8px;
+          }
+          .picfolderdialog-config-item-type {
+            color: var(--color-white6);
+            text-decoration: underline;
+            margin-right: 8px;
+          }
+          .picfolderdialog-config-item-sep {
+            color: var(--color-white6);
+            margin: 0 8px;
+          }
+        }
+      }
+    }
+    .picfolderdialog-form {
+      width: 340px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      .picfolderdialog-form-item {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        background-color: var(--color-white3);
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin-bottom: 12px;
+        border-left: 4px solid var(--color-blue2);
+        .picfolderdialog-form-item-label {
+          color: var(--color-white2);
+          margin-bottom: 4px;
+        }
+        .picfolderdialog-form-item-main {
+          display: flex;
+          align-items: center;
+          width: fit-content;
+          cursor: pointer;
+          &.padding {
+            padding-left: 3px;
+            .picfolderdialog-form-item-main-path {
+              margin-left: 15px;
+            }
+          }
+          .picfolderdialog-form-item-main-path {
+            color: var(--color-white6);
+            margin-left: 12px;
+            max-width: 85%;
+            position: relative;
+            &::after {
+              content: "";
+              position: absolute;
+              bottom: 1px; /* 位置 */
+              left: 0;
+              right: 0;
+              height: 1.5px; /* 下划线粗细 */
+              background-color: var(--color-white6); /* 下划线颜色 */
+              pointer-events: none;
+            }
+          }
+          .picfolderdialog-form-item-switch {
+            display: flex;
+            align-items: center;
+            margin-left: 12px;
+          }
+        }
+        .picfolderdialog-form-item-tip {
+          margin-top: 12px;
+          font-size: 14px;
+          color: var(--color-white7);
+          border-top: 1px solid var(--color-white7);
+          padding-top: 4px;
+          text-align: justify;
+        }
+      }
+    }
+    .picfolderdialog-btn {
+      width: 100%;
+      height: 36px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--color-blue2);
+      color: var(--color-white2);
+      transition: all 0.2s ease;
+      margin-top: 8px;
+      position: relative;
+      &:hover {
+        background-color: var(--color-blue4);
+      }
+      &:active {
+        background-color: var(--color-blue3);
+      }
+      &.loading {
+        background-color: var(--color-blue3) !important;
+        cursor: wait;
+        .picfolderdialog-btn-text {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        .picfolderdialog-btn-loading {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+      .picfolderdialog-btn-text {
+        transform: scale(1);
+        transition: all 0.3s ease;
+      }
+      .picfolderdialog-btn-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0.5);
+        z-index: var(--sortfolderdialog-btn-loading-index);
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+    }
+    .picfolderdialog-form-item-select {
+      position: absolute;
+      left: 32px;
+      top: 234px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      width: 168px;
+      border-radius: 6px;
+      padding: 4px;
+      padding-bottom: 2px;
+      background-color: var(--color-black7);
+      z-index: var(--sortfolderdialog-form-item-main-path-select-index);
+      transform-origin: top center;
+      transition: all 0.3s ease;
+      visibility: hidden;
+      opacity: 0;
+      &.show {
+        top: 244px;
+        visibility: visible;
+        opacity: 1;
+      }
+      .picfolderdialog-form-item-select-item {
+        width: 100%;
+        height: 28px;
+        line-height: 28px;
+        border-radius: 4px;
+        color: var(--color-white6);
+        text-align: center;
+        padding-right: 2px;
+        transition: background-color 0.3s ease, padding-left 0.3s ease;
+        user-select: none;
+        margin-bottom: 2px;
+        cursor: pointer;
+        &:hover {
+          background-color: var(--color-white3);
+          padding-left: 4px;
+        }
+        &.active {
+          background-color: var(--color-white3);
+        }
+      }
+    }
+  }
+}

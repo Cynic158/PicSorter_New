@@ -6,13 +6,14 @@
   "author": "cynic",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node copy.js",
     "start": "nodemon",
     "app:dist": "yarn build && electron-builder"
   },
   "devDependencies": {
     "@types/electron": "^1.6.12",
     "@types/express": "^5.0.0",
+    "@types/lodash": "^4.17.13",
     "@types/node": "^22.10.1",
     "electron": "^26.1.0",
     "electron-builder": "^24.6.4",
@@ -20,8 +21,10 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "exiftool-vendored": "^29.0.0",
     "express": "^4.18.2",
-    "image-size": "^1.0.2",
+    "image-size": "^1.2.0",
+    "lodash": "^4.17.21",
     "wrap-ansi": "7.0.0"
   },
   "build": {

@@ -3,8 +3,46 @@
   width: var(--controler-container-width);
   background-color: var(--color-black1);
   box-shadow: -6px 0 8px 2px rgba($color: #000000, $alpha: 0.2);
+  transition: width 0.5s ease;
+  overflow: hidden;
+  position: relative;
+  .controler-fold-container {
+    position: absolute;
+    z-index: var(--controler-sort-fold-container-index);
+    left: -12px;
+    top: 50%;
+    background-color: var(--color-black4);
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(0, -50%) rotate(45deg) scale(1);
+    transition: all 0.5s ease;
+    cursor: pointer;
+    opacity: 0.6;
+    &.hide {
+      transform: translate(-100%, -50%) rotate(45deg) scale(1);
+    }
+    &:hover {
+      opacity: 1;
+      transform: translate(0, -50%) rotate(45deg) scale(1.2);
+    }
+    .controler-fold {
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 8px;
+      margin-bottom: 8px;
+    }
+  }
+  &.hide {
+    width: 0;
+  }
   .controler-header-container {
-    width: 100%;
+    width: var(--controler-container-width);
     height: var(--controler-header-container-height);
     display: flex;
     align-items: center;
@@ -23,6 +61,31 @@
         width: 32px;
         height: 32px;
         position: relative;
+        cursor: pointer;
+        transform: scale(1);
+        transition: all 0.2s ease;
+        &.disabled {
+          transform: scale(1) !important;
+          .controler-header-item-bg {
+            background-color: transparent !important;
+          }
+          cursor: not-allowed;
+          * {
+            cursor: not-allowed !important;
+          }
+          .controler-header-item-icon {
+            opacity: 0.4;
+          }
+        }
+        &:hover {
+          .controler-header-item-bg {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        &:active {
+          transform: scale(0.9);
+        }
         .controler-header-item-bg {
           width: 100%;
           height: 100%;
@@ -31,11 +94,8 @@
           opacity: 0;
           transform: scale(0);
           transition: all 0.2s ease;
-        }
-        &:hover {
-          .controler-header-item-bg {
-            opacity: 1;
-            transform: scale(1);
+          &.delete {
+            background-color: var(--color-red3);
           }
         }
         .controler-header-item-icon {
@@ -46,88 +106,69 @@
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: all 0.2s ease;
         }
       }
     }
   }
   .controler-sort-container {
-    width: 100%;
+    width: var(--controler-container-width);
     height: calc(
       100% - var(--controler-header-container-height) -
         var(--controler-btn-container-height)
     );
-    overflow-x: hidden;
-    position: relative;
-    .controler-sort-fold-container {
-      position: absolute;
-      z-index: var(--controler-sort-fold-container-index);
-      left: -12px;
-      top: calc(50% + calc(var(--controler-header-container-height) / 2));
-      background-color: var(--color-black4);
-      width: 30px;
-      height: 30px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transform: translateY(-50%) rotate(45deg);
-      transition: all 0.2s ease;
-      cursor: pointer;
-      opacity: 0.6;
-      &:hover {
-        opacity: 1;
-      }
-      .controler-sort-fold {
-        transform: rotate(-45deg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: 8px;
-        margin-bottom: 8px;
-      }
-    }
     .controler-sort {
       width: 100%;
       height: 100%;
       overflow-y: scroll;
-      padding-top: 12px;
+      padding-top: 4px;
+      border-right: 4px solid var(--color-white6);
+      @keyframes controlerSortItemContainerAni {
+        from {
+          transform: translateX(100%);
+        }
+        to {
+          transform: translateX(12px);
+        }
+      }
       .controler-sort-item-container {
-        width: calc(100% - 24px);
+        width: calc(100% - 12px);
         height: 60px;
         float: right;
-        margin-bottom: 12px;
+        margin-bottom: 4px;
         background-color: var(--color-white5);
-        border-radius: 4px 0 0 4px;
         border-left: 2px solid transparent;
         border-top: 2px solid transparent;
         border-bottom: 2px solid transparent;
-        border-right: 4px solid var(--color-white2);
         overflow: hidden;
         position: relative;
         transition: all 0.3s ease;
         cursor: pointer;
+        animation: controlerSortItemContainerAni 0.5s ease;
+        transform: translateX(12px);
         &:hover {
           width: calc(100% - 12px);
-          border-left: 2px solid var(--color-blue4);
-          border-top: 2px solid var(--color-blue4);
-          border-bottom: 2px solid var(--color-blue4);
+          transform: translateX(0);
+          border-left: 2px solid var(--color-blue4) !important;
+          border-top: 2px solid var(--color-blue4) !important;
+          border-bottom: 2px solid var(--color-blue4) !important;
           .controler-sort-item-bg {
             left: -200%;
           }
         }
         &.active {
-          border-left: 2px solid var(--color-green2);
-          border-top: 2px solid var(--color-green2);
-          border-bottom: 2px solid var(--color-green2);
+          border-left: 2px solid var(--color-blue3);
+          border-top: 2px solid var(--color-blue3);
+          border-bottom: 2px solid var(--color-blue3);
           .controler-sort-item-bg {
-            left: -400%;
+            left: -200%;
           }
         }
         .controler-sort-item-bg {
           position: absolute;
           left: 0;
           top: 0;
-          width: 500%;
+          width: 300%;
           height: 100%;
           transition: all 0.3s ease;
           background: linear-gradient(
@@ -135,9 +176,7 @@
             transparent,
             transparent,
             var(--color-blue3),
-            var(--color-blue3),
-            var(--color-green2),
-            var(--color-green2)
+            var(--color-blue3)
           );
         }
         .controler-sort-item {
@@ -165,14 +204,43 @@
               align-items: center;
               justify-content: space-between;
               max-width: 70%;
+              position: relative;
+              .icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%) scale(0.5);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                &.active {
+                  transform: translateY(-50%) scale(1);
+                  opacity: 1;
+                  visibility: visible;
+                }
+                &.selected {
+                  z-index: var(
+                    --controler-sort-item-top-left-icon-selected-index
+                  );
+                }
+                &.select {
+                  z-index: var(
+                    --controler-sort-item-top-left-icon-select-index
+                  );
+                }
+              }
               .name {
-                margin-left: 8px;
+                margin-left: 28px;
                 color: var(--color-white2);
               }
             }
             .controler-sort-item-top-right {
               display: flex;
               align-items: center;
+              margin-right: 12px;
               .top {
                 display: flex;
                 align-items: center;
@@ -189,7 +257,7 @@
             width: calc(100% - 32px);
             margin-left: 32px;
             margin-bottom: -2px;
-            padding-right: 12px;
+            padding-right: 24px;
             border-top: 1px solid var(--color-white5);
             color: var(--color-white4);
             font-size: 14px;
@@ -199,7 +267,7 @@
     }
   }
   .controler-btn-container {
-    width: 100%;
+    width: var(--controler-container-width);
     height: var(--controler-btn-container-height);
     background-color: var(--color-black4);
     padding: 12px;
@@ -208,6 +276,12 @@
       height: 100%;
       display: flex;
       align-items: center;
+      .controler-btn-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
       .controler-btn-left {
         display: flex;
         flex-direction: column;
@@ -224,13 +298,19 @@
           height: 60px;
           border-radius: 6px;
           background-color: var(--color-blue2);
-          transition: all 0.2s ease;
+          transition: transform 0.2s ease, background-color 0.3s ease;
           &:hover {
             background-color: var(--color-blue4);
+            .controler-btn-icon {
+              transform: scale(1.2);
+            }
           }
           &:active {
             background-color: var(--color-blue3);
             transform: scale(0.8);
+            .controler-btn-icon {
+              transform: scale(1);
+            }
           }
         }
       }
@@ -250,17 +330,23 @@
             height: 100%;
             width: calc(100% - 60px);
             border-radius: 4px 0 0 4px;
-            border-right: 2px solid var(--color-white2);
+            border-right: 2px solid var(--color-white8);
             background-color: var(--color-green2);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             &:hover {
               background-color: var(--color-green1);
+              .controler-btn-icon {
+                transform: scale(1.2);
+              }
             }
             &:active {
               background-color: var(--color-green3);
+              .controler-btn-icon {
+                transform: scale(1);
+              }
             }
           }
           .controler-btn-right-item-right {
@@ -271,12 +357,28 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             &:hover {
               background-color: var(--color-green1);
+              .controler-btn-icon {
+                transform: scale(1.2);
+              }
             }
             &:active {
               background-color: var(--color-green3);
+              .controler-btn-icon {
+                transform: scale(1);
+              }
+            }
+            &.disabled {
+              cursor: not-allowed;
+              * {
+                cursor: not-allowed !important;
+              }
+              background-color: var(--color-green2) !important;
+              .controler-btn-icon {
+                transform: scale(1) !important;
+              }
             }
           }
           .controler-btn-right-item-delete {
@@ -287,13 +389,19 @@
             justify-content: center;
             border-radius: 4px;
             background-color: var(--color-red3);
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, background-color 0.3s ease;
             &:hover {
               background-color: var(--color-red2);
+              .controler-btn-icon {
+                transform: scale(1.2);
+              }
             }
             &:active {
               background-color: var(--color-red4);
-              transform: scale(0.8);
+              transform: scale(0.85);
+              .controler-btn-icon {
+                transform: scale(1);
+              }
             }
           }
         }

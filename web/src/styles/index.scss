@@ -62,3 +62,120 @@ span,
 p {
   user-select: none;
 }
+
+// 防止拼写检查
+input {
+  text-decoration: none; /* 去除下划线 */
+}
+
+// 日期选择器
+.flatpickr-current-month {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: row-reverse !important;
+}
+.flatpickr-weekday {
+  color: var(--color-black10) !important;
+}
+.flatpickr-days {
+  margin-top: 4px !important;
+}
+.flatpickr-day {
+  border-radius: 4px !important;
+  color: var(--color-white2) !important;
+  border: 1px solid transparent !important;
+  transition: all 0.2s ease !important;
+  &.nextMonthDay,
+  &.prevMonthDay {
+    color: var(--color-black3) !important;
+    &.selected {
+      color: var(--color-white2) !important;
+    }
+  }
+  &.today {
+    background-color: var(--color-white3) !important;
+    color: var(--color-white2) !important;
+    &.selected {
+      background-color: var(--color-blue5) !important;
+    }
+  }
+  &:hover:not(.selected) {
+    background-color: var(--color-white3) !important;
+    &.nextMonthDay,
+    &.prevMonthDay {
+      color: var(--color-white2) !important;
+    }
+  }
+}
+.flatpickr-innerContainer {
+  background-color: var(--color-black9) !important;
+  border-radius: 0 0 5px 5px;
+}
+.flatpickr-calendar.arrowBottom:after,
+.flatpickr-calendar.arrowBottom::before {
+  border: none !important;
+}
+.flatpickr-current-month
+  .flatpickr-monthDropdown-months
+  .flatpickr-monthDropdown-month {
+  font-size: 14px !important;
+  background-color: var(--color-white6) !important;
+}
+.flatpickr-current-month span.cur-month {
+  font-weight: 500 !important;
+  &:hover {
+    background-color: transparent !important;
+  }
+}
+@-webkit-keyframes fpFadeOutDown {
+  from {
+    visibility: visible;
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transform: translate3d(0, -20px, 0);
+    transform: translate3d(0, -20px, 0);
+  }
+}
+@keyframes fpFadeOutDown {
+  from {
+    visibility: visible;
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transform: translate3d(0, -20px, 0);
+    transform: translate3d(0, -20px, 0);
+  }
+}
+.flatpickr-calendar.animate:not(.open) {
+  -webkit-animation: fpFadeOutDown 300ms cubic-bezier(0.23, 1, 0.32, 1) !important;
+  animation: fpFadeOutDown 300ms cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+.flatpickr-calendar {
+  display: block !important;
+  // visibility: visible !important;
+}
+.form-control {
+  background-color: var(--color-black6);
+  height: 28px;
+  border-radius: 2px;
+  transition: border-bottom 0.3s ease;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 2px 12px 0 12px;
+  width: 120px;
+  color: var(--color-white2);
+  text-align: center;
+  &.active {
+    border-bottom: 2px solid var(--color-blue2);
+  }
+}

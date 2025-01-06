@@ -11,11 +11,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "flatpickr": "^4.6.13",
     "lodash": "^4.17.21",
     "mobx": "^6.12.0",
     "mobx-react": "^9.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-flatpickr": "^3.10.13",
     "react-text-overflow": "^1.0.2",
     "react-zoom-pan-pinch": "^3.6.1"
   },
@@ -24,6 +26,7 @@
     "@types/lodash": "^4.14.202",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@types/react-flatpickr": "^3.8.11",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "eslint": "^9.15.0",
     "eslint-plugin-react-hooks": "^5.0.0",

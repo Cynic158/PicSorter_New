@@ -4,31 +4,59 @@
   --color-white2: #efefef;
   --color-white3: rgba(239, 239, 239, 0.15);
   --color-white4: rgba(239, 239, 239, 0.45);
-  --color-white5: rgba(239, 239, 239, 0.2);
+  --color-white5: rgba(239, 239, 239, 0.15);
+  --color-white6: #c0c0c0;
+  --color-white7: #ababab;
+  --color-white8: #d5d5d5;
+  --color-white9: rgba(239, 239, 239, 0.1);
 
   --color-black1: #4c4c4c;
   --color-black2: #353535;
   --color-black3: #777777;
   --color-black4: #404040;
+  --color-black5: rgba(0, 0, 0, 0.3);
+  --color-black6: rgba(76, 76, 76, 0.8);
+  --color-black7: rgba(76, 76, 76, 0.9);
+  --color-black8: #a7a7a7;
+  --color-black9: rgba(90, 90, 90, 0.8);
+  --color-black10: rgba(0, 0, 0, 0.4);
+  --color-black11: rgba(76, 76, 76, 0.5);
+  --color-black12: #908e8e;
 
   --color-blue1: #00a6ff;
   --color-blue2: rgba(0, 166, 255, 0.7);
   --color-blue3: rgba(0, 166, 255, 0.5);
   --color-blue4: rgba(0, 166, 255, 0.9);
+  --color-blue5: #42a5f5;
 
   --color-green1: rgba(46, 206, 35, 0.9);
   --color-green2: rgba(46, 206, 35, 0.7);
   --color-green3: rgba(46, 206, 35, 0.5);
+  --color-green4: #007f00;
+  --color-green5: rgba(180, 252, 144, 0.6);
 
   --color-red1: #d33d38;
   --color-red2: rgba(211, 61, 56, 0.9);
   --color-red3: rgba(211, 61, 56, 0.7);
   --color-red4: rgba(211, 61, 56, 0.5);
+  --color-red5: rgba(255, 140, 140, 0.6);
+  --color-red6: #d30000;
+  --color-red7: rgba(211, 61, 56, 0.3);
 
   /* 层级变量 */
   --header-container-index: 3;
   --controler-sort-fold-container-index: 2;
   --controler-sort-item-index: 2;
+  --controler-sort-item-top-left-icon-selected-index: 2;
+  --controler-sort-item-top-left-icon-select-index: 3;
+  --viewer-controler-unfold-container-index: 3;
+  --sortfolderdialog-container-index: 5;
+  --sortfolderdialog-form-item-main-path-select-index: 6;
+  --sortfolderdialog-btn-loading-index: 2;
+  --picfolderdialog-block-index: 2;
+  --mainfolderdialog-form-item-folder-index: 2;
+  --errordialog-container-index: 95;
+  --message-container-index: 99;
   /* 通用变量 */
   /* 组件变量 */
   /* 页面变量 */
