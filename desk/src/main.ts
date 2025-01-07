@@ -1,14 +1,44 @@
 import { app, BrowserWindow, Tray } from "electron";
 import { cloneDeep } from "lodash";
 import ipcHandler from "./ipcHandler";
-// import fs from "fs";
+import fs from "fs";
 import path from "path";
 import pathManager from "./utils/path";
-// import express from "express";
+import express from "express";
 
 // 获取要读取的pic目录路径
 const appPath = app.getAppPath();
 const iconPath = pathManager.iconPath;
+const sortConfigPath = pathManager.sortConfigPath;
+const webDistPath = pathManager.webDistPath;
+
+// 先提供一个无效默认的地址
+let picStaticPath = path.resolve(appPath, "./pic");
+// 读取未分类存储文件夹路径
+const configPath = path.resolve(appPath, sortConfigPath);
+// 读取当前配置文件内容
+const fileContent = fs.readFileSync(configPath, "utf-8");
+// 解析JSON内容
+const config: SortConfig = JSON.parse(fileContent);
+if (config.picFolderPath) {
+  // 更换为配置文件中的图片本地地址
+  picStaticPath = config.picFolderPath;
+}
+
+const server = express();
+// 应用ui地址
+const distPath = path.resolve(appPath, webDistPath);
+// 挂载应用ui
+server.use(express.static(distPath));
+// 挂载图片本地服务器
+// server.use("/pic", express.static(picStaticPath));
+// 动态挂载静态资源
+server.use("/pic", (req, res, next) => {
+  express.static(picStaticPath)(req, res, next);
+});
+server.listen(7777, "127.0.0.1", () => {
+  console.log("本地服务器挂载: http://127.0.0.1:7777");
+});
 
 let mainWindow: BrowserWindow;
 
@@ -31,7 +61,8 @@ function createMainWindow() {
   });
 
   // 加载应用的ui
-  mainWindow.loadURL("http://localhost:5173/");
+  mainWindow.loadURL("http://127.0.0.1:5173/");
+  // mainWindow.loadURL("http://127.0.0.1:7777/");
 
   // 打开开发者工具（可选）
   // mainWindow.webContents.openDevTools();
@@ -53,8 +84,21 @@ function createMainWindow() {
   const setPicListSave = (list: Array<PicInfo>) => {
     picListSave = cloneDeep(list);
   };
+
+  // 图片服务器重启方法
+  const resetPicStatic = async (picFolderPath: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      try {
+        picStaticPath = picFolderPath;
+        resolve(true);
+      } catch (_error) {
+        resolve(false);
+      }
+    });
+  };
+
   // 导入ipc通信主入口
-  ipcHandler(mainWindow, getPicListSave, setPicListSave);
+  ipcHandler(mainWindow, getPicListSave, setPicListSave, resetPicStatic);
 
   function createTray(mainWindow: BrowserWindow) {
     const tray = new Tray(path.resolve(appPath, iconPath));

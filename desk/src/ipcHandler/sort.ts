@@ -8,8 +8,7 @@ import fs from "fs";
 import path from "path";
 import pathManager from "../utils/path";
 
-// const sortHandler = (resetPicServer: resetPicServerType) => {
-const sortHandler = () => {
+const sortHandler = (resetPicStatic: ResetPicStaticType) => {
   const appPath = app.getAppPath();
   const sortConfigPath = pathManager.sortConfigPath;
 
@@ -92,11 +91,21 @@ const sortHandler = () => {
           JSON.stringify(config, null, 2),
           "utf-8"
         );
-        // 设置完成
-        return {
-          success: true,
-          data: "",
-        };
+
+        let serverRes = await resetPicStatic(folderConfig.folderPath);
+        if (serverRes) {
+          // 设置完成
+          return {
+            success: true,
+            data: "",
+          };
+        } else {
+          // 设置失败
+          return {
+            success: false,
+            data: "设置本地图片服务器时出错",
+          };
+        }
       } catch (error) {
         // 编写错误报告
         let errorLog = generateErrorLog(error);

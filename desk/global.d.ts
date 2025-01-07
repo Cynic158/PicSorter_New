@@ -40,7 +40,7 @@ declare global {
   }
 
   // sort部分
-  type ResetPicServerType = (picFolderPath: string) => boolean;
+  type ResetPicStaticType = (picFolderPath: string) => Promise<boolean>;
 
   type SortTypeForPic =
     | "nameAsc" // 名称递增: a-z
