@@ -29,6 +29,22 @@ const Pic_getPicList = async (
   );
   return res;
 };
+const Pic_renamePic = async (renamePath: string, newName: string) => {
+  const res = await ipcRenderer.invoke(
+    "Pic_renamePic" as PicApi,
+    renamePath,
+    newName
+  );
+  return res;
+};
+const Pic_getPicInfo = async (picPath: string) => {
+  const res = await ipcRenderer.invoke("Pic_getPicInfo" as PicApi, picPath);
+  return res;
+};
+const Pic_showPic = async (picPath: string) => {
+  const res = await ipcRenderer.invoke("Pic_showPic" as PicApi, picPath);
+  return res;
+};
 
 // sortipc
 const Sort_getPicFolder = () => {
@@ -89,6 +105,9 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Win_max,
   Win_copy,
   Pic_getPicList,
+  Pic_renamePic,
+  Pic_getPicInfo,
+  Pic_showPic,
   Sort_getPicFolder,
   Sort_getPicFolderPath,
   Sort_setPicFolderPath,

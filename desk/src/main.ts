@@ -14,6 +14,7 @@ const webDistPath = pathManager.webDistPath;
 
 // 先提供一个无效默认的地址
 let picStaticPath = path.resolve(appPath, "./pic");
+let sortStaticPath = path.resolve(appPath, "./sort");
 // 读取未分类存储文件夹路径
 const configPath = path.resolve(appPath, sortConfigPath);
 // 读取当前配置文件内容
@@ -23,6 +24,9 @@ const config: SortConfig = JSON.parse(fileContent);
 if (config.picFolderPath) {
   // 更换为配置文件中的图片本地地址
   picStaticPath = config.picFolderPath;
+}
+if (config.sortFolderPath) {
+  sortStaticPath = config.sortFolderPath;
 }
 
 const server = express();
@@ -36,8 +40,11 @@ server.use(express.static(distPath));
 server.use("/pic", (req, res, next) => {
   express.static(picStaticPath)(req, res, next);
 });
+server.use("/sort", (req, res, next) => {
+  express.static(sortStaticPath)(req, res, next);
+});
 server.listen(7777, "127.0.0.1", () => {
-  console.log("本地服务器挂载: http://127.0.0.1:7777");
+  console.log("local server start at: http://127.0.0.1:7777");
 });
 
 let mainWindow: BrowserWindow;

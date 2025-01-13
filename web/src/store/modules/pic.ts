@@ -3,9 +3,23 @@ import winStore from "./win";
 import { generateErrorLog } from "../../utils";
 import PicApi from "../../api/pic";
 import sortStore from "./sort";
+import { cloneDeep } from "lodash";
+import { picStaticPath, sortStaticPath } from "../../utils/config";
 
 const picStore = observable(
   {
+    getPicUrl(picPath: string, folder: "pic" | "sort") {
+      let picUrl = "";
+      if (folder == "pic") {
+        let rootPath = sortStore.picFolderConfig.folderPath;
+        picUrl = picStaticPath + picPath.replace(rootPath, "");
+      } else {
+        let rootPath = sortStore.sortFolderConfig.folderPath;
+        picUrl = sortStaticPath + picPath.replace(rootPath, "");
+      }
+      picUrl = picUrl.replace(/\\/g, "/");
+      return picUrl;
+    },
     viewMode: "view" as viewType,
     setViewMode(mode: viewType) {
       this.viewMode = mode;
@@ -56,6 +70,118 @@ const picStore = observable(
       }
     },
 
+    // 图片重命名
+    renamePicLoading: false,
+    setRenamePicLoading(bool: boolean) {
+      this.renamePicLoading = bool;
+    },
+    async renamePic(newName: string) {
+      let funcAction = "重命名图片";
+      try {
+        this.setRenamePicLoading(true);
+        let res = await PicApi.renamePic(this.picList[1]!.path, newName);
+        if (res.success) {
+          // 看看有没有冲突
+          if (res.conflict) {
+            // 冲突了
+            return {
+              success: true,
+              conflict: true,
+              conflictData: res.data as ConflictDataType,
+            };
+          } else {
+            // 无冲突，执行完成
+            let cloneList = cloneDeep(this.picList);
+            cloneList[1] = res.data as PicInfo;
+            this.setPicList(cloneList);
+            return {
+              success: true,
+              conflict: false,
+            };
+          }
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return {
+            success: false,
+            conflict: false,
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          success: false,
+          conflict: false,
+        };
+      } finally {
+        this.setRenamePicLoading(false);
+      }
+    },
+
+    // 获取图片详细信息
+    getPicInfoLoading: false,
+    setGetPicInfoLoading(bool: boolean) {
+      this.getPicInfoLoading = bool;
+    },
+    async getPicInfo() {
+      if (
+        this.picList[1]?.dpi === undefined ||
+        this.picList[1].dpi === null ||
+        this.picList[1].bitDepth === undefined ||
+        this.picList[1].bitDepth === null
+      ) {
+        let funcAction = "获取图片dpi和位深度";
+        const resetList = (dpi: number, bitDepth: number) => {
+          let cloneList = cloneDeep(this.picList);
+          cloneList[1]!.dpi = dpi;
+          cloneList[1]!.bitDepth = bitDepth;
+          this.setPicList(cloneList);
+        };
+        try {
+          this.setGetPicInfoLoading(true);
+          let res = await PicApi.getPicInfo(this.picList[1]!.path);
+          if (res.success) {
+            resetList(
+              (res.data as PicInfoDataType).dpi,
+              (res.data as PicInfoDataType).bitDepth
+            );
+            return true;
+          } else {
+            // 报错
+            winStore.setErrorDialog(res.data as string, funcAction);
+            resetList(-1, -1);
+            return false;
+          }
+        } catch (error) {
+          // 报错
+          let log = generateErrorLog(error);
+          winStore.setErrorDialog(log, funcAction);
+          resetList(-1, -1);
+          return false;
+        } finally {
+          this.setGetPicInfoLoading(false);
+        }
+      }
+    },
+
+    // 打开图片所在位置
+    async showPic() {
+      let funcAction = "打开图片所在位置";
+      try {
+        let res = await PicApi.showPic(this.picList[1]!.path);
+        if (!res.success) {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+      }
+    },
+
     selectingPicList: [],
     setSelectingPicList() {},
     clearSelectingPicList() {
@@ -63,11 +189,17 @@ const picStore = observable(
     },
   },
   {
+    getPicUrl: action,
     setViewMode: action,
     setPicTotal: action,
     setPicList: action,
     setPicListLoading: action,
     getPicList: action,
+    setRenamePicLoading: action,
+    renamePic: action,
+    setGetPicInfoLoading: action,
+    getPicInfo: action,
+    showPic: action,
     setSelectingPicList: action,
     clearSelectingPicList: action,
   }

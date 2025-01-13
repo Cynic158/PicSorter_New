@@ -67,4 +67,49 @@ const getFileSizeNumber = (size: string, unit: sizeType) => {
   return Math.round(sizeInBytes);
 };
 
-export { generateErrorLog, getFileSize, getFileSizeArr, getFileSizeNumber };
+const getAdaptiveResolution = (
+  targetWidth: [number, number],
+  targetHeight: [number, number],
+  currentWidth: number,
+  currentHeight: number
+): [string, string] => {
+  // 初步计算宽高比例
+  const widthRatio = targetWidth[1] / currentWidth;
+  const heightRatio = targetHeight[1] / currentHeight;
+  const initialScale = Math.min(widthRatio, heightRatio);
+
+  // 初步缩放结果
+  let scaledWidth = currentWidth * initialScale;
+  let scaledHeight = currentHeight * initialScale;
+
+  // 检查是否需要再次缩放
+  if (scaledWidth > targetWidth[1]) {
+    const adjustmentScale = targetWidth[1] / scaledWidth;
+    scaledWidth = targetWidth[1];
+    scaledHeight *= adjustmentScale;
+  } else if (scaledHeight > targetHeight[1]) {
+    const adjustmentScale = targetHeight[1] / scaledHeight;
+    scaledHeight = targetHeight[1];
+    scaledWidth *= adjustmentScale;
+  }
+
+  // 应用最小宽高限制
+  scaledWidth = Math.max(scaledWidth, targetWidth[0]);
+  scaledHeight = Math.max(scaledHeight, targetHeight[0]);
+
+  return [`${Math.round(scaledWidth)}px`, `${Math.round(scaledHeight)}px`];
+};
+
+const getFileTime = (time: number) => {
+  let date = new Date(time);
+  return date.toISOString().split("T")[0].replace(/-/g, "/");
+};
+
+export {
+  generateErrorLog,
+  getFileSize,
+  getFileSizeArr,
+  getFileSizeNumber,
+  getAdaptiveResolution,
+  getFileTime,
+};

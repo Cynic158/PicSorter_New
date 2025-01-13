@@ -1,6 +1,5 @@
 # 备注
 
-* initdesk使用loadinggif
 * 已丢失的图片如果删除，直接返回成功
 
 

@@ -83,4 +83,7 @@ const sortTypeForPic: {
   },
 };
 
-export { sortType, sortTypeForPic };
+const picStaticPath = "http://127.0.0.1:7777/pic";
+const sortStaticPath = "http://127.0.0.1:7777/sort";
+
+export { sortType, sortTypeForPic, picStaticPath, sortStaticPath };

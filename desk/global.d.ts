@@ -1,7 +1,11 @@
 declare global {
   // Api类型
   type WinApi = "Win_quit" | "Win_hide" | "Win_max" | "Win_copy";
-  type PicApi = "Pic_getPicList";
+  type PicApi =
+    | "Pic_getPicList"
+    | "Pic_renamePic"
+    | "Pic_getPicInfo"
+    | "Pic_showPic";
   type SortApi =
     | "Sort_getPicFolder"
     | "Sort_getPicFolderPath"
@@ -33,7 +37,6 @@ declare global {
     createdAt: number;
     modifiedAt: number;
     path: string;
-    exist: boolean;
   };
   interface PicConfig {
     picLoadLimit: number;
