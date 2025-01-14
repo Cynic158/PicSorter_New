@@ -2,6 +2,11 @@ import "../../styles/layout/viewer.scss";
 import { Observer } from "mobx-react";
 import sortStore from "../../store/modules/sort";
 import SvgIcon from "../../components/SvgIcon";
+import EmptyViewer from "../Viewer/EmptyViewer";
+import DefaultViewer from "../Viewer/DefaultViewer";
+import HorizontalViewer from "../Viewer/HorizontalViewer";
+import VerticalViewer from "../Viewer/VerticalViewer";
+import picStore from "../../store/modules/pic";
 
 export default function Viewer() {
   return (
@@ -31,6 +36,27 @@ export default function Viewer() {
               ></SvgIcon>
             </div>
           </div>
+          {picStore.picList.length == 0 || picStore.picList[1] === null ? (
+            <EmptyViewer></EmptyViewer>
+          ) : (
+            <>
+              {picStore.viewMode == "view" ? (
+                <DefaultViewer></DefaultViewer>
+              ) : (
+                <></>
+              )}
+              {picStore.viewMode == "horizontal" ? (
+                <HorizontalViewer></HorizontalViewer>
+              ) : (
+                <></>
+              )}
+              {picStore.viewMode == "vertical" ? (
+                <VerticalViewer></VerticalViewer>
+              ) : (
+                <></>
+              )}
+            </>
+          )}
         </div>
       )}
     </Observer>

@@ -3,7 +3,7 @@
   width: var(--controler-container-width);
   background-color: var(--color-black1);
   box-shadow: -6px 0 8px 2px rgba($color: #000000, $alpha: 0.2);
-  transition: width 0.5s ease;
+  transition: width 0.5s ease, box-shadow 0.5s ease;
   overflow: hidden;
   position: relative;
   .controler-fold-container {
@@ -40,6 +40,7 @@
   }
   &.hide {
     width: 0;
+    box-shadow: -6px 0 8px 2px rgba($color: #000000, $alpha: 0);
   }
   .controler-header-container {
     width: var(--controler-container-width);
