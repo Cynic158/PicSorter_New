@@ -227,6 +227,7 @@ export default function Header() {
               <SvgIcon
                 svgName="setting"
                 svgSize="18px"
+                clickable={true}
                 color="var(--color-white2)"
               ></SvgIcon>
             </li>
@@ -239,6 +240,7 @@ export default function Header() {
               <SvgIcon
                 svgName="minimize"
                 svgSize="16px"
+                clickable={true}
                 color="var(--color-white2)"
               ></SvgIcon>
             </li>
@@ -251,6 +253,7 @@ export default function Header() {
               <SvgIcon
                 svgName="maximize"
                 svgSize="16px"
+                clickable={true}
                 color="var(--color-white2)"
               ></SvgIcon>
             </li>
@@ -263,6 +266,7 @@ export default function Header() {
               <SvgIcon
                 svgName="exit"
                 svgSize="16px"
+                clickable={true}
                 color="var(--color-white2)"
               ></SvgIcon>
             </li>

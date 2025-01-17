@@ -22,7 +22,12 @@ const picHandler = (
   // 获取图片列表
   ipcMain.handle(
     "Pic_getPicList" as PicApi,
-    async (_event, mode: viewType, refresh: boolean, currentPic?: string) => {
+    async (
+      _event,
+      mode: viewType,
+      refresh: boolean,
+      currentPicPath?: string
+    ) => {
       try {
         let config: SortConfig | null = null;
         // 如果需要刷新，读取配置，重新获取一次列表并返回配置
@@ -214,8 +219,8 @@ const picHandler = (
               },
             };
           }
-          // 如果没有提供currentPic，直接提供前三个
-          if (currentPic !== "" && !currentPic) {
+          // 如果没有提供currentPicPath，直接提供前三个
+          if (currentPicPath !== "" && !currentPicPath) {
             let prev = null;
             let now = picList[0];
             let next = picList[1] ? picList[1] : null;
@@ -228,9 +233,9 @@ const picHandler = (
               },
             };
           } else {
-            // 提供了currentPic，需要查找
+            // 提供了currentPicPath，需要查找
             let findIndex = picList.findIndex(
-              (item) => item.name == currentPic
+              (item) => item.path == currentPicPath
             );
             if (findIndex == -1) {
               // 报错

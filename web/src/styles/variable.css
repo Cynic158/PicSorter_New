@@ -23,12 +23,15 @@
   --color-black11: rgba(76, 76, 76, 0.5);
   --color-black12: #908e8e;
   --color-black13: #3c3c3c;
+  --color-black14: rgba(0, 0, 0, 0.2);
 
   --color-blue1: #00a6ff;
   --color-blue2: rgba(0, 166, 255, 0.7);
   --color-blue3: rgba(0, 166, 255, 0.5);
   --color-blue4: rgba(0, 166, 255, 0.9);
   --color-blue5: #42a5f5;
+  --color-blue6: rgba(0, 166, 255, 0.3);
+  --color-blue7: rgba(0, 166, 255, 0.15);
 
   --color-green1: rgba(46, 206, 35, 0.9);
   --color-green2: rgba(46, 206, 35, 0.7);

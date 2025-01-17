@@ -38,12 +38,12 @@ const picStore = observable(
     setPicListLoading(bool: boolean) {
       this.picListLoading = bool;
     },
-    async getPicList(refresh: boolean = false, currentPic?: string) {
-      let funcAction = "获取图片队列";
+    async getPicList(refresh: boolean = false, currentPicPath?: string) {
+      let funcAction = "获取图片组";
       try {
         this.setPicListLoading(true);
         let mode = this.viewMode;
-        let res = await PicApi.getPicList(mode, refresh, currentPic);
+        let res = await PicApi.getPicList(mode, refresh, currentPicPath);
         if (res.success) {
           runInAction(() => {
             this.setPicTotal((res.data as GetPicListDataType).total);

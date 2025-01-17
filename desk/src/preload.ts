@@ -19,13 +19,13 @@ const Win_copy = async (content: string) => {
 const Pic_getPicList = async (
   mode: viewType,
   refresh: boolean,
-  currentPic?: string
+  currentPicPath?: string
 ) => {
   const res = await ipcRenderer.invoke(
     "Pic_getPicList" as PicApi,
     mode,
     refresh,
-    currentPic
+    currentPicPath
   );
   return res;
 };
