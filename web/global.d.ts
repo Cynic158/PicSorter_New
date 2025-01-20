@@ -22,8 +22,24 @@ declare global {
       Pic_getPicList: (
         mode: viewType,
         refresh: boolean,
-        currentPic?: string
+        currentPicPath?: string | null
       ) => Promise<{ success: boolean; data: GetPicListDataType | string }>;
+      Pic_renamePic: (
+        renamePath: string,
+        newName: string
+      ) => Promise<{
+        success: boolean;
+        conflict: boolean;
+        data: PicInfo | ConflictDataType | string;
+      }>;
+      Pic_getPicInfo: (picPath: string) => Promise<{
+        success: boolean;
+        data: PicInfoDataType | string;
+      }>;
+      Pic_showPic: (picPath: string) => Promise<{
+        success: boolean;
+        data: string;
+      }>;
 
       Sort_getPicFolder: () => void;
       Sort_getPicFolderPath: (
@@ -72,16 +88,25 @@ declare global {
     size: number;
     type: picType;
     resolution: {
-      width: number | undefined;
-      height: number | undefined;
+      width: number;
+      height: number;
     };
     dpi: number | undefined;
     bitDepth: number | undefined;
     createdAt: number;
     modifiedAt: number;
     path: string;
-    exist: boolean;
   } | null;
+
+  interface ConflictDataType {
+    path: string;
+    width: number;
+    height: number;
+  }
+  interface PicInfoDataType {
+    dpi: number;
+    bitDepth: number;
+  }
 
   // sort部分
   type SortTypeForPic =

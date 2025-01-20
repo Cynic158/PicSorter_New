@@ -14,6 +14,7 @@
   opacity: 0;
   transition: top 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
   visibility: hidden;
+  font-weight: 600;
   &.show {
     visibility: visible;
     top: calc(var(--header-container-height) + 18px);
@@ -21,6 +22,6 @@
   }
   &.error {
     background-color: var(--color-red5);
-    color: var(--color-red6);
+    color: var(--color-red8);
   }
 }

@@ -1,0 +1,115 @@
+.inputdialog-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: var(--sortfolderdialog-container-index);
+  background-color: var(--color-black5);
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+  &.show {
+    visibility: visible;
+    opacity: 1;
+    .inputdialog-main {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+  .inputdialog-main {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.7);
+    transition: all 0.3s ease;
+    width: 400px;
+    padding: 14px 28px 24px 28px;
+    border-radius: 8px;
+    background-color: var(--color-black6);
+    box-shadow: 0 0 8px 4px rgba($color: #000000, $alpha: 0.2);
+    .inputdialog-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-white6);
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+    .inputdialog-form {
+      width: 100%;
+      height: 200px;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--color-white9);
+      border-radius: 8px;
+      padding: 12px;
+      transition: all 0.3s ease;
+      border-top: 2px solid transparent;
+      &.active {
+        background-color: var(--color-white3);
+        border-top: 2px solid var(--color-blue2);
+      }
+      .inputdialog-textarea {
+        height: calc(100% - 46px);
+        background-color: transparent;
+        border: none;
+        color: var(--color-white8);
+        transition: all 0.3s ease;
+        &:focus {
+          color: var(--color-white2);
+        }
+      }
+      .inputdialog-btn {
+        width: 62px;
+        height: 34px;
+        border-radius: 4px;
+        align-self: flex-end;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-blue2);
+        color: var(--color-white2);
+        transition: all 0.2s ease;
+        margin-top: 12px;
+        position: relative;
+        &:hover {
+          background-color: var(--color-blue4);
+        }
+        &:active {
+          background-color: var(--color-blue3);
+        }
+        &.loading {
+          background-color: var(--color-blue3) !important;
+          cursor: wait;
+          .inputdialog-btn-icon {
+            opacity: 0;
+            transform: scale(0.5);
+          }
+          .inputdialog-btn-loading {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+        .inputdialog-btn-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transform: scale(1);
+          transition: all 0.3s ease;
+        }
+        .inputdialog-btn-loading {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%) scale(0.5);
+          z-index: var(--sortfolderdialog-btn-loading-index);
+          opacity: 0;
+          transition: all 0.3s ease;
+        }
+      }
+    }
+  }
+}

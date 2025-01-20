@@ -95,12 +95,7 @@ async function filterImages(
       const bitDepth = undefined;
 
       // 过滤掉缺少必需属性的文件
-      if (
-        (selectConfig.resolution.width.type != "all" &&
-          resolution.width === undefined) ||
-        (selectConfig.resolution.height.type != "all" &&
-          resolution.height === undefined)
-      ) {
+      if (resolution.width === undefined || resolution.height === undefined) {
         return null;
       }
 
@@ -184,7 +179,6 @@ async function filterImages(
           createdAt: createdAt,
           modifiedAt: modifiedAt,
           path: filePath,
-          exist: true,
         };
       }
 
@@ -294,7 +288,7 @@ const getFolderInfo = async (
 
   for (const file of imageFiles) {
     const stats = getImageStats(file);
-    if (stats) {
+    if (stats && stats.width && stats.height) {
       picTotal++;
       sizeTotal += stats.size;
       sizes.push(stats.size);

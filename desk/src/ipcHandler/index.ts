@@ -6,11 +6,12 @@ import sortHandler from "./sort";
 const ipcHandler = (
   mainWindow: BrowserWindow,
   getPicListSave: () => Array<PicInfo>,
-  setPicListSave: (list: Array<PicInfo>) => void
+  setPicListSave: (list: Array<PicInfo>) => void,
+  resetPicStatic: ResetPicStaticType
 ) => {
   winHandler(mainWindow);
   picHandler(getPicListSave, setPicListSave);
-  sortHandler();
+  sortHandler(resetPicStatic);
 };
 
 export default ipcHandler;

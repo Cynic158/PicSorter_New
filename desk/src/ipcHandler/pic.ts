@@ -1,4 +1,4 @@
-import { ipcMain, app } from "electron";
+import { ipcMain, app, shell } from "electron";
 import {
   checkPathsExist,
   generateErrorLog,
@@ -7,6 +7,9 @@ import {
 import fs from "fs";
 import path from "path";
 import pathManager from "../utils/path";
+import sizeOf from "image-size";
+import { cloneDeep } from "lodash";
+import sharp from "sharp";
 
 const picHandler = (
   getPicListSave: () => Array<PicInfo>,
@@ -19,7 +22,12 @@ const picHandler = (
   // 获取图片列表
   ipcMain.handle(
     "Pic_getPicList" as PicApi,
-    async (_event, mode: viewType, refresh: boolean, currentPic?: string) => {
+    async (
+      _event,
+      mode: viewType,
+      refresh: boolean,
+      currentPicPath?: string
+    ) => {
       try {
         let config: SortConfig | null = null;
         // 如果需要刷新，读取配置，重新获取一次列表并返回配置
@@ -211,8 +219,8 @@ const picHandler = (
               },
             };
           }
-          // 如果没有提供currentPic，直接提供前三个
-          if (currentPic !== "" && !currentPic) {
+          // 如果没有提供currentPicPath，直接提供前三个
+          if (currentPicPath !== "" && !currentPicPath) {
             let prev = null;
             let now = picList[0];
             let next = picList[1] ? picList[1] : null;
@@ -225,9 +233,9 @@ const picHandler = (
               },
             };
           } else {
-            // 提供了currentPic，需要查找
+            // 提供了currentPicPath，需要查找
             let findIndex = picList.findIndex(
-              (item) => item.name == currentPic
+              (item) => item.path == currentPicPath
             );
             if (findIndex == -1) {
               // 报错
@@ -386,6 +394,230 @@ const picHandler = (
       }
     }
   );
+
+  // 图片重命名
+  ipcMain.handle(
+    "Pic_renamePic" as PicApi,
+    async (_event, renamePath: string, newName: string) => {
+      try {
+        // 检查在缓存列表中有没有这个图片
+        let picList = getPicListSave();
+        let findPicIndex = picList.findIndex((item) => item.path == renamePath);
+        if (findPicIndex == -1) {
+          // 没找到
+          return {
+            success: false,
+            conflict: false,
+            data: "onlymessage缓存列表中不存在此图片",
+          };
+        }
+        // 获取到其路径
+        let checkRes = await checkPathsExist("file", [
+          picList[findPicIndex].path,
+        ]);
+        // 检查在文件夹中有没有这个图片
+        if (!checkRes.success) {
+          // 文件夹内不存在这个图片
+          return {
+            success: false,
+            conflict: false,
+            data: "onlymessage未分类存储文件夹中不存在此图片",
+          };
+        }
+
+        const getPicInfo = (picPath: string): PicInfo => {
+          const stats = fs.statSync(picPath);
+          const fileName = path.basename(picPath);
+          const fileSize = stats.size;
+          const createdAt = stats.birthtimeMs;
+          const modifiedAt = stats.mtimeMs;
+          interface ResolutionType {
+            width: number | undefined;
+            height: number | undefined;
+          }
+          let resolution: ResolutionType = {
+            width: undefined,
+            height: undefined,
+          };
+          const dimensions = sizeOf(picPath);
+          resolution = { width: dimensions.width, height: dimensions.height };
+          const dpi = undefined;
+          const bitDepth = undefined;
+
+          return {
+            name: fileName,
+            size: fileSize,
+            type: path
+              .extname(picPath)
+              .toUpperCase()
+              .replace(".", "") as picType,
+            resolution: resolution,
+            dpi: dpi,
+            bitDepth: bitDepth,
+            createdAt: createdAt,
+            modifiedAt: modifiedAt,
+            path: picPath,
+          };
+        };
+
+        // 根据其路径于文件夹中检查新名称是否冲突
+        let parsedPath = path.parse(picList[findPicIndex].path);
+        let newPath = path.join(parsedPath.dir, `${newName}${parsedPath.ext}`);
+        let conflictCheckRes = await checkPathsExist("file", [newPath]);
+        if (conflictCheckRes.success) {
+          // 文件夹内新名称冲突
+          let newPicInfo = getPicInfo(newPath);
+          if (!newPicInfo.resolution.width || !newPicInfo.resolution.height) {
+            return {
+              success: false,
+              conflict: false,
+              data: "获取冲突图片的分辨率时出错",
+            };
+          } else {
+            return {
+              success: true,
+              conflict: true,
+              data: {
+                path: newPath,
+                width: newPicInfo.resolution.width,
+                height: newPicInfo.resolution.height,
+              },
+            };
+          }
+        }
+
+        // 无冲突，允许根据其路径重命名
+        await fs.promises.rename(picList[findPicIndex].path, newPath);
+
+        // 重新获取该图片信息
+        let newPicInfo = getPicInfo(newPath);
+        // 对缓存列表中这个图片进行翻新
+        let cloneList = cloneDeep(picList);
+        cloneList[findPicIndex] = newPicInfo;
+        // 重新设置缓存列表
+        setPicListSave(cloneList);
+        // 返回新的图片对象
+        return {
+          success: true,
+          conflict: false,
+          data: newPicInfo,
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          conflict: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
+
+  // 获取图片详细信息
+  ipcMain.handle(
+    "Pic_getPicInfo" as PicApi,
+    async (_event, picPath: string) => {
+      try {
+        // 检查在缓存列表中有没有这个图片
+        let picList = getPicListSave();
+        let findPicIndex = picList.findIndex((item) => item.path == picPath);
+        if (findPicIndex == -1) {
+          // 没找到
+          return {
+            success: false,
+            data: "onlymessage缓存列表中不存在此图片",
+          };
+        }
+        // 获取到其路径
+        let checkRes = await checkPathsExist("file", [
+          picList[findPicIndex].path,
+        ]);
+        // 检查在文件夹中有没有这个图片
+        if (!checkRes.success) {
+          // 文件夹内不存在这个图片
+          return {
+            success: false,
+            data: "onlymessage未分类存储文件夹中不存在此图片",
+          };
+        }
+
+        // 图片存在，获取其dpi以及位深度
+        let dpi = -1;
+        let bitDepth = -1;
+        const sharpMetadata = await sharp(picPath).metadata();
+        dpi = sharpMetadata.density ? sharpMetadata.density : 96;
+
+        if (sharpMetadata.depth && sharpMetadata.channels) {
+          const depthMap: { [key: string]: number } = {
+            uchar: 8, // Unsigned 8-bit integer
+            ushort: 16, // Unsigned 16-bit integer
+            uint: 32, // Unsigned 32-bit integer
+            float: 32, // 32-bit floating point
+            double: 64, // 64-bit floating point
+            char: 8, // Signed 8-bit integer
+            short: 16, // Signed 16-bit integer
+          };
+
+          // 根据 `depth` 和 `channels` 计算位深度
+          bitDepth = depthMap[sharpMetadata.depth]
+            ? depthMap[sharpMetadata.depth] * sharpMetadata.channels
+            : -1; // 未知类型则返回 -1
+        } else {
+          bitDepth = -1;
+        }
+
+        // 对缓存列表中这个图片进行翻新
+        let cloneList = cloneDeep(picList);
+        cloneList[findPicIndex].dpi = dpi;
+        cloneList[findPicIndex].bitDepth = bitDepth;
+        // 重新设置缓存列表
+        setPicListSave(cloneList);
+        return {
+          success: true,
+          data: {
+            dpi: dpi,
+            bitDepth: bitDepth,
+          },
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
+
+  // 打开图片所在位置
+  ipcMain.handle("Pic_showPic" as PicApi, async (_event, picPath: string) => {
+    try {
+      // 检查是否存在
+      let checkRes = await checkPathsExist("file", [picPath]);
+      if (!checkRes.success) {
+        // 文件夹内不存在这个图片
+        return {
+          success: false,
+          data: "onlymessage图片已丢失",
+        };
+      }
+
+      shell.showItemInFolder(picPath);
+      return {
+        success: true,
+        data: "",
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
+    }
+  });
 };
 
 export default picHandler;

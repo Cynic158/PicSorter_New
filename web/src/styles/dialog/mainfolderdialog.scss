@@ -20,7 +20,7 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translate(-50%, -50%) scale(0.7);
     transition: all 0.3s ease;
     width: 840px;
     padding: 14px 28px 24px 28px;
@@ -134,8 +134,6 @@
               align-items: center;
               justify-content: space-between;
               padding: 4px 8px;
-              // background-color: var(--color-white3);
-              // border-left: 4px solid var(--color-blue2);
               border-bottom: 2px solid var(--color-white4);
               .mainfolderdialog-form-item-info-overflow {
                 max-width: 72%;

@@ -1,0 +1,100 @@
+.verticalviewer-container {
+  width: 100%;
+  height: 100%;
+  .verticalviewer-main {
+    width: 100%;
+    height: 100%;
+    overflow-x: scroll;
+    .verticalviewer-scroll {
+      height: 100%;
+      white-space: nowrap;
+      .verticalviewer-item {
+        display: inline-block;
+        height: 100%;
+        margin-right: 4px;
+        position: relative;
+        overflow: hidden;
+        &:nth-last-of-type(1) {
+          margin-right: 0;
+        }
+        &.active {
+          .verticalviewer-item-pic {
+            transform: scale(0.95);
+          }
+          .verticalviewer-item-select {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+        &:hover {
+          .verticalviewer-item-info {
+            bottom: 0;
+            opacity: 1;
+          }
+        }
+        .verticalviewer-item-select {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%) scale(0.5);
+          opacity: 0;
+          z-index: 4;
+          transition: all 0.3s ease;
+        }
+        .verticalviewer-item-pic {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          transform: scale(1);
+          transition: transform 0.3s ease;
+        }
+        .verticalviewer-item-info {
+          position: absolute;
+          left: 0;
+          bottom: -30px;
+          z-index: 5;
+          width: 100%;
+          height: 64px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-evenly;
+          opacity: 0;
+          background: linear-gradient(to top, var(--color-black6), transparent);
+          transition: all 0.3s ease;
+          .verticalviewer-item-info-item {
+            display: flex;
+            align-items: center;
+            width: calc(100% - 50px);
+            color: var(--color-white2);
+            .item {
+              margin-left: 12px;
+            }
+            &.padding {
+              padding-left: 12px;
+            }
+          }
+          .verticalviewer-item-detail {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 50px;
+            bottom: 8px;
+          }
+          .verticalviewer-item-zoom {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 12px;
+            bottom: 9px;
+          }
+        }
+      }
+    }
+  }
+}

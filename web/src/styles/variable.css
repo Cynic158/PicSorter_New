@@ -22,12 +22,16 @@
   --color-black10: rgba(0, 0, 0, 0.4);
   --color-black11: rgba(76, 76, 76, 0.5);
   --color-black12: #908e8e;
+  --color-black13: #3c3c3c;
+  --color-black14: rgba(0, 0, 0, 0.2);
 
   --color-blue1: #00a6ff;
   --color-blue2: rgba(0, 166, 255, 0.7);
   --color-blue3: rgba(0, 166, 255, 0.5);
   --color-blue4: rgba(0, 166, 255, 0.9);
   --color-blue5: #42a5f5;
+  --color-blue6: rgba(0, 166, 255, 0.3);
+  --color-blue7: rgba(0, 166, 255, 0.15);
 
   --color-green1: rgba(46, 206, 35, 0.9);
   --color-green2: rgba(46, 206, 35, 0.7);
@@ -42,6 +46,7 @@
   --color-red5: rgba(255, 140, 140, 0.6);
   --color-red6: #d30000;
   --color-red7: rgba(211, 61, 56, 0.3);
+  --color-red8: #b30202;
 
   /* 层级变量 */
   --header-container-index: 3;
@@ -49,12 +54,13 @@
   --controler-sort-item-index: 2;
   --controler-sort-item-top-left-icon-selected-index: 2;
   --controler-sort-item-top-left-icon-select-index: 3;
-  --viewer-controler-unfold-container-index: 3;
+  --viewer-controler-unfold-container-index: 10;
   --sortfolderdialog-container-index: 5;
   --sortfolderdialog-form-item-main-path-select-index: 6;
   --sortfolderdialog-btn-loading-index: 2;
   --picfolderdialog-block-index: 2;
   --mainfolderdialog-form-item-folder-index: 2;
+  --conflictdialog-container-index: 7;
   --errordialog-container-index: 95;
   --message-container-index: 99;
   /* 通用变量 */

@@ -3,10 +3,6 @@
   width: calc(100% - var(--controler-container-width));
   position: relative;
   transition: width 0.5s ease;
-  background-image: url("../../assets/images/99415661_p1.png");
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
   &.expend {
     width: 100%;
   }
