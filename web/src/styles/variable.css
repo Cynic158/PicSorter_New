@@ -46,6 +46,7 @@
   --color-red5: rgba(255, 140, 140, 0.6);
   --color-red6: #d30000;
   --color-red7: rgba(211, 61, 56, 0.3);
+  --color-red8: #b30202;
 
   /* 层级变量 */
   --header-container-index: 3;
@@ -53,7 +54,7 @@
   --controler-sort-item-index: 2;
   --controler-sort-item-top-left-icon-selected-index: 2;
   --controler-sort-item-top-left-icon-select-index: 3;
-  --viewer-controler-unfold-container-index: 3;
+  --viewer-controler-unfold-container-index: 10;
   --sortfolderdialog-container-index: 5;
   --sortfolderdialog-form-item-main-path-select-index: 6;
   --sortfolderdialog-btn-loading-index: 2;

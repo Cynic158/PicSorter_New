@@ -1,13 +1,13 @@
 import "../../styles/layout/header.scss";
 import SvgIcon from "../../components/SvgIcon";
-import Loader from "../../components/Loader";
 import TextOverflow from "react-text-overflow";
 import WinApi from "../../api/win";
 import picStore from "../../store/modules/pic";
 import { Observer } from "mobx-react";
-import { getFileSize, getFileTime } from "../../utils";
+import { getFileSize } from "../../utils";
 import InputDialog from "../Dialog/InputDialog";
-import { useEffect, useState } from "react";
+import PicInfoDialog from "../Dialog/PicInfoDialog";
+import { useState } from "react";
 import winStore from "../../store/modules/win";
 
 export default function Header() {
@@ -18,30 +18,20 @@ export default function Header() {
   const hideInputDialog = () => {
     setInputDialogShow(false);
   };
+  const [picInfoDialogShow, setPicInfoDialogShow] = useState(false);
+  const showPicInfoDialog = () => {
+    setPicInfoDialogShow(true);
+  };
+  const hidePicInfoDialog = () => {
+    setPicInfoDialogShow(false);
+  };
 
-  const [infoShow, setInfoShow] = useState(false);
   const getPicInfo = () => {
-    let timer = setTimeout(() => {
-      if (!infoShow) {
-        setInfoShow(true);
-        if (!picStore.getPicInfoLoading) {
-          picStore.getPicInfo();
-        }
-      }
-      clearTimeout(timer);
-    }, 200);
+    if (!picStore.getPicInfoLoading) {
+      picStore.getPicInfo(1);
+      showPicInfoDialog();
+    }
   };
-  const resetInfoShow = () => {
-    setInfoShow(false);
-  };
-
-  useEffect(() => {
-    document.body.addEventListener("click", resetInfoShow);
-
-    return () => {
-      document.body.removeEventListener("click", resetInfoShow);
-    };
-  }, []);
 
   const showTip = () => {
     winStore.setMessage({
@@ -64,6 +54,12 @@ export default function Header() {
               show={inputDialogShow}
               hide={hideInputDialog}
             ></InputDialog>
+            <PicInfoDialog
+              type="view"
+              show={picInfoDialogShow}
+              hide={hidePicInfoDialog}
+              picIndex={1}
+            ></PicInfoDialog>
             <ul className="header-info">
               {picStore.viewMode == "view" &&
               picStore.picList.length > 0 &&
@@ -111,7 +107,7 @@ export default function Header() {
                   </li>
                   {/* 余数 */}
                   <li className="header-info-item withicon">{`余 ${picStore.picTotal} 张`}</li>
-                  {/* dpi、位深度、创建时间、修改时间、了解参数意义 */}
+                  {/* dpi、位深度、创建时间、修改时间、路径 */}
                   <li
                     onClick={getPicInfo}
                     className="header-info-item icon info"
@@ -124,76 +120,6 @@ export default function Header() {
                       color="var(--color-black3)"
                       clickable={true}
                     ></SvgIcon>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                      className={`info-container${infoShow ? " show" : ""}`}
-                    >
-                      <div className="info-item">
-                        <span>dpi</span>
-                        <div
-                          className={`info-load${
-                            picStore.getPicInfoLoading ? " loading" : ""
-                          }`}
-                        >
-                          <span className="info-text">
-                            {picStore.picList[1].dpi == -1
-                              ? "无法读取"
-                              : picStore.picList[1].dpi == 96
-                              ? "96(默认值)"
-                              : picStore.picList[1].dpi}
-                          </span>
-                          <div className="info-loading">
-                            <Loader width="20px"></Loader>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="info-item">
-                        <span>位深度</span>
-                        <div
-                          className={`info-load${
-                            picStore.getPicInfoLoading ? " loading" : ""
-                          }`}
-                        >
-                          <span className="info-text">
-                            {picStore.picList[1].bitDepth == -1
-                              ? "无法读取"
-                              : picStore.picList[1].bitDepth}
-                          </span>
-                          <div className="info-loading">
-                            <Loader width="20px"></Loader>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="info-item">
-                        <span>创建时间</span>
-                        <span>
-                          {getFileTime(picStore.picList[1].createdAt)}
-                        </span>
-                      </div>
-                      <div className="info-item">
-                        <span>修改时间</span>
-                        <span>
-                          {getFileTime(picStore.picList[1].modifiedAt)}
-                        </span>
-                      </div>
-                      <div className="info-item">
-                        <span>图片路径</span>
-                        <div
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            picStore.showPic();
-                          }}
-                          className="path"
-                        >
-                          <TextOverflow
-                            truncatePosition="middle"
-                            text={picStore.picList[1].path}
-                          ></TextOverflow>
-                        </div>
-                      </div>
-                    </div>
                   </li>
                 </>
               ) : (

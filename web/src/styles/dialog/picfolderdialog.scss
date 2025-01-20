@@ -7,10 +7,16 @@
   z-index: var(--sortfolderdialog-container-index);
   background-color: var(--color-black5);
   visibility: hidden;
+  * {
+    visibility: hidden !important;
+  }
   opacity: 0;
   transition: all 0.3s ease;
   &.show {
     visibility: visible;
+    * {
+      visibility: visible !important;
+    }
     opacity: 1;
     .picfolderdialog-main {
       transform: translate(-50%, -50%) scale(1);
@@ -29,7 +35,7 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translate(-50%, -50%) scale(0.7);
     transition: all 0.3s ease;
     width: 868px;
     padding: 14px 28px 24px 28px;

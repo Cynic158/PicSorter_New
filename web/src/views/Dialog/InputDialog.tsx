@@ -117,7 +117,7 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
   };
   const maskClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     // 点击对话框外容器关闭对话框
-    const el = document.querySelector(".inputdialog-container");
+    const el = document.querySelector(".inputdialog-container." + type);
     if (event.target == el) {
       closeDialog();
     }
@@ -159,7 +159,7 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
           onClick={(event) => {
             maskClick(event);
           }}
-          className={`inputdialog-container${show ? " show" : ""}`}
+          className={`inputdialog-container${" " + type}${show ? " show" : ""}`}
         >
           <ConflictDialog
             conflictWidth={conflictWidth}

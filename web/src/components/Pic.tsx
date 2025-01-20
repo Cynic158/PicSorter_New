@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import IconLoader from "./IconLoader";
 import ErrorPic from "../assets/images/errorpic.jpg";
+import ErrorPic_hor from "../assets/images/errorpic_hor.jpg";
+import ErrorPic_ver from "../assets/images/errorpic_ver.jpg";
 import "../styles/components/pic.scss";
 
 // 非图片预览使用时
@@ -48,7 +50,13 @@ const Pic: React.FC<PicProps> = ({ type, width = "", height = "", url }) => {
       </div>
       <img
         className={`pic-error${errorShow ? " show" : ""}`}
-        src={ErrorPic}
+        src={
+          type == "other"
+            ? ErrorPic
+            : type == "horizontal"
+            ? ErrorPic_hor
+            : ErrorPic_ver
+        }
         alt="errorpic"
       ></img>
       <img
@@ -61,6 +69,7 @@ const Pic: React.FC<PicProps> = ({ type, width = "", height = "", url }) => {
         className={`pic${picShow ? " show" : ""}`}
         src={url}
         alt="pic"
+        loading="lazy"
         onLoad={handleSuccess}
         onError={handleError}
       />

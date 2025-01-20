@@ -22,7 +22,7 @@ declare global {
       Pic_getPicList: (
         mode: viewType,
         refresh: boolean,
-        currentPicPath?: string
+        currentPicPath?: string | null
       ) => Promise<{ success: boolean; data: GetPicListDataType | string }>;
       Pic_renamePic: (
         renamePath: string,

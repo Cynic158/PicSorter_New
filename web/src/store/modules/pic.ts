@@ -23,6 +23,7 @@ const picStore = observable(
     viewMode: "view" as viewType,
     setViewMode(mode: viewType) {
       this.viewMode = mode;
+      this.clearSelectingPicList();
     },
     picTotal: 0,
     setPicTotal(total: number) {
@@ -38,14 +39,24 @@ const picStore = observable(
     setPicListLoading(bool: boolean) {
       this.picListLoading = bool;
     },
-    async getPicList(refresh: boolean = false, currentPicPath?: string) {
+    async getPicList(
+      refresh: boolean = false,
+      currentPicPath?: string | null,
+      preload?: viewType
+    ) {
       let funcAction = "获取图片组";
       try {
         this.setPicListLoading(true);
         let mode = this.viewMode;
+        if (preload) {
+          mode = preload;
+        }
         let res = await PicApi.getPicList(mode, refresh, currentPicPath);
         if (res.success) {
           runInAction(() => {
+            if (preload) {
+              this.setViewMode(preload);
+            }
             this.setPicTotal((res.data as GetPicListDataType).total);
             this.setPicList((res.data as GetPicListDataType).picList);
             if (refresh) {
@@ -125,23 +136,23 @@ const picStore = observable(
     setGetPicInfoLoading(bool: boolean) {
       this.getPicInfoLoading = bool;
     },
-    async getPicInfo() {
+    async getPicInfo(picIndex: number) {
       if (
-        this.picList[1]?.dpi === undefined ||
-        this.picList[1].dpi === null ||
-        this.picList[1].bitDepth === undefined ||
-        this.picList[1].bitDepth === null
+        this.picList[picIndex]?.dpi === undefined ||
+        this.picList[picIndex].dpi === null ||
+        this.picList[picIndex].bitDepth === undefined ||
+        this.picList[picIndex].bitDepth === null
       ) {
         let funcAction = "获取图片dpi和位深度";
         const resetList = (dpi: number, bitDepth: number) => {
           let cloneList = cloneDeep(this.picList);
-          cloneList[1]!.dpi = dpi;
-          cloneList[1]!.bitDepth = bitDepth;
+          cloneList[picIndex]!.dpi = dpi;
+          cloneList[picIndex]!.bitDepth = bitDepth;
           this.setPicList(cloneList);
         };
         try {
           this.setGetPicInfoLoading(true);
-          let res = await PicApi.getPicInfo(this.picList[1]!.path);
+          let res = await PicApi.getPicInfo(this.picList[picIndex]!.path);
           if (res.success) {
             resetList(
               (res.data as PicInfoDataType).dpi,
@@ -167,10 +178,10 @@ const picStore = observable(
     },
 
     // 打开图片所在位置
-    async showPic() {
+    async showPic(picIndex: number) {
       let funcAction = "打开图片所在位置";
       try {
-        let res = await PicApi.showPic(this.picList[1]!.path);
+        let res = await PicApi.showPic(this.picList[picIndex]!.path);
         if (!res.success) {
           // 报错
           winStore.setErrorDialog(res.data, funcAction);
@@ -182,8 +193,15 @@ const picStore = observable(
       }
     },
 
-    selectingPicList: [],
-    setSelectingPicList() {},
+    selectingPicList: [] as Array<number>,
+    setSelectingPicList(index: number) {
+      let findIndex = this.selectingPicList.findIndex((item) => item == index);
+      if (findIndex == -1) {
+        this.selectingPicList.push(index);
+      } else {
+        this.selectingPicList.splice(findIndex, 1);
+      }
+    },
     clearSelectingPicList() {
       this.selectingPicList = [];
     },

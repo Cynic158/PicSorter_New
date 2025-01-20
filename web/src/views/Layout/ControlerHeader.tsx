@@ -3,6 +3,7 @@ import SvgIcon from "../../components/SvgIcon";
 import MainFolderDialog from "../Dialog/MainFolderDialog";
 import { Observer } from "mobx-react";
 import { useState } from "react";
+import picStore from "../../store/modules/pic";
 
 export default function ControlerHeader() {
   const [mainFolderDialogShow, setMainFolderDialogShow] = useState(false);
@@ -11,6 +12,16 @@ export default function ControlerHeader() {
   };
   const hideMainFolderDialog = () => {
     setMainFolderDialogShow(false);
+  };
+
+  const switchMode = (mode: viewType) => {
+    if (
+      picStore.picTotal != 0 &&
+      !picStore.picListLoading &&
+      picStore.viewMode != mode
+    ) {
+      picStore.getPicList(false, null, mode);
+    }
   };
 
   return (
@@ -29,7 +40,18 @@ export default function ControlerHeader() {
                 ></SvgIcon>
               </div>
             </li>
-            <li className="controler-header-item">
+            <li
+              onClick={() => {
+                switchMode("view");
+              }}
+              className={`controler-header-item${
+                picStore.picTotal == 0 ||
+                picStore.viewMode == "view" ||
+                picStore.picListLoading
+                  ? " disabled"
+                  : ""
+              }`}
+            >
               <div className="controler-header-item-bg"></div>
               <div className="controler-header-item-icon">
                 <SvgIcon
@@ -40,7 +62,18 @@ export default function ControlerHeader() {
                 ></SvgIcon>
               </div>
             </li>
-            <li className="controler-header-item">
+            <li
+              onClick={() => {
+                switchMode("horizontal");
+              }}
+              className={`controler-header-item${
+                picStore.picTotal == 0 ||
+                picStore.viewMode == "horizontal" ||
+                picStore.picListLoading
+                  ? " disabled"
+                  : ""
+              }`}
+            >
               <div className="controler-header-item-bg"></div>
               <div className="controler-header-item-icon">
                 <SvgIcon
@@ -51,7 +84,18 @@ export default function ControlerHeader() {
                 ></SvgIcon>
               </div>
             </li>
-            <li className="controler-header-item">
+            <li
+              onClick={() => {
+                switchMode("vertical");
+              }}
+              className={`controler-header-item${
+                picStore.picTotal == 0 ||
+                picStore.viewMode == "vertical" ||
+                picStore.picListLoading
+                  ? " disabled"
+                  : ""
+              }`}
+            >
               <div className="controler-header-item-bg"></div>
               <div className="controler-header-item-icon">
                 <SvgIcon
