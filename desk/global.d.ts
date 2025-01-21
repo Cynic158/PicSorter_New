@@ -16,7 +16,8 @@ declare global {
     | "Sort_getSortFolderPath"
     | "Sort_setSortFolderPath"
     | "Sort_getSortFolderInfo"
-    | "Sort_openSortFolder";
+    | "Sort_openSortFolder"
+    | "Sort_insertSortFolder";
 
   // 其他类型
   // 通用部分
@@ -44,6 +45,7 @@ declare global {
 
   // sort部分
   type ResetPicStaticType = (picFolderPath: string) => Promise<boolean>;
+  type ResetSortStaticType = (sortFolderPath: string) => Promise<boolean>;
 
   type SortTypeForPic =
     | "nameAsc" // 名称递增: a-z

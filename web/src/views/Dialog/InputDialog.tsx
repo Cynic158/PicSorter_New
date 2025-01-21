@@ -8,6 +8,7 @@ import "../../styles/dialog/inputdialog.scss";
 import winStore from "../../store/modules/win";
 import picStore from "../../store/modules/pic";
 import { getAdaptiveResolution } from "../../utils";
+import sortStore from "../../store/modules/sort";
 
 interface InputDialogProps {
   type: "renamePic" | "insertSortFolder" | "renameSortFolder";
@@ -58,7 +59,23 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
       } else if (/[/\\:*?"<>|]/.test(inputVal.trim())) {
         winStore.setMessage({
           type: "error",
-          msg: '文件名不能包含字符\\/:*?"<>|',
+          msg: '图片名称不能包含字符\\/:*?"<>|',
+        });
+        return false;
+      } else {
+        return true;
+      }
+    } else if (type == "insertSortFolder") {
+      if (inputVal.trim() == "") {
+        winStore.setMessage({
+          type: "error",
+          msg: "文件夹名称不能为空",
+        });
+        return false;
+      } else if (/^[.]|[/\\:*?"<>|.]/.test(inputVal.trim())) {
+        winStore.setMessage({
+          type: "error",
+          msg: '文件夹名称不能包含字符\\/:*?"<>|.',
         });
         return false;
       } else {
@@ -70,7 +87,7 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
   };
 
   const applyVal = async () => {
-    if (!picStore.renamePicLoading) {
+    if (!picStore.renamePicLoading || !sortStore.insertSortFolderLoading) {
       let validateRes = validateVal();
       if (validateRes) {
         if (type == "renamePic") {
@@ -105,13 +122,29 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
               clearTimeout(timer);
             }, 100);
           }
+        } else if (type == "insertSortFolder") {
+          let res = await sortStore.insertSortFolder(inputVal.trim());
+          if (res.success && !res.conflict) {
+            // 新增成功
+            winStore.setMessage({
+              type: "success",
+              msg: "新建分类文件夹成功",
+            });
+            closeDialog();
+          } else if (res.conflict) {
+            // 冲突
+            winStore.setMessage({
+              type: "error",
+              msg: "此文件夹名称已被使用",
+            });
+          }
         }
       }
     }
   };
 
   const closeDialog = () => {
-    if (!picStore.renamePicLoading) {
+    if (!picStore.renamePicLoading || !sortStore.insertSortFolderLoading) {
       hide();
     }
   };
@@ -131,12 +164,15 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
       setIputActive(false);
     };
     let textareaEl: HTMLTextAreaElement = document.querySelector(
-      ".inputdialog-textarea"
+      ".inputdialog-textarea." + type
     )!;
     if (show) {
       if (type == "renamePic") {
         setInputPlaceholder("请输入新的图片名称(不带文件后缀)");
         setInputTitle("重命名图片");
+      } else if (type == "insertSortFolder") {
+        setInputPlaceholder("请输入新的分类文件夹名称");
+        setInputTitle("新建分类文件夹");
       }
       setInputVal("");
       textareaEl.addEventListener("focus", setActive);
@@ -178,7 +214,7 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
                 onChange={(e) => {
                   handleChange(e);
                 }}
-                className="inputdialog-textarea"
+                className={`inputdialog-textarea${" " + type}`}
                 placeholder={inputPlaceholder}
               ></textarea>
               <button

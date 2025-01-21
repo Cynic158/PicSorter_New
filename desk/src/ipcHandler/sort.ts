@@ -8,7 +8,10 @@ import fs from "fs";
 import path from "path";
 import pathManager from "../utils/path";
 
-const sortHandler = (resetPicStatic: ResetPicStaticType) => {
+const sortHandler = (
+  resetPicStatic: ResetPicStaticType,
+  resetSortStatic: ResetSortStaticType
+) => {
   const appPath = app.getAppPath();
   const sortConfigPath = pathManager.sortConfigPath;
 
@@ -458,11 +461,21 @@ const sortHandler = (resetPicStatic: ResetPicStaticType) => {
           JSON.stringify(config, null, 2),
           "utf-8"
         );
-        // 设置完成
-        return {
-          success: true,
-          data: "",
-        };
+
+        let serverRes = await resetSortStatic(folderConfig.folderPath);
+        if (serverRes) {
+          // 设置完成
+          return {
+            success: true,
+            data: "",
+          };
+        } else {
+          // 设置失败
+          return {
+            success: false,
+            data: "设置本地图片服务器时出错",
+          };
+        }
       } catch (error) {
         // 编写错误报告
         let errorLog = generateErrorLog(error);
@@ -541,6 +554,69 @@ const sortHandler = (resetPicStatic: ResetPicStaticType) => {
       };
     }
   });
+
+  // 新增分类文件夹
+  ipcMain.handle(
+    "Sort_insertSortFolder" as SortApi,
+    async (_event, name: string) => {
+      try {
+        // 获取sortConfig的完整路径
+        const configPath = path.resolve(appPath, sortConfigPath);
+        // 读取当前配置文件内容
+        const fileContent = await fs.promises.readFile(configPath, "utf-8");
+        // 解析JSON内容
+        const config: SortConfig = JSON.parse(fileContent);
+        // 总分类文件夹路径
+        let sortFolderPath = config.sortFolderPath;
+        if (sortFolderPath == "") {
+          return {
+            success: false,
+            conflict: false,
+            data: "onlymessage未指定总分类存储文件夹",
+          };
+        }
+
+        // 检查对应文件夹存不存在
+        const checkRes = await checkPathsExist("folder", [sortFolderPath]);
+        if (!checkRes.success) {
+          return {
+            success: false,
+            conflict: false,
+            data: "onlymessage总分类存储文件夹丢失！",
+          };
+        }
+
+        // 检查新名称有没有冲突
+        let newSortFolderPath = path.resolve(sortFolderPath, name);
+        const conflictCheckRes = await checkPathsExist("folder", [
+          newSortFolderPath,
+        ]);
+        if (conflictCheckRes.success) {
+          return {
+            success: true,
+            conflict: true,
+            data: "",
+          };
+        }
+
+        // 无冲突，允许新建
+        await fs.promises.mkdir(newSortFolderPath);
+        return {
+          success: true,
+          conflict: false,
+          data: "",
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          conflict: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
 };
 
 export default sortHandler;

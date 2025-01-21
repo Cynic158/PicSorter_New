@@ -98,6 +98,13 @@ const Sort_openSortFolder = async () => {
   const res = await ipcRenderer.invoke("Sort_openSortFolder" as SortApi);
   return res;
 };
+const Sort_insertSortFolder = async (name: string) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_insertSortFolder" as SortApi,
+    name
+  );
+  return res;
+};
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
@@ -118,4 +125,5 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_setSortFolderPath,
   Sort_getSortFolderInfo,
   Sort_openSortFolder,
+  Sort_insertSortFolder,
 });

@@ -320,6 +320,52 @@ const sortStore = observable(
         winStore.setErrorDialog(log, funcAction);
       }
     },
+
+    // 新增分类文件夹
+    insertSortFolderLoading: false,
+    setInsertSortFolderLoading(bool: boolean) {
+      this.insertSortFolderLoading = bool;
+    },
+    async insertSortFolder(name: string) {
+      let funcAction = "新增分类文件夹";
+      try {
+        this.setInsertSortFolderLoading(true);
+        let res = await SortApi.insertSortFolder(name);
+        if (res.success) {
+          if (res.conflict) {
+            // 冲突
+            return {
+              success: true,
+              conflict: true,
+            };
+          } else {
+            // 无冲突，获取一次列表
+            this.getSortFolderList();
+            return {
+              success: true,
+              conflict: false,
+            };
+          }
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return {
+            success: false,
+            conflict: false,
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          success: false,
+          conflict: false,
+        };
+      } finally {
+        this.setInsertSortFolderLoading(false);
+      }
+    },
   },
   {
     setShowControler: action,
@@ -344,6 +390,8 @@ const sortStore = observable(
     getSortFolderInfo: action,
     openPicFolder: action,
     openSortFolder: action,
+    setInsertSortFolderLoading: action,
+    insertSortFolder: action,
   }
 );
 

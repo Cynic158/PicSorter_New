@@ -103,9 +103,25 @@ function createMainWindow() {
       }
     });
   };
+  const resetSortStatic = async (sortFolderPath: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      try {
+        sortStaticPath = sortFolderPath;
+        resolve(true);
+      } catch (_error) {
+        resolve(false);
+      }
+    });
+  };
 
   // 导入ipc通信主入口
-  ipcHandler(mainWindow, getPicListSave, setPicListSave, resetPicStatic);
+  ipcHandler(
+    mainWindow,
+    getPicListSave,
+    setPicListSave,
+    resetPicStatic,
+    resetSortStatic
+  );
 
   function createTray(mainWindow: BrowserWindow) {
     const tray = new Tray(path.resolve(appPath, iconPath));

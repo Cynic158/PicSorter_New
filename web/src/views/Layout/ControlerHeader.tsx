@@ -1,9 +1,11 @@
 import "../../styles/layout/controler.scss";
 import SvgIcon from "../../components/SvgIcon";
 import MainFolderDialog from "../Dialog/MainFolderDialog";
+import InputDialog from "../Dialog/InputDialog";
 import { Observer } from "mobx-react";
 import { useState } from "react";
 import picStore from "../../store/modules/pic";
+import sortStore from "../../store/modules/sort";
 
 export default function ControlerHeader() {
   const [mainFolderDialogShow, setMainFolderDialogShow] = useState(false);
@@ -21,6 +23,20 @@ export default function ControlerHeader() {
       picStore.viewMode != mode
     ) {
       picStore.getPicList(false, null, mode);
+    }
+  };
+
+  const [inputDialogShow, setInputDialogShow] = useState(false);
+  const showInputDialog = () => {
+    setInputDialogShow(true);
+  };
+  const hideInputDialog = () => {
+    setInputDialogShow(false);
+  };
+  const insertSortFolder = () => {
+    if (sortStore.sortFolderConfig.folderPath) {
+      // 允许执行
+      showInputDialog();
     }
   };
 
@@ -106,7 +122,12 @@ export default function ControlerHeader() {
                 ></SvgIcon>
               </div>
             </li>
-            <li className="controler-header-item">
+            <li
+              onClick={insertSortFolder}
+              className={`controler-header-item${
+                !sortStore.sortFolderConfig.folderPath ? " disabled" : ""
+              }`}
+            >
               <div className="controler-header-item-bg"></div>
               <div className="controler-header-item-icon">
                 <SvgIcon
@@ -159,6 +180,11 @@ export default function ControlerHeader() {
               show={mainFolderDialogShow}
               hide={hideMainFolderDialog}
             ></MainFolderDialog>
+            <InputDialog
+              type="insertSortFolder"
+              show={inputDialogShow}
+              hide={hideInputDialog}
+            ></InputDialog>
           </ul>
         </div>
       )}

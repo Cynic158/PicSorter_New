@@ -7,11 +7,12 @@ const ipcHandler = (
   mainWindow: BrowserWindow,
   getPicListSave: () => Array<PicInfo>,
   setPicListSave: (list: Array<PicInfo>) => void,
-  resetPicStatic: ResetPicStaticType
+  resetPicStatic: ResetPicStaticType,
+  resetSortStatic: ResetSortStaticType
 ) => {
   winHandler(mainWindow);
   picHandler(getPicListSave, setPicListSave);
-  sortHandler(resetPicStatic);
+  sortHandler(resetPicStatic, resetSortStatic);
 };
 
 export default ipcHandler;
