@@ -14,6 +14,7 @@ const sortHandler = (
 ) => {
   const appPath = app.getAppPath();
   const sortConfigPath = pathManager.sortConfigPath;
+  const settingConfigPath = pathManager.settingConfigPath;
 
   ipcMain.handle("Sort_getPicFolder" as SortApi, () => {});
 
@@ -612,6 +613,85 @@ const sortHandler = (
         return {
           success: false,
           conflict: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
+
+  // 删除分类文件夹
+  ipcMain.handle(
+    "Sort_deleteSortFolder" as SortApi,
+    async (_event, targets: Array<string>) => {
+      try {
+        // 获取sortConfig的完整路径
+        const configPath = path.resolve(appPath, sortConfigPath);
+        // 读取当前配置文件内容
+        const fileContent = await fs.promises.readFile(configPath, "utf-8");
+        // 解析JSON内容
+        const config: SortConfig = JSON.parse(fileContent);
+        // 总分类文件夹路径
+        let sortFolderPath = config.sortFolderPath;
+        if (sortFolderPath == "") {
+          return {
+            success: false,
+            data: "onlymessage未指定总分类存储文件夹",
+          };
+        }
+
+        // 检查对应文件夹存不存在
+        const checkRes = await checkPathsExist("folder", [sortFolderPath]);
+        if (!checkRes.success) {
+          return {
+            success: false,
+            data: "onlymessage总分类存储文件夹丢失！",
+          };
+        }
+
+        // 检查需要删除的文件夹是否存在
+        let mapTargets = targets.map((target) =>
+          path.resolve(sortFolderPath, target)
+        );
+        const existRes = await checkPathsExist("folder", [...mapTargets]);
+        // 过滤掉不存在的文件夹
+        let filterTargets = mapTargets.filter(
+          (target) => !existRes.result.includes(target)
+        );
+        // 余下文件夹都存在，可开始删除
+        await Promise.all(
+          filterTargets.map(async (target) => {
+            await shell.trashItem(target);
+          })
+        );
+
+        // 清理自动重命名配置
+        const settingPath = path.resolve(appPath, settingConfigPath);
+        // 读取当前配置文件内容
+        const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+        // 解析JSON内容
+        const settingConfig: SettingConfig = JSON.parse(settingContent);
+        // 自动重命名配置
+        const autoRenameConfig = settingConfig.autoRename;
+        const filterConfig = autoRenameConfig.filter(
+          (item) => !mapTargets.includes(item.path)
+        );
+        // 更新配置
+        settingConfig.autoRename = filterConfig;
+        // 写回文件
+        await fs.promises.writeFile(
+          settingPath,
+          JSON.stringify(settingConfig, null, 2),
+          "utf-8"
+        );
+        return {
+          success: true,
+          data: "",
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
           data: errorLog,
         };
       }

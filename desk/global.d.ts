@@ -17,7 +17,8 @@ declare global {
     | "Sort_setSortFolderPath"
     | "Sort_getSortFolderInfo"
     | "Sort_openSortFolder"
-    | "Sort_insertSortFolder";
+    | "Sort_insertSortFolder"
+    | "Sort_deleteSortFolder";
 
   // 其他类型
   // 通用部分
@@ -137,6 +138,14 @@ declare global {
     picType: Array<picType>;
     createdAt: string;
     modifiedAt: string;
+  }
+
+  // 设置部分
+  interface AutoRenameConfig {
+    path: string;
+  }
+  interface SettingConfig {
+    autoRename: Array<AutoRenameConfig>;
   }
 }
 

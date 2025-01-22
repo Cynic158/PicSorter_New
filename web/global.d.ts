@@ -72,6 +72,9 @@ declare global {
       Sort_insertSortFolder: (
         name: string
       ) => Promise<{ success: boolean; conflict: boolean; data: string }>;
+      Sort_deleteSortFolder: (
+        targets: Array<string>
+      ) => Promise<{ success: boolean; data: string }>;
       Sort_copyPic: () => void;
       Sort_cutPic: () => void;
       Sort_deletePic: () => void;

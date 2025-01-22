@@ -105,6 +105,13 @@ const Sort_insertSortFolder = async (name: string) => {
   );
   return res;
 };
+const Sort_deleteSortFolder = async (targets: Array<string>) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_deleteSortFolder" as SortApi,
+    targets
+  );
+  return res;
+};
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
@@ -126,4 +133,5 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_getSortFolderInfo,
   Sort_openSortFolder,
   Sort_insertSortFolder,
+  Sort_deleteSortFolder,
 });

@@ -10,6 +10,7 @@ const SortApi = {
   getSortFolderInfo: window.DeskApi?.Sort_getSortFolderInfo,
   openSortFolder: window.DeskApi?.Sort_openSortFolder,
   insertSortFolder: window.DeskApi?.Sort_insertSortFolder,
+  deleteSortFolder: window.DeskApi?.Sort_deleteSortFolder,
   copyPic: window.DeskApi?.Sort_copyPic,
   cutPic: window.DeskApi?.Sort_cutPic,
   deletePic: window.DeskApi?.Sort_deletePic,

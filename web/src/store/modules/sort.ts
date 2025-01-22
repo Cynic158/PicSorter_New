@@ -3,6 +3,7 @@ import SortApi from "../../api/sort";
 import winStore from "./win";
 import { generateErrorLog } from "../../utils";
 import picStore from "./pic";
+import { cloneDeep } from "lodash";
 
 const sortStore = observable(
   {
@@ -366,6 +367,40 @@ const sortStore = observable(
         this.setInsertSortFolderLoading(false);
       }
     },
+
+    // 删除分类文件夹
+    deleteSortFolderLoading: false,
+    setDeleteSortFolderLoading(bool: boolean) {
+      this.deleteSortFolderLoading = bool;
+    },
+    async deleteSortFolder() {
+      let funcAction = "删除分类文件夹";
+      try {
+        this.setDeleteSortFolderLoading(true);
+        let res = await SortApi.deleteSortFolder(
+          cloneDeep(this.selectingSortList)
+        );
+        if (res.success) {
+          // 删除完成，获取一次列表
+          // 清空当前选择分类列表
+          this.clearSelectingSortList();
+          this.clearSelectedSortList();
+          this.getSortFolderList();
+          return true;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setDeleteSortFolderLoading(false);
+      }
+    },
   },
   {
     setShowControler: action,
@@ -392,6 +427,8 @@ const sortStore = observable(
     openSortFolder: action,
     setInsertSortFolderLoading: action,
     insertSortFolder: action,
+    setDeleteSortFolderLoading: action,
+    deleteSortFolder: action,
   }
 );
 
