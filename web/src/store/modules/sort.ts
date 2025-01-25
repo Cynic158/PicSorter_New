@@ -114,6 +114,16 @@ const sortStore = observable(
         this.selectingSortList.splice(findIndex, 1);
       }
     },
+    // 全选或者取消全选分类组
+    fullSelectingSortList() {
+      if (this.selectingSortList.length != this.sortFolderList.length) {
+        this.selectingSortList = cloneDeep(
+          this.sortFolderList.map((item) => item.name)
+        );
+      } else {
+        this.clearSelectingSortList();
+      }
+    },
     clearSelectingSortList() {
       this.selectingSortList = [];
     },
@@ -411,6 +421,7 @@ const sortStore = observable(
     setSortFolderConfig: action,
     setSelectingSortList: action,
     clearSelectingSortList: action,
+    fullSelectingSortList: action,
     setSelectedSortList: action,
     clearSelectedSortList: action,
     getPicFolderPath: action,

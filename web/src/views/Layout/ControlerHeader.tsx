@@ -55,6 +55,15 @@ export default function ControlerHeader() {
     }
   };
 
+  const fullSelect = () => {
+    if (
+      sortStore.sortFolderConfig.folderPath &&
+      sortStore.sortFolderList.length > 0
+    ) {
+      sortStore.fullSelectingSortList();
+    }
+  };
+
   return (
     <Observer>
       {() => (
@@ -169,7 +178,15 @@ export default function ControlerHeader() {
                 ></SvgIcon>
               </div>
             </li>
-            <li className="controler-header-item">
+            <li
+              onClick={fullSelect}
+              className={`controler-header-item${
+                sortStore.sortFolderConfig.folderPath &&
+                sortStore.sortFolderList.length > 0
+                  ? ""
+                  : " disabled"
+              }`}
+            >
               <div className="controler-header-item-bg"></div>
               <div className="controler-header-item-icon">
                 <SvgIcon
