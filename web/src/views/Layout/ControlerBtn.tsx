@@ -1,10 +1,13 @@
 import "../../styles/layout/controler.scss";
 import SvgIcon from "../../components/SvgIcon";
+import Loader from "../../components/Loader";
 import SortFolderDialog from "../Dialog/SortFolderDialog";
 import PicFolderDialog from "../Dialog/PicFolderDialog";
+import DeleteDialog from "../Dialog/DeleteDialog";
 import { useState } from "react";
 import sortStore from "../../store/modules/sort";
 import { Observer } from "mobx-react";
+import picStore from "../../store/modules/pic";
 
 export default function ControlerBtn() {
   const [sortFolderDialogShow, setSortFolderDialogShow] = useState(false);
@@ -22,10 +25,43 @@ export default function ControlerBtn() {
     setPicFolderDialogShow(false);
   };
 
+  const [deleteDialogShow, setDeleteDialogShow] = useState(false);
+  const showDeleteDialog = () => {
+    setDeleteDialogShow(true);
+  };
+  const hideDeleteDialog = () => {
+    setDeleteDialogShow(false);
+  };
+  const handleDeletePic = () => {
+    if (
+      (picStore.viewMode == "view" && picStore.picList[1] !== null) ||
+      (picStore.viewMode != "view" &&
+        picStore.picList.length != 0 &&
+        picStore.selectingPicList.length != 0)
+    ) {
+      if (!sortStore.handlePicLoading && !picStore.picListLoading) {
+        showDeleteDialog();
+      }
+    }
+  };
+
   return (
     <Observer>
       {() => (
         <div className="controler-btn-container">
+          <PicFolderDialog
+            show={picFolderDialogShow}
+            hide={hidePicFolderDialog}
+          ></PicFolderDialog>
+          <SortFolderDialog
+            show={sortFolderDialogShow}
+            hide={hideSortFolderDialog}
+          ></SortFolderDialog>
+          <DeleteDialog
+            type="deletePic"
+            show={deleteDialogShow}
+            hide={hideDeleteDialog}
+          ></DeleteDialog>
           <div className="controler-btn">
             <div className="controler-btn-left">
               <button className="controler-btn-left-item">
@@ -75,10 +111,6 @@ export default function ControlerBtn() {
                     </div>
                   </div>
                 </button>
-                <PicFolderDialog
-                  show={picFolderDialogShow}
-                  hide={hidePicFolderDialog}
-                ></PicFolderDialog>
                 <button
                   onClick={() => {
                     if (sortStore.picFolderConfig.folderPath) {
@@ -115,10 +147,6 @@ export default function ControlerBtn() {
                     ></SvgIcon>
                   </div>
                 </button>
-                <SortFolderDialog
-                  show={sortFolderDialogShow}
-                  hide={hideSortFolderDialog}
-                ></SortFolderDialog>
                 <button
                   onClick={() => {
                     if (sortStore.sortFolderConfig.folderPath) {
@@ -140,7 +168,21 @@ export default function ControlerBtn() {
                 </button>
               </div>
               <div className="controler-btn-right-item">
-                <button className="controler-btn-right-item-delete">
+                <button
+                  onClick={handleDeletePic}
+                  className={`controler-btn-right-item-delete${
+                    (picStore.viewMode == "view" &&
+                      picStore.picList[1] !== null) ||
+                    (picStore.viewMode != "view" &&
+                      picStore.picList.length != 0 &&
+                      picStore.selectingPicList.length != 0)
+                      ? ""
+                      : " disabled"
+                  }${sortStore.deletePicLoading ? " loading" : ""}`}
+                >
+                  <div className="controler-btn-icon-loading">
+                    <Loader></Loader>
+                  </div>
                   <div className="controler-btn-icon">
                     <SvgIcon
                       svgName="delete"

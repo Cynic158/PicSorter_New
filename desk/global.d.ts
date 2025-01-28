@@ -18,7 +18,9 @@ declare global {
     | "Sort_getSortFolderInfo"
     | "Sort_openSortFolder"
     | "Sort_insertSortFolder"
-    | "Sort_deleteSortFolder";
+    | "Sort_deleteSortFolder"
+    | "Sort_deletePic"
+    | "Sort_deletePicGroup";
 
   // 其他类型
   // 通用部分
@@ -26,6 +28,9 @@ declare global {
   type viewType = "view" | "horizontal" | "vertical";
 
   // pic部分
+  type GetPicListSaveType = () => Array<PicInfo>;
+  type SetPicListSave = (list: Array<PicInfo>) => void;
+
   type PicInfo = {
     name: string;
     size: number;

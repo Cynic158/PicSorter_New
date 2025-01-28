@@ -52,6 +52,8 @@
         .deletedialog-form-item-label {
           color: var(--color-white2);
           margin-bottom: 4px;
+          word-break: break-all;
+          text-align: justify;
         }
         .deletedialog-form-item-tip {
           margin-top: 12px;

@@ -411,6 +411,81 @@ const sortStore = observable(
         this.setDeleteSortFolderLoading(false);
       }
     },
+
+    // 删除图片
+    handlePicLoading: false,
+    setHandlePicLoading(bool: boolean) {
+      this.handlePicLoading = bool;
+    },
+    deletePicLoading: false,
+    setDeletePicLoading(bool: boolean) {
+      this.deletePicLoading = bool;
+    },
+    async deletePic() {
+      let funcAction = "删除图片";
+      try {
+        this.setHandlePicLoading(true);
+        this.setDeletePicLoading(true);
+        let res = await SortApi.deletePic(picStore.picList[1]!.path);
+        if (res.success) {
+          // 看情况跳转下一张还是上一张
+          // 默认先跳下一张
+          if (picStore.picList[2] !== null) {
+            // 可跳下一张
+            picStore.getPicList(false, picStore.picList[2].path);
+          } else if (picStore.picList[0] !== null) {
+            // 可跳上一张
+            picStore.getPicList(false, picStore.picList[0].path);
+          } else {
+            // 皆不可跳
+            picStore.getPicList();
+          }
+          return true;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setHandlePicLoading(false);
+        this.setDeletePicLoading(false);
+      }
+    },
+    async deletePicGroup() {
+      let funcAction = "删除图片组";
+      try {
+        this.setHandlePicLoading(true);
+        this.setDeletePicLoading(true);
+        let picPathGroup = picStore.selectingPicList.map(
+          (index) => picStore.picList[index]!.path
+        );
+        let res = await SortApi.deletePicGroup(picPathGroup);
+        if (res.success) {
+          // 清除选择列表
+          picStore.clearSelectingPicList();
+          // 重新获取列表
+          picStore.getPicList();
+          return true;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setHandlePicLoading(false);
+        this.setDeletePicLoading(false);
+      }
+    },
   },
   {
     setShowControler: action,
@@ -440,6 +515,10 @@ const sortStore = observable(
     insertSortFolder: action,
     setDeleteSortFolderLoading: action,
     deleteSortFolder: action,
+    setHandlePicLoading: action,
+    setDeletePicLoading: action,
+    deletePic: action,
+    deletePicGroup: action,
   }
 );
 

@@ -7,10 +7,13 @@ import {
 import fs from "fs";
 import path from "path";
 import pathManager from "../utils/path";
+import { cloneDeep } from "lodash";
 
 const sortHandler = (
   resetPicStatic: ResetPicStaticType,
-  resetSortStatic: ResetSortStaticType
+  resetSortStatic: ResetSortStaticType,
+  getPicListSave: GetPicListSaveType,
+  setPicListSave: SetPicListSave
 ) => {
   const appPath = app.getAppPath();
   const sortConfigPath = pathManager.sortConfigPath;
@@ -683,6 +686,104 @@ const sortHandler = (
           JSON.stringify(settingConfig, null, 2),
           "utf-8"
         );
+        return {
+          success: true,
+          data: "",
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
+
+  // 删除图片
+  ipcMain.handle(
+    "Sort_deletePic" as SortApi,
+    async (_event, picPath: string) => {
+      try {
+        // 检查在缓存列表中有没有这个图片
+        let picList = getPicListSave();
+        let findPicIndex = picList.findIndex((item) => item.path == picPath);
+        if (findPicIndex == -1) {
+          // 没找到
+          return {
+            success: true,
+            data: "",
+          };
+        }
+
+        // 获取到其路径
+        let checkRes = await checkPathsExist("file", [
+          picList[findPicIndex].path,
+        ]);
+        // 检查在文件夹中有没有这个图片
+        if (!checkRes.success) {
+          // 文件夹内不存在这个图片
+          return {
+            success: true,
+            data: "",
+          };
+        }
+
+        await shell.trashItem(picList[findPicIndex].path);
+        // 更新缓存列表
+        let cloneList = cloneDeep(picList);
+        cloneList.splice(findPicIndex, 1);
+        // 重新设置缓存列表
+        setPicListSave(cloneList);
+        return {
+          success: true,
+          data: "",
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
+
+  // 删除图片组
+  ipcMain.handle(
+    "Sort_deletePicGroup" as SortApi,
+    async (_event, picPathGroup: Array<string>) => {
+      try {
+        const resetList = () => {
+          let picList = getPicListSave();
+          let cloneList = cloneDeep(picList);
+          let filterList = cloneList.filter(
+            (item) => !picPathGroup.includes(item.path)
+          );
+          setPicListSave(filterList);
+        };
+        // 直接检查所有路径
+        let checkRes = await checkPathsExist("file", picPathGroup);
+        // 得到存在列表
+        let filterList = picPathGroup.filter(
+          (item) => !checkRes.result.includes(item)
+        );
+        if (filterList.length == 0) {
+          resetList();
+          return {
+            success: true,
+            data: "",
+          };
+        }
+
+        await Promise.all(
+          filterList.map(async (item) => {
+            await shell.trashItem(item);
+          })
+        );
+        resetList();
         return {
           success: true,
           data: "",

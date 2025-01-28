@@ -15,9 +15,34 @@ interface DeleteDialogProps {
 
 const DeleteDialog: React.FC<DeleteDialogProps> = ({ type, show, hide }) => {
   const handleDelete = async () => {
-    if (!sortStore.deleteSortFolderLoading) {
-      if (type == "deleteSortFolder") {
-        let res = await sortStore.deleteSortFolder();
+    if (type == "deleteSortFolder" && !sortStore.deleteSortFolderLoading) {
+      let res = await sortStore.deleteSortFolder();
+      if (res) {
+        winStore.setMessage({
+          type: "success",
+          msg: "删除成功",
+        });
+        closeDialog();
+      }
+    } else if (
+      type == "deletePic" &&
+      !sortStore.handlePicLoading &&
+      !picStore.picListLoading
+    ) {
+      // 先判断是单图还是多图
+      if (picStore.viewMode == "view") {
+        // 单图
+        let res = await sortStore.deletePic();
+        if (res) {
+          winStore.setMessage({
+            type: "success",
+            msg: "删除成功",
+          });
+          closeDialog();
+        }
+      } else {
+        // 多图
+        let res = await sortStore.deletePicGroup();
         if (res) {
           winStore.setMessage({
             type: "success",
@@ -30,7 +55,7 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ type, show, hide }) => {
   };
 
   const closeDialog = () => {
-    if (!sortStore.deleteSortFolderLoading) {
+    if (!sortStore.deleteSortFolderLoading && !sortStore.handlePicLoading) {
       hide();
     }
   };
@@ -70,7 +95,7 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ type, show, hide }) => {
                   {type == "deletePic"
                     ? "确定要删除" +
                       (picStore.viewMode == "view"
-                        ? " " + picStore.picList[1]!.name + " 吗？"
+                        ? " " + picStore.picList[1]?.name + " 吗？"
                         : "指定的 " +
                           picStore.selectingPicList.length +
                           "张 图片吗？")
@@ -86,7 +111,10 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ type, show, hide }) => {
               <button
                 onClick={handleDelete}
                 className={`deletedialog-btn${
-                  sortStore.deleteSortFolderLoading ? " loading" : ""
+                  sortStore.deleteSortFolderLoading ||
+                  sortStore.handlePicLoading
+                    ? " loading"
+                    : ""
                 }`}
               >
                 <span className="deletedialog-btn-text">确定</span>

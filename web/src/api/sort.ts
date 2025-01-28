@@ -14,6 +14,7 @@ const SortApi = {
   copyPic: window.DeskApi?.Sort_copyPic,
   cutPic: window.DeskApi?.Sort_cutPic,
   deletePic: window.DeskApi?.Sort_deletePic,
+  deletePicGroup: window.DeskApi?.Sort_deletePicGroup,
 };
 
 export default SortApi;

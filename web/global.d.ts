@@ -77,7 +77,12 @@ declare global {
       ) => Promise<{ success: boolean; data: string }>;
       Sort_copyPic: () => void;
       Sort_cutPic: () => void;
-      Sort_deletePic: () => void;
+      Sort_deletePic: (
+        picPath: string
+      ) => Promise<{ success: boolean; data: string }>;
+      Sort_deletePicGroup: (
+        picPathGroup: Array<string>
+      ) => Promise<{ success: boolean; data: string }>;
     };
   }
 

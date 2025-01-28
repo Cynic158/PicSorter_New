@@ -112,6 +112,17 @@ const Sort_deleteSortFolder = async (targets: Array<string>) => {
   );
   return res;
 };
+const Sort_deletePic = async (picPath: string) => {
+  const res = await ipcRenderer.invoke("Sort_deletePic" as SortApi, picPath);
+  return res;
+};
+const Sort_deletePicGroup = async (picPathGroup: Array<string>) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_deletePicGroup" as SortApi,
+    picPathGroup
+  );
+  return res;
+};
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
@@ -134,4 +145,6 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_openSortFolder,
   Sort_insertSortFolder,
   Sort_deleteSortFolder,
+  Sort_deletePic,
+  Sort_deletePicGroup,
 });

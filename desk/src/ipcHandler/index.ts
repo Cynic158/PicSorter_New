@@ -5,14 +5,14 @@ import sortHandler from "./sort";
 
 const ipcHandler = (
   mainWindow: BrowserWindow,
-  getPicListSave: () => Array<PicInfo>,
-  setPicListSave: (list: Array<PicInfo>) => void,
+  getPicListSave: GetPicListSaveType,
+  setPicListSave: SetPicListSave,
   resetPicStatic: ResetPicStaticType,
   resetSortStatic: ResetSortStaticType
 ) => {
   winHandler(mainWindow);
   picHandler(getPicListSave, setPicListSave);
-  sortHandler(resetPicStatic, resetSortStatic);
+  sortHandler(resetPicStatic, resetSortStatic, getPicListSave, setPicListSave);
 };
 
 export default ipcHandler;

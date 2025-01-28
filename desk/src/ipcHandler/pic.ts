@@ -12,8 +12,8 @@ import { cloneDeep } from "lodash";
 import sharp from "sharp";
 
 const picHandler = (
-  getPicListSave: () => Array<PicInfo>,
-  setPicListSave: (list: Array<PicInfo>) => void
+  getPicListSave: GetPicListSaveType,
+  setPicListSave: SetPicListSave
 ) => {
   const appPath = app.getAppPath();
   const picConfigPath = pathManager.picConfigPath;

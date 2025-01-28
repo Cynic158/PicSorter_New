@@ -30,7 +30,7 @@ const picStore = observable(
       this.picTotal = total;
     },
     // 图片列表
-    picList: [] as Array<PicInfo>,
+    picList: [null, null, null] as Array<PicInfo>,
     setPicList(list: Array<PicInfo>) {
       this.picList = list;
     },
