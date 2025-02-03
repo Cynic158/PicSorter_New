@@ -32,7 +32,11 @@ const picStore = observable(
     // 图片列表
     picList: [null, null, null] as Array<PicInfo>,
     setPicList(list: Array<PicInfo>) {
-      this.picList = list;
+      if (this.viewMode == "view" && list.length == 0) {
+        this.picList = [null, null, null];
+      } else {
+        this.picList = list;
+      }
     },
     // 获取图片列表
     picListLoading: false,

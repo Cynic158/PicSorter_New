@@ -77,7 +77,7 @@ const sortHandler = (
         if (!checkRes.success) {
           return {
             success: false,
-            data: "onlymessage对应未分类文件夹不存在！",
+            data: "onlymessage对应未分类文件夹不存在",
           };
         }
 
@@ -149,7 +149,7 @@ const sortHandler = (
       if (!checkRes.success) {
         return {
           success: false,
-          data: "onlymessage未分类存储文件夹丢失！",
+          data: "onlymessage未分类存储文件夹丢失",
         };
       }
 
@@ -229,7 +229,7 @@ const sortHandler = (
       if (!checkRes.success) {
         return {
           success: false,
-          data: "onlymessage总分类文件夹丢失！",
+          data: "onlymessage总分类文件夹丢失",
         };
       }
       // 获取总分类文件夹下的文件夹列表
@@ -446,7 +446,7 @@ const sortHandler = (
         if (!checkRes.success) {
           return {
             success: false,
-            data: "onlymessage对应总分类文件夹不存在！",
+            data: "onlymessage对应总分类文件夹不存在",
           };
         }
 
@@ -514,7 +514,7 @@ const sortHandler = (
       if (!checkRes.success) {
         return {
           success: false,
-          data: "onlymessage总分类存储文件夹丢失！",
+          data: "onlymessage总分类存储文件夹丢失",
         };
       }
 
@@ -586,7 +586,7 @@ const sortHandler = (
           return {
             success: false,
             conflict: false,
-            data: "onlymessage总分类存储文件夹丢失！",
+            data: "onlymessage总分类存储文件夹丢失",
           };
         }
 
@@ -647,7 +647,7 @@ const sortHandler = (
         if (!checkRes.success) {
           return {
             success: false,
-            data: "onlymessage总分类存储文件夹丢失！",
+            data: "onlymessage总分类存储文件夹丢失",
           };
         }
 
@@ -704,7 +704,7 @@ const sortHandler = (
   // 删除图片
   ipcMain.handle(
     "Sort_deletePic" as SortApi,
-    async (_event, picPath: string) => {
+    async (_event, picPath: string, cut: boolean = false) => {
       try {
         // 检查在缓存列表中有没有这个图片
         let picList = getPicListSave();
@@ -730,7 +730,13 @@ const sortHandler = (
           };
         }
 
-        await shell.trashItem(picList[findPicIndex].path);
+        if (!cut) {
+          await shell.trashItem(picList[findPicIndex].path);
+        } else {
+          // 不进行回收，直接删除
+          await fs.promises.unlink(picList[findPicIndex].path);
+        }
+
         // 更新缓存列表
         let cloneList = cloneDeep(picList);
         cloneList.splice(findPicIndex, 1);
@@ -754,7 +760,7 @@ const sortHandler = (
   // 删除图片组
   ipcMain.handle(
     "Sort_deletePicGroup" as SortApi,
-    async (_event, picPathGroup: Array<string>) => {
+    async (_event, picPathGroup: Array<string>, cut: boolean = false) => {
       try {
         const resetList = () => {
           let picList = getPicListSave();
@@ -778,11 +784,21 @@ const sortHandler = (
           };
         }
 
-        await Promise.all(
-          filterList.map(async (item) => {
-            await shell.trashItem(item);
-          })
-        );
+        if (!cut) {
+          await Promise.all(
+            filterList.map(async (item) => {
+              await shell.trashItem(item);
+            })
+          );
+        } else {
+          // 不进行回收，直接删除
+          await Promise.all(
+            filterList.map(async (item) => {
+              await fs.promises.unlink(item);
+            })
+          );
+        }
+
         resetList();
         return {
           success: true,
@@ -793,6 +809,233 @@ const sortHandler = (
         let errorLog = generateErrorLog(error);
         return {
           success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
+
+  // 复制图片
+  ipcMain.handle(
+    "Sort_copyPic" as SortApi,
+    async (
+      _event,
+      picPath: string,
+      targets: Array<string>,
+      action: "copy" | "cut",
+      force: boolean
+    ) => {
+      try {
+        // 获取根路径
+        const configPath = path.resolve(appPath, sortConfigPath);
+        // 读取当前配置文件内容
+        const fileContent = await fs.promises.readFile(configPath, "utf-8");
+        // 解析JSON内容
+        const config: SortConfig = JSON.parse(fileContent);
+        // 总分类文件夹路径
+        let sortFolderPath = config.sortFolderPath;
+
+        // 检查图片是否存在
+        let checkRes = await checkPathsExist("file", [picPath]);
+        if (!checkRes.success) {
+          return {
+            success: false,
+            conflict: false,
+            data: "onlymessage所操作图片已丢失",
+          };
+        }
+
+        // 创建映射
+        let picName = path.basename(picPath);
+        let mapTargets: Array<CopyPicDataType> = targets.map((target) => {
+          return {
+            picName: picName,
+            picPath: picPath,
+            sortName: target,
+            sortPath: path.join(sortFolderPath, target),
+            action: action,
+          };
+        });
+
+        // 检查有没有冲突
+        let mapPaths = mapTargets.map((target) =>
+          path.join(target.sortPath, picName)
+        );
+
+        // 如果强制复制
+        if (force) {
+          // 对可执行路径进行复制到对应文件夹
+          await Promise.all(
+            mapPaths.map(async (item) => {
+              await fs.promises.copyFile(picPath, item);
+            })
+          );
+          return {
+            success: true,
+            conflict: false,
+            data: "",
+          };
+        }
+
+        let checkConflictRes = await checkPathsExist("file", mapPaths);
+        // 得到可执行的路径
+        let allowCopyRes = checkConflictRes.result;
+        // 得到冲突的路径
+        let conflictRes = mapPaths.filter(
+          (item) => !allowCopyRes.includes(item)
+        );
+        // 得到冲突对象
+        let conflictTargets: Array<CopyPicDataType> = [];
+        if (conflictRes.length > 0) {
+          conflictTargets = mapTargets.filter((target) =>
+            conflictRes.includes(path.join(target.sortPath, picName))
+          );
+        }
+
+        // 对可执行路径进行复制到对应文件夹
+        await Promise.all(
+          allowCopyRes.map(async (item) => {
+            await fs.promises.copyFile(picPath, item);
+          })
+        );
+
+        if (conflictTargets.length == 0) {
+          // 无冲突
+          return {
+            success: true,
+            conflict: false,
+            data: "",
+          };
+        } else {
+          // 有冲突
+          return {
+            success: true,
+            conflict: true,
+            data: conflictTargets,
+          };
+        }
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          conflict: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
+
+  // 复制图片组
+  ipcMain.handle(
+    "Sort_copyPicGroup" as SortApi,
+    async (
+      _event,
+      picPathGroup: Array<string>,
+      targets: Array<string>,
+      action: "copy" | "cut",
+      force: boolean
+    ) => {
+      try {
+        // 检查所有图片是否存在
+        let checkRes = await checkPathsExist("file", picPathGroup);
+        let filterPicPathGroup = picPathGroup.filter(
+          (item) => !checkRes.result.includes(item)
+        );
+
+        // 获取配置文件的根路径，并读取配置
+        const configPath = path.resolve(appPath, sortConfigPath);
+        const fileContent = await fs.promises.readFile(configPath, "utf-8");
+        const config: SortConfig = JSON.parse(fileContent);
+        // 总分类文件夹路径
+        let sortFolderPath = config.sortFolderPath;
+
+        // 构建所有待复制的映射数据
+        // 每个图片在每个目标文件夹都有一份映射
+        let mapTargets: Array<CopyPicDataType> = [];
+        filterPicPathGroup.forEach((picPath) => {
+          // 获取当前图片文件名（包含后缀）
+          let picName = path.basename(picPath);
+          targets.forEach((target) => {
+            mapTargets.push({
+              picName: picName,
+              picPath: picPath,
+              sortName: target,
+              sortPath: path.join(sortFolderPath, target),
+              action: action,
+            });
+          });
+        });
+
+        // 得到所有待复制的目标文件完整路径
+        let mapPaths = mapTargets.map((target) =>
+          path.join(target.sortPath, target.picName)
+        );
+
+        // 如果强制复制
+        if (force) {
+          await Promise.all(
+            mapTargets.map(async (target) => {
+              let destPath = path.join(target.sortPath, target.picName);
+              await fs.promises.copyFile(target.picPath, destPath);
+            })
+          );
+          return {
+            success: true,
+            conflict: false,
+            data: "",
+          };
+        }
+
+        // 检查目标路径是否存在（判断冲突）
+        let checkConflictRes = await checkPathsExist("file", mapPaths);
+        // 允许复制的目标路径
+        let allowCopyRes = checkConflictRes.result;
+        // 允许复制的对象
+        let allowTargets = mapTargets.filter((target) =>
+          allowCopyRes.includes(path.join(target.sortPath, target.picName))
+        );
+        // 冲突的目标路径
+        let conflictRes = mapPaths.filter(
+          (item) => !allowCopyRes.includes(item)
+        );
+        // 得到冲突对象
+        let conflictTargets: Array<CopyPicDataType> = [];
+        if (conflictRes.length > 0) {
+          conflictTargets = mapTargets.filter((target) =>
+            conflictRes.includes(path.join(target.sortPath, target.picName))
+          );
+        }
+
+        // 对允许复制的目标路径，使用 Promise.all 异步并行执行复制操作
+        await Promise.all(
+          allowTargets.map(async (target) => {
+            let destPath = path.join(target.sortPath, target.picName);
+            await fs.promises.copyFile(target.picPath, destPath);
+          })
+        );
+
+        if (conflictTargets.length === 0) {
+          // 无冲突，全部复制成功
+          return {
+            success: true,
+            conflict: false,
+            data: "",
+          };
+        } else {
+          // 存在冲突，返回冲突对象
+          return {
+            success: true,
+            conflict: true,
+            data: conflictTargets,
+          };
+        }
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          conflict: false,
           data: errorLog,
         };
       }

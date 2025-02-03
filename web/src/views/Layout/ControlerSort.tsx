@@ -6,6 +6,10 @@ import { Observer } from "mobx-react";
 import { getFileSize } from "../../utils";
 
 export default function ControlerSort() {
+  const applySelected = () => {
+    sortStore.applySelected();
+  };
+
   return (
     <Observer>
       {() => (
@@ -43,6 +47,10 @@ export default function ControlerSort() {
                         ></SvgIcon>
                       </div>
                       <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          applySelected();
+                        }}
                         className={`icon selected${
                           !sortStore.selectingSortList.includes(item.name) &&
                           sortStore.selectedSortList.includes(item.name)
@@ -54,7 +62,7 @@ export default function ControlerSort() {
                           svgName="selected"
                           svgSize="20px"
                           clickable={true}
-                          color="var(--color-white2)"
+                          color="var(--color-blue5)"
                         ></SvgIcon>
                       </div>
                       <div

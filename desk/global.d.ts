@@ -19,6 +19,8 @@ declare global {
     | "Sort_openSortFolder"
     | "Sort_insertSortFolder"
     | "Sort_deleteSortFolder"
+    | "Sort_copyPic"
+    | "Sort_copyPicGroup"
     | "Sort_deletePic"
     | "Sort_deletePicGroup";
 
@@ -143,6 +145,14 @@ declare global {
     picType: Array<picType>;
     createdAt: string;
     modifiedAt: string;
+  }
+
+  interface CopyPicDataType {
+    picName: string;
+    picPath: string;
+    sortName: string;
+    sortPath: string;
+    action: "copy" | "cut";
   }
 
   // 设置部分

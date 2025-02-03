@@ -8,6 +8,7 @@ import { useState } from "react";
 import sortStore from "../../store/modules/sort";
 import { Observer } from "mobx-react";
 import picStore from "../../store/modules/pic";
+import winStore from "../../store/modules/win";
 
 export default function ControlerBtn() {
   const [sortFolderDialogShow, setSortFolderDialogShow] = useState(false);
@@ -45,6 +46,103 @@ export default function ControlerBtn() {
     }
   };
 
+  const [replaceDialogShow, setReplaceDialogShow] = useState(false);
+  const showReplaceDialog = () => {
+    setReplaceDialogShow(true);
+  };
+  const hideReplaceDialog = () => {
+    setReplaceDialogShow(false);
+  };
+  const [replaceData, setReplaceData] = useState<Array<CopyPicDataType>>([]);
+  const handleCopyPic = async () => {
+    if (!sortStore.handlePicLoading && !sortStore.copyPicLoading) {
+      if (
+        picStore.viewMode == "view" &&
+        picStore.picList[1] !== null &&
+        sortStore.selectingSortList.length > 0
+      ) {
+        let res = await sortStore.copyPic();
+        if (res.success && res.conflictData.length > 0) {
+          // 有冲突
+          setReplaceData(res.conflictData);
+          let timer = setTimeout(() => {
+            showReplaceDialog();
+            clearTimeout(timer);
+          }, 100);
+        } else if (res.success && res.conflictData.length == 0) {
+          winStore.setMessage({
+            msg: "复制成功",
+            type: "success",
+          });
+        }
+      } else if (
+        picStore.viewMode != "view" &&
+        picStore.picList.length > 0 &&
+        picStore.selectingPicList.length > 0 &&
+        sortStore.selectingSortList.length > 0
+      ) {
+        let res = await sortStore.copyPicGroup();
+        if (res.success && res.conflictData.length > 0) {
+          // 有冲突
+          setReplaceData(res.conflictData);
+          let timer = setTimeout(() => {
+            showReplaceDialog();
+            clearTimeout(timer);
+          }, 100);
+        } else if (res.success && res.conflictData.length == 0) {
+          winStore.setMessage({
+            msg: "复制成功",
+            type: "success",
+          });
+        }
+      }
+    }
+  };
+  const handleCutPic = async () => {
+    if (!sortStore.handlePicLoading && !sortStore.cutPicLoading) {
+      if (
+        picStore.viewMode == "view" &&
+        picStore.picList[1] !== null &&
+        sortStore.selectingSortList.length > 0
+      ) {
+        let res = await sortStore.cutPic();
+        if (res.success && res.conflictData.length > 0) {
+          // 有冲突
+          setReplaceData(res.conflictData);
+          let timer = setTimeout(() => {
+            showReplaceDialog();
+            clearTimeout(timer);
+          }, 100);
+        } else if (res.success && res.conflictData.length == 0) {
+          winStore.setMessage({
+            msg: "剪切成功",
+            type: "success",
+          });
+        }
+      } else if (
+        picStore.viewMode != "view" &&
+        picStore.picList.length > 0 &&
+        picStore.selectingPicList.length > 0 &&
+        sortStore.selectingSortList.length > 0
+      ) {
+        let res = await sortStore.cutPicGroup();
+        if (res.success && res.conflictData.length > 0) {
+          // 有冲突
+          setReplaceData(res.conflictData);
+          let timer = setTimeout(() => {
+            showReplaceDialog();
+            clearTimeout(timer);
+          }, 100);
+        } else if (res.success && res.conflictData.length == 0) {
+          winStore.setMessage({
+            msg: "剪切成功",
+            type: "success",
+          });
+        }
+      }
+    }
+  };
+
   return (
     <Observer>
       {() => (
@@ -64,7 +162,23 @@ export default function ControlerBtn() {
           ></DeleteDialog>
           <div className="controler-btn">
             <div className="controler-btn-left">
-              <button className="controler-btn-left-item">
+              <button
+                onClick={handleCutPic}
+                className={`controler-btn-left-item${
+                  (picStore.viewMode == "view" &&
+                    picStore.picList[1] !== null &&
+                    sortStore.selectingSortList.length > 0) ||
+                  (picStore.viewMode != "view" &&
+                    picStore.picList.length > 0 &&
+                    picStore.selectingPicList.length > 0 &&
+                    sortStore.selectingSortList.length > 0)
+                    ? ""
+                    : " disabled"
+                }${sortStore.cutPicLoading ? " loading" : ""}`}
+              >
+                <div className="controler-btn-icon-loading">
+                  <Loader></Loader>
+                </div>
                 <div className="controler-btn-icon">
                   <SvgIcon
                     svgName="cut"
@@ -74,7 +188,23 @@ export default function ControlerBtn() {
                   ></SvgIcon>
                 </div>
               </button>
-              <button className="controler-btn-left-item">
+              <button
+                onClick={handleCopyPic}
+                className={`controler-btn-left-item${
+                  (picStore.viewMode == "view" &&
+                    picStore.picList[1] !== null &&
+                    sortStore.selectingSortList.length > 0) ||
+                  (picStore.viewMode != "view" &&
+                    picStore.picList.length > 0 &&
+                    picStore.selectingPicList.length > 0 &&
+                    sortStore.selectingSortList.length > 0)
+                    ? ""
+                    : " disabled"
+                }${sortStore.copyPicLoading ? " loading" : ""}`}
+              >
+                <div className="controler-btn-icon-loading">
+                  <Loader></Loader>
+                </div>
                 <div className="controler-btn-icon">
                   <SvgIcon
                     svgName="copy"
