@@ -7,6 +7,7 @@ import "../../styles/viewer/horizontalviewer.scss";
 import { getFileSize } from "../../utils";
 import { useState } from "react";
 import PicInfoDialog from "../Dialog/PicInfoDialog";
+import sortStore from "../../store/modules/sort";
 
 export default function HorizontalViewer() {
   const [currentPicIndex, setCurrentPicIndex] = useState(0);
@@ -18,7 +19,7 @@ export default function HorizontalViewer() {
     setPicInfoDialogShow(false);
   };
   const getPicInfo = (picIndex: number) => {
-    if (!picStore.getPicInfoLoading) {
+    if (!picStore.getPicInfoLoading && !sortStore.handlePicLoading) {
       setCurrentPicIndex(picIndex);
       picStore.getPicInfo(picIndex);
       showPicInfoDialog();
@@ -30,7 +31,7 @@ export default function HorizontalViewer() {
   };
 
   const zoomPic = (picPath: string) => {
-    if (!picStore.picListLoading) {
+    if (!picStore.picListLoading && !sortStore.handlePicLoading) {
       picStore.getPicList(false, picPath, "view");
     }
   };

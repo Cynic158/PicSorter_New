@@ -1,10 +1,16 @@
 import "../../styles/layout/controler.scss";
 import SvgIcon from "../../components/SvgIcon";
+import Loader from "../../components/Loader";
 import SortFolderDialog from "../Dialog/SortFolderDialog";
 import PicFolderDialog from "../Dialog/PicFolderDialog";
+import DeleteDialog from "../Dialog/DeleteDialog";
+import ReplaceDialog from "../Dialog/ReplaceDialog";
 import { useState } from "react";
 import sortStore from "../../store/modules/sort";
 import { Observer } from "mobx-react";
+import picStore from "../../store/modules/pic";
+import winStore from "../../store/modules/win";
+import { cloneDeep } from "lodash";
 
 export default function ControlerBtn() {
   const [sortFolderDialogShow, setSortFolderDialogShow] = useState(false);
@@ -22,13 +28,172 @@ export default function ControlerBtn() {
     setPicFolderDialogShow(false);
   };
 
+  const [deleteDialogShow, setDeleteDialogShow] = useState(false);
+  const showDeleteDialog = () => {
+    setDeleteDialogShow(true);
+  };
+  const hideDeleteDialog = () => {
+    setDeleteDialogShow(false);
+  };
+  const handleDeletePic = () => {
+    if (
+      (picStore.viewMode == "view" && picStore.picList[1] !== null) ||
+      (picStore.viewMode != "view" &&
+        picStore.picList.length != 0 &&
+        picStore.selectingPicList.length != 0)
+    ) {
+      if (!sortStore.handlePicLoading && !picStore.picListLoading) {
+        showDeleteDialog();
+      }
+    }
+  };
+
+  const [replaceDialogShow, setReplaceDialogShow] = useState(false);
+  const showReplaceDialog = () => {
+    setReplaceDialogShow(true);
+  };
+  const hideReplaceDialog = () => {
+    setReplaceDialogShow(false);
+  };
+  const [replaceData, setReplaceData] = useState<Array<CopyPicDataType>>([]);
+  const updateReplaceData = (count: number) => {
+    let newData = cloneDeep(replaceData);
+    newData.splice(0, count);
+    if (newData.length == 0) {
+      hideReplaceDialog();
+    }
+    setReplaceData(newData);
+  };
+  const handleCopyPic = async () => {
+    if (!sortStore.handlePicLoading && !sortStore.copyPicLoading) {
+      if (
+        picStore.viewMode == "view" &&
+        picStore.picList[1] !== null &&
+        sortStore.selectingSortList.length > 0
+      ) {
+        let res = await sortStore.copyPic();
+        if (res.success && res.conflictData.length > 0) {
+          // 有冲突
+          setReplaceData(res.conflictData);
+          let timer = setTimeout(() => {
+            showReplaceDialog();
+            clearTimeout(timer);
+          }, 100);
+        } else if (res.success && res.conflictData.length == 0) {
+          winStore.setMessage({
+            msg: "复制成功",
+            type: "success",
+          });
+        }
+      } else if (
+        picStore.viewMode != "view" &&
+        picStore.picList.length > 0 &&
+        picStore.selectingPicList.length > 0 &&
+        sortStore.selectingSortList.length > 0
+      ) {
+        let res = await sortStore.copyPicGroup();
+        if (res.success && res.conflictData.length > 0) {
+          // 有冲突
+          setReplaceData(res.conflictData);
+          let timer = setTimeout(() => {
+            showReplaceDialog();
+            clearTimeout(timer);
+          }, 100);
+        } else if (res.success && res.conflictData.length == 0) {
+          winStore.setMessage({
+            msg: "复制成功",
+            type: "success",
+          });
+        }
+      }
+    }
+  };
+  const handleCutPic = async () => {
+    if (!sortStore.handlePicLoading && !sortStore.cutPicLoading) {
+      if (
+        picStore.viewMode == "view" &&
+        picStore.picList[1] !== null &&
+        sortStore.selectingSortList.length > 0
+      ) {
+        let res = await sortStore.cutPic();
+        if (res.success && res.conflictData.length > 0) {
+          // 有冲突
+          setReplaceData(res.conflictData);
+          let timer = setTimeout(() => {
+            showReplaceDialog();
+            clearTimeout(timer);
+          }, 100);
+        } else if (res.success && res.conflictData.length == 0) {
+          winStore.setMessage({
+            msg: "剪切成功",
+            type: "success",
+          });
+        }
+      } else if (
+        picStore.viewMode != "view" &&
+        picStore.picList.length > 0 &&
+        picStore.selectingPicList.length > 0 &&
+        sortStore.selectingSortList.length > 0
+      ) {
+        let res = await sortStore.cutPicGroup();
+        if (res.success && res.conflictData.length > 0) {
+          // 有冲突
+          setReplaceData(res.conflictData);
+          let timer = setTimeout(() => {
+            showReplaceDialog();
+            clearTimeout(timer);
+          }, 100);
+        } else if (res.success && res.conflictData.length == 0) {
+          winStore.setMessage({
+            msg: "剪切成功",
+            type: "success",
+          });
+        }
+      }
+    }
+  };
+
   return (
     <Observer>
       {() => (
         <div className="controler-btn-container">
+          <PicFolderDialog
+            show={picFolderDialogShow}
+            hide={hidePicFolderDialog}
+          ></PicFolderDialog>
+          <SortFolderDialog
+            show={sortFolderDialogShow}
+            hide={hideSortFolderDialog}
+          ></SortFolderDialog>
+          <DeleteDialog
+            type="deletePic"
+            show={deleteDialogShow}
+            hide={hideDeleteDialog}
+          ></DeleteDialog>
+          <ReplaceDialog
+            show={replaceDialogShow}
+            replaceData={replaceData}
+            updateReplaceData={updateReplaceData}
+          ></ReplaceDialog>
           <div className="controler-btn">
             <div className="controler-btn-left">
-              <button className="controler-btn-left-item">
+              <button
+                onClick={handleCutPic}
+                className={`controler-btn-left-item${
+                  (picStore.viewMode == "view" &&
+                    picStore.picList[1] !== null &&
+                    sortStore.selectingSortList.length > 0) ||
+                  (picStore.viewMode != "view" &&
+                    picStore.picList.length > 0 &&
+                    picStore.selectingPicList.length > 0 &&
+                    sortStore.selectingSortList.length > 0)
+                    ? ""
+                    : " disabled"
+                }${sortStore.cutPicLoading ? " loading" : ""}`}
+              >
+                <div className="controler-btn-icon-loading">
+                  <Loader></Loader>
+                </div>
                 <div className="controler-btn-icon">
                   <SvgIcon
                     svgName="cut"
@@ -38,7 +203,23 @@ export default function ControlerBtn() {
                   ></SvgIcon>
                 </div>
               </button>
-              <button className="controler-btn-left-item">
+              <button
+                onClick={handleCopyPic}
+                className={`controler-btn-left-item${
+                  (picStore.viewMode == "view" &&
+                    picStore.picList[1] !== null &&
+                    sortStore.selectingSortList.length > 0) ||
+                  (picStore.viewMode != "view" &&
+                    picStore.picList.length > 0 &&
+                    picStore.selectingPicList.length > 0 &&
+                    sortStore.selectingSortList.length > 0)
+                    ? ""
+                    : " disabled"
+                }${sortStore.copyPicLoading ? " loading" : ""}`}
+              >
+                <div className="controler-btn-icon-loading">
+                  <Loader></Loader>
+                </div>
                 <div className="controler-btn-icon">
                   <SvgIcon
                     svgName="copy"
@@ -75,10 +256,6 @@ export default function ControlerBtn() {
                     </div>
                   </div>
                 </button>
-                <PicFolderDialog
-                  show={picFolderDialogShow}
-                  hide={hidePicFolderDialog}
-                ></PicFolderDialog>
                 <button
                   onClick={() => {
                     if (sortStore.picFolderConfig.folderPath) {
@@ -115,10 +292,6 @@ export default function ControlerBtn() {
                     ></SvgIcon>
                   </div>
                 </button>
-                <SortFolderDialog
-                  show={sortFolderDialogShow}
-                  hide={hideSortFolderDialog}
-                ></SortFolderDialog>
                 <button
                   onClick={() => {
                     if (sortStore.sortFolderConfig.folderPath) {
@@ -140,7 +313,21 @@ export default function ControlerBtn() {
                 </button>
               </div>
               <div className="controler-btn-right-item">
-                <button className="controler-btn-right-item-delete">
+                <button
+                  onClick={handleDeletePic}
+                  className={`controler-btn-right-item-delete${
+                    (picStore.viewMode == "view" &&
+                      picStore.picList[1] !== null) ||
+                    (picStore.viewMode != "view" &&
+                      picStore.picList.length != 0 &&
+                      picStore.selectingPicList.length != 0)
+                      ? ""
+                      : " disabled"
+                  }${sortStore.deletePicLoading ? " loading" : ""}`}
+                >
+                  <div className="controler-btn-icon-loading">
+                    <Loader></Loader>
+                  </div>
                   <div className="controler-btn-icon">
                     <SvgIcon
                       svgName="delete"

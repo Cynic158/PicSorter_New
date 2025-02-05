@@ -1248,6 +1248,7 @@ const PicFolderDialog: React.FC<PicFolderDialogProps> = ({ show, hide }) => {
                     <div className="picfolderdialog-config-item-right show">
                       {fileType.map((type) => (
                         <div
+                          key={type}
                           onClick={() => {
                             setFileType(type);
                           }}

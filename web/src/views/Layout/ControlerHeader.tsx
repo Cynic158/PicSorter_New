@@ -1,9 +1,12 @@
 import "../../styles/layout/controler.scss";
 import SvgIcon from "../../components/SvgIcon";
 import MainFolderDialog from "../Dialog/MainFolderDialog";
+import InputDialog from "../Dialog/InputDialog";
+import DeleteDialog from "../Dialog/DeleteDialog";
 import { Observer } from "mobx-react";
 import { useState } from "react";
 import picStore from "../../store/modules/pic";
+import sortStore from "../../store/modules/sort";
 
 export default function ControlerHeader() {
   const [mainFolderDialogShow, setMainFolderDialogShow] = useState(false);
@@ -18,9 +21,47 @@ export default function ControlerHeader() {
     if (
       picStore.picTotal != 0 &&
       !picStore.picListLoading &&
-      picStore.viewMode != mode
+      picStore.viewMode != mode &&
+      !sortStore.handlePicLoading
     ) {
       picStore.getPicList(false, null, mode);
+    }
+  };
+
+  const [inputDialogShow, setInputDialogShow] = useState(false);
+  const showInputDialog = () => {
+    setInputDialogShow(true);
+  };
+  const hideInputDialog = () => {
+    setInputDialogShow(false);
+  };
+  const insertSortFolder = () => {
+    if (sortStore.sortFolderConfig.folderPath && !sortStore.handlePicLoading) {
+      // 允许执行
+      showInputDialog();
+    }
+  };
+
+  const [deleteDialogShow, setDeleteDialogShow] = useState(false);
+  const showDeleteDialog = () => {
+    setDeleteDialogShow(true);
+  };
+  const hideDeleteDialog = () => {
+    setDeleteDialogShow(false);
+  };
+  const deleteSortFolder = () => {
+    if (sortStore.selectingSortList.length > 0 && !sortStore.handlePicLoading) {
+      // 允许执行
+      showDeleteDialog();
+    }
+  };
+
+  const fullSelect = () => {
+    if (
+      sortStore.sortFolderConfig.folderPath &&
+      sortStore.sortFolderList.length > 0
+    ) {
+      sortStore.fullSelectingSortList();
     }
   };
 
@@ -106,7 +147,12 @@ export default function ControlerHeader() {
                 ></SvgIcon>
               </div>
             </li>
-            <li className="controler-header-item">
+            <li
+              onClick={insertSortFolder}
+              className={`controler-header-item${
+                !sortStore.sortFolderConfig.folderPath ? " disabled" : ""
+              }`}
+            >
               <div className="controler-header-item-bg"></div>
               <div className="controler-header-item-icon">
                 <SvgIcon
@@ -117,7 +163,12 @@ export default function ControlerHeader() {
                 ></SvgIcon>
               </div>
             </li>
-            <li className="controler-header-item">
+            <li
+              onClick={deleteSortFolder}
+              className={`controler-header-item${
+                sortStore.selectingSortList.length > 0 ? "" : " disabled"
+              }`}
+            >
               <div className="controler-header-item-bg delete"></div>
               <div className="controler-header-item-icon">
                 <SvgIcon
@@ -128,7 +179,15 @@ export default function ControlerHeader() {
                 ></SvgIcon>
               </div>
             </li>
-            <li className="controler-header-item">
+            <li
+              onClick={fullSelect}
+              className={`controler-header-item${
+                sortStore.sortFolderConfig.folderPath &&
+                sortStore.sortFolderList.length > 0
+                  ? ""
+                  : " disabled"
+              }`}
+            >
               <div className="controler-header-item-bg"></div>
               <div className="controler-header-item-icon">
                 <SvgIcon
@@ -159,6 +218,16 @@ export default function ControlerHeader() {
               show={mainFolderDialogShow}
               hide={hideMainFolderDialog}
             ></MainFolderDialog>
+            <InputDialog
+              type="insertSortFolder"
+              show={inputDialogShow}
+              hide={hideInputDialog}
+            ></InputDialog>
+            <DeleteDialog
+              type="deleteSortFolder"
+              show={deleteDialogShow}
+              hide={hideDeleteDialog}
+            ></DeleteDialog>
           </ul>
         </div>
       )}

@@ -16,7 +16,13 @@ declare global {
     | "Sort_getSortFolderPath"
     | "Sort_setSortFolderPath"
     | "Sort_getSortFolderInfo"
-    | "Sort_openSortFolder";
+    | "Sort_openSortFolder"
+    | "Sort_insertSortFolder"
+    | "Sort_deleteSortFolder"
+    | "Sort_copyPic"
+    | "Sort_copyPicGroup"
+    | "Sort_deletePic"
+    | "Sort_deletePicGroup";
 
   // 其他类型
   // 通用部分
@@ -24,6 +30,9 @@ declare global {
   type viewType = "view" | "horizontal" | "vertical";
 
   // pic部分
+  type GetPicListSaveType = () => Array<PicInfo>;
+  type SetPicListSave = (list: Array<PicInfo>) => void;
+
   type PicInfo = {
     name: string;
     size: number;
@@ -44,6 +53,7 @@ declare global {
 
   // sort部分
   type ResetPicStaticType = (picFolderPath: string) => Promise<boolean>;
+  type ResetSortStaticType = (sortFolderPath: string) => Promise<boolean>;
 
   type SortTypeForPic =
     | "nameAsc" // 名称递增: a-z
@@ -135,6 +145,22 @@ declare global {
     picType: Array<picType>;
     createdAt: string;
     modifiedAt: string;
+  }
+
+  interface CopyPicDataType {
+    picName: string;
+    picPath: string;
+    sortName: string;
+    sortPath: string;
+    action: "copy" | "cut";
+  }
+
+  // 设置部分
+  interface AutoRenameConfig {
+    path: string;
+  }
+  interface SettingConfig {
+    autoRename: Array<AutoRenameConfig>;
   }
 }
 

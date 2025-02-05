@@ -68,6 +68,41 @@ declare global {
         data: FolderInfoType | string;
       }>;
       Sort_openSortFolder: () => Promise<{ success: boolean; data: string }>;
+
+      Sort_insertSortFolder: (
+        name: string
+      ) => Promise<{ success: boolean; conflict: boolean; data: string }>;
+      Sort_deleteSortFolder: (
+        targets: Array<string>
+      ) => Promise<{ success: boolean; data: string }>;
+      Sort_copyPic: (
+        picPath: string,
+        targets: Array<string>,
+        action: "copy" | "cut",
+        force: boolean
+      ) => Promise<{
+        success: boolean;
+        conflict: boolean;
+        data: Array<CopyPicDataType> | string;
+      }>;
+      Sort_copyPicGroup: (
+        picPathGroup: Array<string>,
+        targets: Array<string>,
+        action: "copy" | "cut",
+        force: boolean
+      ) => Promise<{
+        success: boolean;
+        conflict: boolean;
+        data: Array<CopyPicDataType> | string;
+      }>;
+      Sort_deletePic: (
+        picPath: string,
+        cut?: boolean
+      ) => Promise<{ success: boolean; data: string }>;
+      Sort_deletePicGroup: (
+        picPathGroup: Array<string>,
+        cut?: boolean
+      ) => Promise<{ success: boolean; data: string }>;
     };
   }
 
@@ -236,6 +271,14 @@ declare global {
     picType: Array<picType> | string;
     createdAt: string;
     modifiedAt: string;
+  }
+
+  interface CopyPicDataType {
+    picName: string;
+    picPath: string;
+    sortName: string;
+    sortPath: string;
+    action: "copy" | "cut";
   }
 }
 

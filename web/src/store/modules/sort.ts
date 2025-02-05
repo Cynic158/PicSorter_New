@@ -3,6 +3,7 @@ import SortApi from "../../api/sort";
 import winStore from "./win";
 import { generateErrorLog } from "../../utils";
 import picStore from "./pic";
+import { cloneDeep } from "lodash";
 
 const sortStore = observable(
   {
@@ -113,6 +114,16 @@ const sortStore = observable(
         this.selectingSortList.splice(findIndex, 1);
       }
     },
+    // 全选或者取消全选分类组
+    fullSelectingSortList() {
+      if (this.selectingSortList.length != this.sortFolderList.length) {
+        this.selectingSortList = cloneDeep(
+          this.sortFolderList.map((item) => item.name)
+        );
+      } else {
+        this.clearSelectingSortList();
+      }
+    },
     clearSelectingSortList() {
       this.selectingSortList = [];
     },
@@ -123,6 +134,9 @@ const sortStore = observable(
     },
     clearSelectedSortList() {
       this.selectedSortList = [];
+    },
+    applySelected() {
+      this.selectingSortList = cloneDeep(this.selectedSortList);
     },
 
     // 获取未分类文件夹路径
@@ -320,6 +334,432 @@ const sortStore = observable(
         winStore.setErrorDialog(log, funcAction);
       }
     },
+
+    // 新增分类文件夹
+    insertSortFolderLoading: false,
+    setInsertSortFolderLoading(bool: boolean) {
+      this.insertSortFolderLoading = bool;
+    },
+    async insertSortFolder(name: string) {
+      let funcAction = "新增分类文件夹";
+      try {
+        this.setInsertSortFolderLoading(true);
+        let res = await SortApi.insertSortFolder(name);
+        if (res.success) {
+          if (res.conflict) {
+            // 冲突
+            return {
+              success: true,
+              conflict: true,
+            };
+          } else {
+            // 无冲突，获取一次列表
+            this.getSortFolderList();
+            return {
+              success: true,
+              conflict: false,
+            };
+          }
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return {
+            success: false,
+            conflict: false,
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          success: false,
+          conflict: false,
+        };
+      } finally {
+        this.setInsertSortFolderLoading(false);
+      }
+    },
+
+    // 删除分类文件夹
+    deleteSortFolderLoading: false,
+    setDeleteSortFolderLoading(bool: boolean) {
+      this.deleteSortFolderLoading = bool;
+    },
+    async deleteSortFolder() {
+      let funcAction = "删除分类文件夹";
+      try {
+        this.setDeleteSortFolderLoading(true);
+        let res = await SortApi.deleteSortFolder(
+          cloneDeep(this.selectingSortList)
+        );
+        if (res.success) {
+          // 删除完成，获取一次列表
+          // 清空当前选择分类列表
+          this.clearSelectingSortList();
+          this.clearSelectedSortList();
+          this.getSortFolderList();
+          return true;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setDeleteSortFolderLoading(false);
+      }
+    },
+
+    // 删除图片
+    handlePicLoading: false,
+    setHandlePicLoading(bool: boolean) {
+      this.handlePicLoading = bool;
+    },
+    deletePicLoading: false,
+    setDeletePicLoading(bool: boolean) {
+      this.deletePicLoading = bool;
+    },
+    async deletePic(cut: boolean = false) {
+      let funcAction = "删除图片";
+      try {
+        if (!cut) {
+          this.setHandlePicLoading(true);
+          this.setDeletePicLoading(true);
+        }
+
+        let res = await SortApi.deletePic(picStore.picList[1]!.path, cut);
+        if (res.success) {
+          // 看情况跳转下一张还是上一张
+          // 默认先跳下一张
+          if (picStore.picList[2] !== null) {
+            // 可跳下一张
+            picStore.getPicList(false, picStore.picList[2].path);
+          } else if (picStore.picList[0] !== null) {
+            // 可跳上一张
+            picStore.getPicList(false, picStore.picList[0].path);
+          } else {
+            // 皆不可跳
+            picStore.getPicList();
+          }
+          return true;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        if (!cut) {
+          this.setHandlePicLoading(false);
+          this.setDeletePicLoading(false);
+        }
+      }
+    },
+    async deletePicGroup(
+      cut: boolean = false,
+      conflict?: boolean,
+      cutGroup?: Array<string>
+    ) {
+      let funcAction = "删除图片组";
+      try {
+        if (!cut) {
+          this.setHandlePicLoading(true);
+          this.setDeletePicLoading(true);
+        }
+
+        let picPathGroup = picStore.selectingPicList.map(
+          (index) => picStore.picList[index]!.path
+        );
+        if (conflict) {
+          picPathGroup = cutGroup!;
+        }
+
+        let res = await SortApi.deletePicGroup(picPathGroup, cut);
+        if (res.success) {
+          // 清除选择列表
+          picStore.clearSelectingPicList();
+          // 重新获取列表
+          picStore.getPicList();
+          return true;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        if (!cut) {
+          this.setHandlePicLoading(false);
+          this.setDeletePicLoading(false);
+        }
+      }
+    },
+
+    // 复制图片
+    copyPicLoading: false,
+    setCopyPicLoading(bool: boolean) {
+      this.copyPicLoading = bool;
+    },
+    async copyPic() {
+      let funcAction = "复制图片";
+      try {
+        this.setHandlePicLoading(true);
+        this.setCopyPicLoading(true);
+        let picPath = picStore.picList[1]!.path;
+        let targets = cloneDeep(this.selectingSortList);
+        let res = await SortApi.copyPic(picPath, targets, "copy", false);
+        if (res.success) {
+          this.setSelectedSortList(cloneDeep(this.selectingSortList));
+          // 需要检查有没有冲突
+          if (!res.conflict) {
+            // 无冲突
+            // 获取一次分类列表
+            this.getSortFolderList();
+            return {
+              success: true,
+              conflictData: [] as Array<CopyPicDataType>,
+            };
+          } else {
+            // 有冲突
+            return {
+              success: true,
+              conflictData: res.data as Array<CopyPicDataType>,
+            };
+          }
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return {
+            success: false,
+            conflictData: [] as Array<CopyPicDataType>,
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          success: false,
+          conflictData: [] as Array<CopyPicDataType>,
+        };
+      } finally {
+        this.setHandlePicLoading(false);
+        this.setCopyPicLoading(false);
+      }
+    },
+    async copyPicGroup() {
+      let funcAction = "复制图片组";
+      try {
+        this.setHandlePicLoading(true);
+        this.setCopyPicLoading(true);
+        let picPathGroup = picStore.selectingPicList.map(
+          (index) => picStore.picList[index]!.path
+        );
+        let targets = cloneDeep(this.selectingSortList);
+        let res = await SortApi.copyPicGroup(
+          picPathGroup,
+          targets,
+          "copy",
+          false
+        );
+        if (res.success) {
+          this.setSelectedSortList(cloneDeep(this.selectingSortList));
+          this.getSortFolderList();
+          // 需要检查有没有冲突
+          if (!res.conflict) {
+            // 无冲突
+            return {
+              success: true,
+              conflictData: [] as Array<CopyPicDataType>,
+            };
+          } else {
+            // 有冲突
+            return {
+              success: true,
+              conflictData: res.data as Array<CopyPicDataType>,
+            };
+          }
+        } else {
+          picStore.getPicList(true);
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return {
+            success: false,
+            conflictData: [] as Array<CopyPicDataType>,
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          success: false,
+          conflictData: [] as Array<CopyPicDataType>,
+        };
+      } finally {
+        this.setHandlePicLoading(false);
+        this.setCopyPicLoading(false);
+      }
+    },
+    cutPicLoading: false,
+    setCutPicLoading(bool: boolean) {
+      this.cutPicLoading = bool;
+    },
+    async cutPic() {
+      let funcAction = "剪切图片";
+      try {
+        this.setHandlePicLoading(true);
+        this.setCutPicLoading(true);
+        let picPath = picStore.picList[1]!.path;
+        let targets = cloneDeep(this.selectingSortList);
+        let res = await SortApi.copyPic(picPath, targets, "cut", false);
+        if (res.success) {
+          this.setSelectedSortList(cloneDeep(this.selectingSortList));
+          // 需要检查有没有冲突
+          if (!res.conflict) {
+            // 无冲突
+            this.getSortFolderList();
+            await this.deletePic(true);
+            return {
+              success: true,
+              conflictData: [] as Array<CopyPicDataType>,
+            };
+          } else {
+            // 有冲突
+            return {
+              success: true,
+              conflictData: res.data as Array<CopyPicDataType>,
+            };
+          }
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return {
+            success: false,
+            conflictData: [] as Array<CopyPicDataType>,
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          success: false,
+          conflictData: [] as Array<CopyPicDataType>,
+        };
+      } finally {
+        this.setHandlePicLoading(false);
+        this.setCutPicLoading(false);
+      }
+    },
+    async cutPicGroup() {
+      let funcAction = "剪切图片组";
+      try {
+        this.setHandlePicLoading(true);
+        this.setCutPicLoading(true);
+        let picPathGroup = picStore.selectingPicList.map(
+          (index) => picStore.picList[index]!.path
+        );
+        let targets = cloneDeep(this.selectingSortList);
+        let res = await SortApi.copyPicGroup(
+          picPathGroup,
+          targets,
+          "cut",
+          false
+        );
+        if (res.success) {
+          this.setSelectedSortList(cloneDeep(this.selectingSortList));
+          this.getSortFolderList();
+          // 需要检查有没有冲突
+          if (!res.conflict) {
+            // 无冲突
+            await this.deletePicGroup(true);
+            return {
+              success: true,
+              conflictData: [] as Array<CopyPicDataType>,
+            };
+          } else {
+            // 有冲突
+            // 过滤出需要删除的图片
+            let mapConflictData = (res.data as Array<CopyPicDataType>).map(
+              (item) => item.picPath
+            );
+            let filterGroup = picPathGroup.filter(
+              (item) => !mapConflictData.includes(item)
+            );
+            await this.deletePicGroup(true, true, filterGroup);
+            return {
+              success: true,
+              conflictData: res.data as Array<CopyPicDataType>,
+            };
+          }
+        } else {
+          picStore.getPicList(true);
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return {
+            success: false,
+            conflictData: [] as Array<CopyPicDataType>,
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          success: false,
+          conflictData: [] as Array<CopyPicDataType>,
+        };
+      } finally {
+        this.setHandlePicLoading(false);
+        this.setCutPicLoading(false);
+      }
+    },
+    async replacePic(target: CopyPicDataType) {
+      let funcAction = "替换图片";
+      try {
+        this.setHandlePicLoading(true);
+        let action = target.action;
+        let picPath = target.picPath;
+        let sortTarget = target.sortName;
+        let res = await SortApi.copyPic(picPath, [sortTarget], action, true);
+        if (res.success) {
+          if (action == "cut") {
+            if (picStore.viewMode == "view") {
+              // 单个
+              await this.deletePic(true);
+            } else {
+              await this.deletePicGroup(true, true, [picPath]);
+            }
+          }
+          return true;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setHandlePicLoading(false);
+      }
+    },
   },
   {
     setShowControler: action,
@@ -330,8 +770,10 @@ const sortStore = observable(
     setSortFolderConfig: action,
     setSelectingSortList: action,
     clearSelectingSortList: action,
+    fullSelectingSortList: action,
     setSelectedSortList: action,
     clearSelectedSortList: action,
+    applySelected: action,
     getPicFolderPath: action,
     getSortFolderPath: action,
     setPicFolderPathLoading: action,
@@ -344,6 +786,21 @@ const sortStore = observable(
     getSortFolderInfo: action,
     openPicFolder: action,
     openSortFolder: action,
+    setInsertSortFolderLoading: action,
+    insertSortFolder: action,
+    setDeleteSortFolderLoading: action,
+    deleteSortFolder: action,
+    setHandlePicLoading: action,
+    setDeletePicLoading: action,
+    deletePic: action,
+    deletePicGroup: action,
+    setCopyPicLoading: action,
+    copyPic: action,
+    copyPicGroup: action,
+    setCutPicLoading: action,
+    cutPic: action,
+    cutPicGroup: action,
+    replacePic: action,
   }
 );
 

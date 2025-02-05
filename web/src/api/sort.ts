@@ -9,6 +9,12 @@ const SortApi = {
   setSortFolderPath: window.DeskApi?.Sort_setSortFolderPath,
   getSortFolderInfo: window.DeskApi?.Sort_getSortFolderInfo,
   openSortFolder: window.DeskApi?.Sort_openSortFolder,
+  insertSortFolder: window.DeskApi?.Sort_insertSortFolder,
+  deleteSortFolder: window.DeskApi?.Sort_deleteSortFolder,
+  copyPic: window.DeskApi?.Sort_copyPic,
+  copyPicGroup: window.DeskApi?.Sort_copyPicGroup,
+  deletePic: window.DeskApi?.Sort_deletePic,
+  deletePicGroup: window.DeskApi?.Sort_deletePicGroup,
 };
 
 export default SortApi;

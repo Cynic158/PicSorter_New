@@ -10,6 +10,7 @@ import {
   ReactZoomPanPinchRef,
 } from "react-zoom-pan-pinch";
 import { useEffect, useRef, useState } from "react";
+import sortStore from "../../store/modules/sort";
 
 export default function DefaultViewer() {
   const [picUrl, setPicUrl] = useState("");
@@ -36,12 +37,20 @@ export default function DefaultViewer() {
   };
 
   const switchPrev = () => {
-    if (picStore.picList[0] !== null && !picStore.picListLoading) {
+    if (
+      picStore.picList[0] !== null &&
+      !picStore.picListLoading &&
+      !sortStore.handlePicLoading
+    ) {
       picStore.getPicList(false, picStore.picList[0].path);
     }
   };
   const switchNext = () => {
-    if (picStore.picList[2] !== null && !picStore.picListLoading) {
+    if (
+      picStore.picList[2] !== null &&
+      !picStore.picListLoading &&
+      !sortStore.handlePicLoading
+    ) {
       picStore.getPicList(false, picStore.picList[2].path);
     }
   };

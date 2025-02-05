@@ -98,6 +98,69 @@ const Sort_openSortFolder = async () => {
   const res = await ipcRenderer.invoke("Sort_openSortFolder" as SortApi);
   return res;
 };
+const Sort_insertSortFolder = async (name: string) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_insertSortFolder" as SortApi,
+    name
+  );
+  return res;
+};
+const Sort_deleteSortFolder = async (targets: Array<string>) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_deleteSortFolder" as SortApi,
+    targets
+  );
+  return res;
+};
+const Sort_deletePic = async (picPath: string, cut: boolean = false) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_deletePic" as SortApi,
+    picPath,
+    cut
+  );
+  return res;
+};
+const Sort_deletePicGroup = async (
+  picPathGroup: Array<string>,
+  cut: boolean = false
+) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_deletePicGroup" as SortApi,
+    picPathGroup,
+    cut
+  );
+  return res;
+};
+const Sort_copyPic = async (
+  picPath: string,
+  targets: Array<string>,
+  action: "copy" | "cut",
+  force: boolean
+) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_copyPic" as SortApi,
+    picPath,
+    targets,
+    action,
+    force
+  );
+  return res;
+};
+const Sort_copyPicGroup = async (
+  picPathGroup: Array<string>,
+  targets: Array<string>,
+  action: "copy" | "cut",
+  force: boolean
+) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_copyPicGroup" as SortApi,
+    picPathGroup,
+    targets,
+    action,
+    force
+  );
+  return res;
+};
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
@@ -118,4 +181,10 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_setSortFolderPath,
   Sort_getSortFolderInfo,
   Sort_openSortFolder,
+  Sort_insertSortFolder,
+  Sort_deleteSortFolder,
+  Sort_deletePic,
+  Sort_deletePicGroup,
+  Sort_copyPic,
+  Sort_copyPicGroup,
 });
