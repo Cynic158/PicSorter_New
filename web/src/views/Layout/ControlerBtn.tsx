@@ -4,11 +4,13 @@ import Loader from "../../components/Loader";
 import SortFolderDialog from "../Dialog/SortFolderDialog";
 import PicFolderDialog from "../Dialog/PicFolderDialog";
 import DeleteDialog from "../Dialog/DeleteDialog";
+import ReplaceDialog from "../Dialog/ReplaceDialog";
 import { useState } from "react";
 import sortStore from "../../store/modules/sort";
 import { Observer } from "mobx-react";
 import picStore from "../../store/modules/pic";
 import winStore from "../../store/modules/win";
+import { cloneDeep } from "lodash";
 
 export default function ControlerBtn() {
   const [sortFolderDialogShow, setSortFolderDialogShow] = useState(false);
@@ -54,6 +56,14 @@ export default function ControlerBtn() {
     setReplaceDialogShow(false);
   };
   const [replaceData, setReplaceData] = useState<Array<CopyPicDataType>>([]);
+  const updateReplaceData = (count: number) => {
+    let newData = cloneDeep(replaceData);
+    newData.splice(0, count);
+    if (newData.length == 0) {
+      hideReplaceDialog();
+    }
+    setReplaceData(newData);
+  };
   const handleCopyPic = async () => {
     if (!sortStore.handlePicLoading && !sortStore.copyPicLoading) {
       if (
@@ -160,6 +170,11 @@ export default function ControlerBtn() {
             show={deleteDialogShow}
             hide={hideDeleteDialog}
           ></DeleteDialog>
+          <ReplaceDialog
+            show={replaceDialogShow}
+            replaceData={replaceData}
+            updateReplaceData={updateReplaceData}
+          ></ReplaceDialog>
           <div className="controler-btn">
             <div className="controler-btn-left">
               <button

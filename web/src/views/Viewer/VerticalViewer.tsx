@@ -1,5 +1,6 @@
 import { Observer } from "mobx-react";
 import picStore from "../../store/modules/pic";
+import sortStore from "../../store/modules/sort";
 import SvgIcon from "../../components/SvgIcon";
 import TextOverflow from "react-text-overflow";
 import Pic from "../../components/Pic";
@@ -18,7 +19,7 @@ export default function VerticalViewer() {
     setPicInfoDialogShow(false);
   };
   const getPicInfo = (picIndex: number) => {
-    if (!picStore.getPicInfoLoading) {
+    if (!picStore.getPicInfoLoading && !sortStore.handlePicLoading) {
       setCurrentPicIndex(picIndex);
       picStore.getPicInfo(picIndex);
       showPicInfoDialog();
@@ -30,7 +31,7 @@ export default function VerticalViewer() {
   };
 
   const zoomPic = (picPath: string) => {
-    if (!picStore.picListLoading) {
+    if (!picStore.picListLoading && !sortStore.handlePicLoading) {
       picStore.getPicList(false, picPath, "view");
     }
   };

@@ -9,6 +9,7 @@ import InputDialog from "../Dialog/InputDialog";
 import PicInfoDialog from "../Dialog/PicInfoDialog";
 import { useState } from "react";
 import winStore from "../../store/modules/win";
+import sortStore from "../../store/modules/sort";
 
 export default function Header() {
   const [inputDialogShow, setInputDialogShow] = useState(false);
@@ -27,7 +28,7 @@ export default function Header() {
   };
 
   const getPicInfo = () => {
-    if (!picStore.getPicInfoLoading) {
+    if (!picStore.getPicInfoLoading && !sortStore.handlePicLoading) {
       picStore.getPicInfo(1);
       showPicInfoDialog();
     }

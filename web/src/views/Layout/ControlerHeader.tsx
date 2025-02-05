@@ -21,7 +21,8 @@ export default function ControlerHeader() {
     if (
       picStore.picTotal != 0 &&
       !picStore.picListLoading &&
-      picStore.viewMode != mode
+      picStore.viewMode != mode &&
+      !sortStore.handlePicLoading
     ) {
       picStore.getPicList(false, null, mode);
     }
@@ -35,7 +36,7 @@ export default function ControlerHeader() {
     setInputDialogShow(false);
   };
   const insertSortFolder = () => {
-    if (sortStore.sortFolderConfig.folderPath) {
+    if (sortStore.sortFolderConfig.folderPath && !sortStore.handlePicLoading) {
       // 允许执行
       showInputDialog();
     }
@@ -49,7 +50,7 @@ export default function ControlerHeader() {
     setDeleteDialogShow(false);
   };
   const deleteSortFolder = () => {
-    if (sortStore.selectingSortList.length > 0) {
+    if (sortStore.selectingSortList.length > 0 && !sortStore.handlePicLoading) {
       // 允许执行
       showDeleteDialog();
     }
