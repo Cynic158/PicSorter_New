@@ -760,6 +760,34 @@ const sortStore = observable(
         this.setHandlePicLoading(false);
       }
     },
+
+    // 分类项设置
+    sortItemSettingShow: false,
+    currentSortItem: "",
+    showSortItemSetting(sortName: string) {
+      runInAction(() => {
+        this.currentSortItem = sortName;
+        this.sortItemSettingShow = true;
+      });
+    },
+    hideSortItemSetting() {
+      this.sortItemSettingShow = false;
+    },
+    // 打开分类项所在目录
+    async openSortItemFolder() {
+      let funcAction = "打开分类项文件夹";
+      try {
+        let res = await SortApi.openSortItemFolder(this.currentSortItem);
+        if (!res.success) {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+      }
+    },
   },
   {
     setShowControler: action,
@@ -801,6 +829,9 @@ const sortStore = observable(
     cutPic: action,
     cutPicGroup: action,
     replacePic: action,
+    showSortItemSetting: action,
+    hideSortItemSetting: action,
+    openSortItemFolder: action,
   }
 );
 

@@ -161,6 +161,13 @@ const Sort_copyPicGroup = async (
   );
   return res;
 };
+const Sort_openSortItemFolder = async (sortName: string) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_openSortItemFolder" as SortApi,
+    sortName
+  );
+  return res;
+};
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
@@ -187,4 +194,5 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_deletePicGroup,
   Sort_copyPic,
   Sort_copyPicGroup,
+  Sort_openSortItemFolder,
 });

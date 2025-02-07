@@ -48,11 +48,11 @@ const ReplaceDialog: React.FC<ReplaceDialogProps> = ({
           updateReplaceData(successCount);
         }
       }
+      let timer = setTimeout(() => {
+        setReplaceLoading(false);
+        clearTimeout(timer);
+      }, 100);
     }
-    let timer = setTimeout(() => {
-      setReplaceLoading(false);
-      clearTimeout(timer);
-    }, 100);
   };
 
   useEffect(() => {

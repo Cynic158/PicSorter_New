@@ -103,6 +103,9 @@ declare global {
         picPathGroup: Array<string>,
         cut?: boolean
       ) => Promise<{ success: boolean; data: string }>;
+      Sort_openSortItemFolder: (
+        sortName: string
+      ) => Promise<{ success: boolean; data: string }>;
     };
   }
 

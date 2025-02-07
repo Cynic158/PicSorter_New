@@ -1041,6 +1041,37 @@ const sortHandler = (
       }
     }
   );
+
+  // 打开指定分类文件夹
+  ipcMain.handle(
+    "Sort_openSortItemFolder" as SortApi,
+    async (_event, sortName: string) => {
+      try {
+        // 获取sortConfig的完整路径
+        const configPath = path.resolve(appPath, sortConfigPath);
+        // 读取当前配置文件内容
+        const fileContent = await fs.promises.readFile(configPath, "utf-8");
+        // 解析JSON内容
+        const config: SortConfig = JSON.parse(fileContent);
+        // 总分类文件夹路径
+        let sortFolderPath = config.sortFolderPath;
+        // 得到指定分类文件夹路径
+        let sortItemPath = path.join(sortFolderPath, sortName);
+        await shell.openPath(sortItemPath);
+        return {
+          success: true,
+          data: "",
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
 };
 
 export default sortHandler;

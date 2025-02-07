@@ -22,7 +22,8 @@ declare global {
     | "Sort_copyPic"
     | "Sort_copyPicGroup"
     | "Sort_deletePic"
-    | "Sort_deletePicGroup";
+    | "Sort_deletePicGroup"
+    | "Sort_openSortItemFolder";
 
   // 其他类型
   // 通用部分

@@ -14,6 +14,111 @@ export default function ControlerSort() {
     <Observer>
       {() => (
         <div className="controler-sort-container">
+          <div
+            className={`controler-sort-setting${
+              sortStore.sortItemSettingShow ? " show" : ""
+            }`}
+          >
+            <div
+              onClick={() => {
+                sortStore.openSortItemFolder();
+                sortStore.hideSortItemSetting();
+              }}
+              className="controler-sort-setting-item"
+            >
+              <span>打开文件夹</span>
+              <div className="controler-sort-setting-item-icon">
+                <SvgIcon
+                  svgName="folder"
+                  svgSize="18px"
+                  clickable={true}
+                  color="var(--color-white2)"
+                ></SvgIcon>
+              </div>
+            </div>
+            <div className="controler-sort-setting-item">
+              <span>详细信息</span>
+              <div className="controler-sort-setting-item-icon">
+                <SvgIcon
+                  svgName="info"
+                  svgSize="18px"
+                  clickable={true}
+                  color="var(--color-white2)"
+                ></SvgIcon>
+              </div>
+            </div>
+            <div className="controler-sort-setting-item">
+              <span>重命名</span>
+              <div className="controler-sort-setting-item-icon">
+                <SvgIcon
+                  svgName="edit"
+                  svgSize="18px"
+                  clickable={true}
+                  color="var(--color-white2)"
+                ></SvgIcon>
+              </div>
+            </div>
+            <div className="controler-sort-setting-item">
+              <span>设为置顶</span>
+              <div className="controler-sort-setting-item-icon">
+                <SvgIcon
+                  svgName="top"
+                  svgSize="18px"
+                  clickable={true}
+                  color="var(--color-white2)"
+                ></SvgIcon>
+              </div>
+            </div>
+            {/* <div className="controler-sort-setting-item">
+                  <span>取消置顶</span>
+                  <div className="controler-sort-setting-item-icon">
+                    <SvgIcon
+                      svgName="top"
+                      svgSize="18px"
+                      clickable={true}
+                      color="var(--color-white2)"
+                    ></SvgIcon>
+                  </div>
+                </div> */}
+            <div className="controler-sort-setting-item">
+              <span>自动重命名</span>
+              <div className="controler-sort-setting-item-icon">
+                <SvgIcon
+                  svgName="auto"
+                  svgSize="18px"
+                  clickable={true}
+                  color="var(--color-white2)"
+                ></SvgIcon>
+              </div>
+            </div>
+            <div className="controler-sort-setting-item delete">
+              <span>删除文件夹</span>
+              <div className="controler-sort-setting-item-icon">
+                <SvgIcon
+                  svgName="delete"
+                  svgSize="18px"
+                  clickable={true}
+                  color="var(--color-white2)"
+                ></SvgIcon>
+              </div>
+            </div>
+            <div
+              onClick={() => {
+                sortStore.hideSortItemSetting();
+              }}
+              className="controler-sort-setting-item"
+            >
+              <span>取消</span>
+              <div className="controler-sort-setting-item-icon padding">
+                <SvgIcon
+                  svgName="exit"
+                  svgSize="14px"
+                  clickable={true}
+                  color="var(--color-white2)"
+                ></SvgIcon>
+              </div>
+            </div>
+          </div>
           <ul className="controler-sort">
             {sortStore.sortFolderList.map((item) => (
               <li
@@ -85,6 +190,14 @@ export default function ControlerSort() {
                       </div>
                     </div>
                     <div className="controler-sort-item-top-right">
+                      <div className="auto">
+                        <SvgIcon
+                          svgName="auto"
+                          svgSize="18px"
+                          clickable={true}
+                          color="var(--color-white2)"
+                        ></SvgIcon>
+                      </div>
                       {item.top ? (
                         <div className="top">
                           <SvgIcon
@@ -97,12 +210,20 @@ export default function ControlerSort() {
                       ) : (
                         <></>
                       )}
-                      <SvgIcon
-                        svgName="setting"
-                        svgSize="20px"
-                        clickable={true}
-                        color="var(--color-white2)"
-                      ></SvgIcon>
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          sortStore.showSortItemSetting(item.name);
+                        }}
+                        className="setting"
+                      >
+                        <SvgIcon
+                          svgName="setting"
+                          svgSize="20px"
+                          clickable={true}
+                          color="var(--color-white2)"
+                        ></SvgIcon>
+                      </div>
                     </div>
                   </div>
                   <div className="controler-sort-item-bottom">
