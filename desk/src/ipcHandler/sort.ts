@@ -1072,6 +1072,47 @@ const sortHandler = (
       }
     }
   );
+
+  // 获取指定分类文件夹信息
+  ipcMain.handle(
+    "Sort_getSortItemFolderInfo" as SortApi,
+    async (_event, sortName: string) => {
+      try {
+        // 获取sortConfig的完整路径
+        const configPath = path.resolve(appPath, sortConfigPath);
+        // 读取当前配置文件内容
+        const fileContent = await fs.promises.readFile(configPath, "utf-8");
+        // 解析JSON内容
+        const config: SortConfig = JSON.parse(fileContent);
+        // 总分类文件夹路径
+        let sortFolderPath = config.sortFolderPath;
+        // 得到指定分类文件夹路径
+        let sortItemPath = path.join(sortFolderPath, sortName);
+
+        // 检查对应文件夹存不存在
+        const checkRes = await checkPathsExist("folder", [sortItemPath]);
+        if (!checkRes.success) {
+          return {
+            success: false,
+            data: "onlymessage指定的分类文件夹丢失",
+          };
+        }
+
+        let infoRes = await getFolderInfo(sortItemPath, false, "pic");
+        return {
+          success: true,
+          data: infoRes,
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
 };
 
 export default sortHandler;

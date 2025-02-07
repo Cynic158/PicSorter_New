@@ -168,6 +168,13 @@ const Sort_openSortItemFolder = async (sortName: string) => {
   );
   return res;
 };
+const Sort_getSortItemFolderInfo = async (sortName: string) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_getSortItemFolderInfo" as SortApi,
+    sortName
+  );
+  return res;
+};
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
@@ -195,4 +202,5 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_copyPic,
   Sort_copyPicGroup,
   Sort_openSortItemFolder,
+  Sort_getSortItemFolderInfo,
 });

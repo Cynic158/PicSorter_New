@@ -106,6 +106,10 @@ declare global {
       Sort_openSortItemFolder: (
         sortName: string
       ) => Promise<{ success: boolean; data: string }>;
+      Sort_getSortItemFolderInfo: (sortName: string) => Promise<{
+        success: boolean;
+        data: FolderInfoType | string;
+      }>;
     };
   }
 

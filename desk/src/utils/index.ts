@@ -231,7 +231,7 @@ const getFolderInfo = async (
       const fullPath = path.join(dirPath, item.name);
       if (item.isFile() && isImage(item.name)) {
         files.push(fullPath);
-      } else if (item.isDirectory() && deep) {
+      } else if (deep && item.isDirectory()) {
         files = files.concat(getFolderContentsForPic(fullPath, true));
       }
     }

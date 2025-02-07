@@ -788,6 +788,32 @@ const sortStore = observable(
         winStore.setErrorDialog(log, funcAction);
       }
     },
+    // 获取分类项信息
+    sortItemFolderInfoLoading: false,
+    setSortItemFolderInfoLoading(bool: boolean) {
+      this.sortItemFolderInfoLoading = bool;
+    },
+    async getSortItemFolderInfo() {
+      let funcAction = "读取分类项文件夹信息";
+      try {
+        this.setSortItemFolderInfoLoading(true);
+        let res = await SortApi.getSortItemFolderInfo(this.currentSortItem);
+        if (res.success) {
+          return res.data as FolderInfoType;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setSortItemFolderInfoLoading(false);
+      }
+    },
   },
   {
     setShowControler: action,
@@ -832,6 +858,8 @@ const sortStore = observable(
     showSortItemSetting: action,
     hideSortItemSetting: action,
     openSortItemFolder: action,
+    setSortItemFolderInfoLoading: action,
+    getSortItemFolderInfo: action,
   }
 );
 

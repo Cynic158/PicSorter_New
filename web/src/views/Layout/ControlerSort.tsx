@@ -1,19 +1,34 @@
 import "../../styles/layout/controler.scss";
 import SvgIcon from "../../components/SvgIcon";
 import TextOverflow from "react-text-overflow";
+import SortItemFolderDialog from "../Dialog/SortItemFolderDialog";
 import sortStore from "../../store/modules/sort";
 import { Observer } from "mobx-react";
 import { getFileSize } from "../../utils";
+import { useState } from "react";
 
 export default function ControlerSort() {
   const applySelected = () => {
     sortStore.applySelected();
   };
 
+  const [sortItemFolderDialogShow, setSortItemFolderDialogShow] =
+    useState(false);
+  const showSortItemFolderDialog = () => {
+    setSortItemFolderDialogShow(true);
+  };
+  const hideSortItemFolderDialog = () => {
+    setSortItemFolderDialogShow(false);
+  };
+
   return (
     <Observer>
       {() => (
         <div className="controler-sort-container">
+          <SortItemFolderDialog
+            show={sortItemFolderDialogShow}
+            hide={hideSortItemFolderDialog}
+          ></SortItemFolderDialog>
           <div
             className={`controler-sort-setting${
               sortStore.sortItemSettingShow ? " show" : ""
@@ -36,7 +51,13 @@ export default function ControlerSort() {
                 ></SvgIcon>
               </div>
             </div>
-            <div className="controler-sort-setting-item">
+            <div
+              onClick={() => {
+                showSortItemFolderDialog();
+                sortStore.hideSortItemSetting();
+              }}
+              className="controler-sort-setting-item"
+            >
               <span>详细信息</span>
               <div className="controler-sort-setting-item-icon">
                 <SvgIcon
