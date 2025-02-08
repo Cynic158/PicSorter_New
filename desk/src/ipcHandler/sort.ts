@@ -667,6 +667,19 @@ const sortHandler = (
           })
         );
 
+        // 清理置顶配置
+        let topList = cloneDeep(config.topList);
+        let filterTopList = topList.filter(
+          (item) => !mapTargets.includes(item)
+        );
+        // 更新配置
+        config.topList = filterTopList;
+        await fs.promises.writeFile(
+          configPath,
+          JSON.stringify(config, null, 2),
+          "utf-8"
+        );
+
         // 清理自动重命名配置
         const settingPath = path.resolve(appPath, settingConfigPath);
         // 读取当前配置文件内容
@@ -1102,6 +1115,54 @@ const sortHandler = (
         return {
           success: true,
           data: infoRes,
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
+
+  // 设置置顶列表
+  ipcMain.handle(
+    "Sort_setTopList" as SortApi,
+    async (_event, sortName: string, type: "insert" | "delete") => {
+      try {
+        // 获取sortConfig的完整路径
+        const configPath = path.resolve(appPath, sortConfigPath);
+        // 读取当前配置文件内容
+        const fileContent = await fs.promises.readFile(configPath, "utf-8");
+        // 解析JSON内容
+        const config: SortConfig = JSON.parse(fileContent);
+        // 总分类文件夹路径
+        let sortFolderPath = config.sortFolderPath;
+        // 置顶列表
+        let topList = cloneDeep(config.topList);
+        // 指定分类
+        let sortItemPath = path.join(sortFolderPath, sortName);
+        if (type == "insert") {
+          // 添加到置顶列表
+          topList.unshift(sortItemPath);
+        } else {
+          // 从置顶列表移除
+          let findIndex = topList.findIndex((item) => item == sortItemPath);
+          if (findIndex != -1) {
+            topList.splice(findIndex, 1);
+          }
+        }
+        config.topList = topList;
+        await fs.promises.writeFile(
+          configPath,
+          JSON.stringify(config, null, 2),
+          "utf-8"
+        );
+        return {
+          success: true,
+          data: "",
         };
       } catch (error) {
         // 编写错误报告

@@ -23,7 +23,7 @@ const sortStore = observable(
     setSortFolderLoading(bool: boolean) {
       this.sortFolderLoading = bool;
     },
-    async getSortFolderList() {
+    async getSortFolderList(setTop: boolean = false) {
       let funcAction = "获取分类文件夹列表";
       try {
         this.setSortFolderLoading(true);
@@ -36,7 +36,7 @@ const sortStore = observable(
             });
             this.setSortFolderList((res.data as GetSortFolderDataType).list);
 
-            if ((res.data as GetSortFolderDataType).clearList) {
+            if ((res.data as GetSortFolderDataType).clearList && !setTop) {
               // 根据设置来决定是否清空当前选择分类列表
               this.clearSelectingSortList();
             }
@@ -386,18 +386,35 @@ const sortStore = observable(
     setDeleteSortFolderLoading(bool: boolean) {
       this.deleteSortFolderLoading = bool;
     },
-    async deleteSortFolder() {
+    async deleteSortFolder(item: boolean = false) {
       let funcAction = "删除分类文件夹";
       try {
         this.setDeleteSortFolderLoading(true);
-        let res = await SortApi.deleteSortFolder(
-          cloneDeep(this.selectingSortList)
-        );
+        let targets = cloneDeep(this.selectingSortList);
+        if (item) {
+          let sortName = this.currentSortItem;
+          targets = [sortName];
+        }
+        let res = await SortApi.deleteSortFolder(targets);
         if (res.success) {
           // 删除完成，获取一次列表
           // 清空当前选择分类列表
-          this.clearSelectingSortList();
-          this.clearSelectedSortList();
+          runInAction(() => {
+            if (item && this.selectingSortList.includes(this.currentSortItem)) {
+              this.setSelectingSortList(this.currentSortItem);
+            }
+            if (item && this.selectedSortList.includes(this.currentSortItem)) {
+              let cloneSelectedList = cloneDeep(this.selectedSortList);
+              let filterSelectedList = cloneSelectedList.filter(
+                (item) => item != this.currentSortItem
+              );
+              this.setSelectedSortList(filterSelectedList);
+            }
+            if (!item) {
+              this.clearSelectingSortList();
+              this.clearSelectedSortList();
+            }
+          });
           this.getSortFolderList();
           return true;
         } else {
@@ -764,9 +781,11 @@ const sortStore = observable(
     // 分类项设置
     sortItemSettingShow: false,
     currentSortItem: "",
-    showSortItemSetting(sortName: string) {
+    currentTop: false,
+    showSortItemSetting(sortItem: SortFolderListType) {
       runInAction(() => {
-        this.currentSortItem = sortName;
+        this.currentSortItem = sortItem.name;
+        this.currentTop = sortItem.top;
         this.sortItemSettingShow = true;
       });
     },
@@ -812,6 +831,42 @@ const sortStore = observable(
         return false;
       } finally {
         this.setSortItemFolderInfoLoading(false);
+      }
+    },
+    // 设置分类项置顶
+    topListLoading: false,
+    setTopListLoading(bool: boolean) {
+      this.topListLoading = bool;
+    },
+    async setTopList() {
+      let funcAction = "设置分类项置顶";
+      try {
+        this.setTopListLoading(true);
+        let setType: "insert" | "delete" = "insert";
+        if (this.currentTop) {
+          setType = "delete";
+        }
+        let res = await SortApi.setTopList(this.currentSortItem, setType);
+        if (res.success) {
+          // 设置成功，重新获取列表
+          await this.getSortFolderList(true);
+          winStore.setMessage({
+            type: "success",
+            msg: "设置成功",
+          });
+          return true;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setTopListLoading(false);
       }
     },
   },
@@ -860,6 +915,8 @@ const sortStore = observable(
     openSortItemFolder: action,
     setSortItemFolderInfoLoading: action,
     getSortItemFolderInfo: action,
+    setTopListLoading: action,
+    setTopList: action,
   }
 );
 

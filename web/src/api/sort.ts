@@ -17,6 +17,7 @@ const SortApi = {
   deletePicGroup: window.DeskApi?.Sort_deletePicGroup,
   openSortItemFolder: window.DeskApi?.Sort_openSortItemFolder,
   getSortItemFolderInfo: window.DeskApi?.Sort_getSortItemFolderInfo,
+  setTopList: window.DeskApi?.Sort_setTopList,
 };
 
 export default SortApi;

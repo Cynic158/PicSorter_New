@@ -110,6 +110,13 @@ declare global {
         success: boolean;
         data: FolderInfoType | string;
       }>;
+      Sort_setTopList: (
+        sortName: string,
+        type: "insert" | "delete"
+      ) => Promise<{
+        success: boolean;
+        data: string;
+      }>;
     };
   }
 

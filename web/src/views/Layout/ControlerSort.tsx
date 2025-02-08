@@ -2,6 +2,7 @@ import "../../styles/layout/controler.scss";
 import SvgIcon from "../../components/SvgIcon";
 import TextOverflow from "react-text-overflow";
 import SortItemFolderDialog from "../Dialog/SortItemFolderDialog";
+import DeleteDialog from "../Dialog/DeleteDialog";
 import sortStore from "../../store/modules/sort";
 import { Observer } from "mobx-react";
 import { getFileSize } from "../../utils";
@@ -21,6 +22,14 @@ export default function ControlerSort() {
     setSortItemFolderDialogShow(false);
   };
 
+  const [deleteDialogShow, setDeleteDialogShow] = useState(false);
+  const showDeleteDialog = () => {
+    setDeleteDialogShow(true);
+  };
+  const hideDeleteDialog = () => {
+    setDeleteDialogShow(false);
+  };
+
   return (
     <Observer>
       {() => (
@@ -29,6 +38,11 @@ export default function ControlerSort() {
             show={sortItemFolderDialogShow}
             hide={hideSortItemFolderDialog}
           ></SortItemFolderDialog>
+          <DeleteDialog
+            type="deleteSortItemFolder"
+            show={deleteDialogShow}
+            hide={hideDeleteDialog}
+          ></DeleteDialog>
           <div
             className={`controler-sort-setting${
               sortStore.sortItemSettingShow ? " show" : ""
@@ -79,8 +93,18 @@ export default function ControlerSort() {
                 ></SvgIcon>
               </div>
             </div>
-            <div className="controler-sort-setting-item">
-              <span>设为置顶</span>
+            <div
+              onClick={() => {
+                sortStore.setTopList();
+                sortStore.hideSortItemSetting();
+              }}
+              className="controler-sort-setting-item"
+            >
+              {sortStore.currentTop ? (
+                <span>取消置顶</span>
+              ) : (
+                <span>设为置顶</span>
+              )}
               <div className="controler-sort-setting-item-icon">
                 <SvgIcon
                   svgName="top"
@@ -90,17 +114,6 @@ export default function ControlerSort() {
                 ></SvgIcon>
               </div>
             </div>
-            {/* <div className="controler-sort-setting-item">
-                  <span>取消置顶</span>
-                  <div className="controler-sort-setting-item-icon">
-                    <SvgIcon
-                      svgName="top"
-                      svgSize="18px"
-                      clickable={true}
-                      color="var(--color-white2)"
-                    ></SvgIcon>
-                  </div>
-                </div> */}
             <div className="controler-sort-setting-item">
               <span>自动重命名</span>
               <div className="controler-sort-setting-item-icon">
@@ -112,7 +125,13 @@ export default function ControlerSort() {
                 ></SvgIcon>
               </div>
             </div>
-            <div className="controler-sort-setting-item delete">
+            <div
+              onClick={() => {
+                showDeleteDialog();
+                sortStore.hideSortItemSetting();
+              }}
+              className="controler-sort-setting-item delete"
+            >
               <span>删除文件夹</span>
               <div className="controler-sort-setting-item-icon">
                 <SvgIcon
@@ -234,7 +253,7 @@ export default function ControlerSort() {
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
-                          sortStore.showSortItemSetting(item.name);
+                          sortStore.showSortItemSetting(item);
                         }}
                         className="setting"
                       >
