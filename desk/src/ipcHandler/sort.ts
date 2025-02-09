@@ -687,8 +687,8 @@ const sortHandler = (
         // 解析JSON内容
         const settingConfig: SettingConfig = JSON.parse(settingContent);
         // 自动重命名配置
-        const autoRenameConfig = settingConfig.autoRename;
-        const filterConfig = autoRenameConfig.filter(
+        let autoRenameConfig = cloneDeep(settingConfig.autoRename);
+        let filterConfig = autoRenameConfig.filter(
           (item) => !mapTargets.includes(item.path)
         );
         // 更新配置
@@ -1169,6 +1169,95 @@ const sortHandler = (
         let errorLog = generateErrorLog(error);
         return {
           success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
+
+  // 重命名分类文件夹
+  ipcMain.handle(
+    "Sort_renameSortItem" as SortApi,
+    async (_event, oldName: string, newName: string) => {
+      try {
+        // 获取sortConfig的完整路径
+        const configPath = path.resolve(appPath, sortConfigPath);
+        // 读取当前配置文件内容
+        const fileContent = await fs.promises.readFile(configPath, "utf-8");
+        // 解析JSON内容
+        const config: SortConfig = JSON.parse(fileContent);
+        // 总分类文件夹路径
+        let sortFolderPath = config.sortFolderPath;
+        // 原分类文件夹路径
+        let oldSortItemPath = path.join(sortFolderPath, oldName);
+        // 检查对应文件夹存不存在
+        const checkRes = await checkPathsExist("folder", [oldSortItemPath]);
+        if (!checkRes.success) {
+          return {
+            success: false,
+            conflict: false,
+            data: "onlymessage指定的分类文件夹丢失",
+          };
+        }
+
+        // 指定的分类文件夹存在，检查有没有重名
+        let newSortItemPath = path.join(sortFolderPath, newName);
+        const conflictRes = await checkPathsExist("folder", [newSortItemPath]);
+        if (conflictRes.success) {
+          return {
+            success: true,
+            conflict: true,
+            data: "",
+          };
+        }
+
+        // 允许重命名
+        await fs.promises.rename(oldSortItemPath, newSortItemPath);
+        // 更新置顶
+        let topList = cloneDeep(config.topList);
+        let findIndex = topList.findIndex((item) => item == oldSortItemPath);
+        if (findIndex != -1) {
+          topList[findIndex] = newSortItemPath;
+          config.topList = topList;
+          await fs.promises.writeFile(
+            configPath,
+            JSON.stringify(config, null, 2),
+            "utf-8"
+          );
+        }
+
+        // 更新重命名配置
+        const settingPath = path.resolve(appPath, settingConfigPath);
+        // 读取当前配置文件内容
+        const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+        // 解析JSON内容
+        const settingConfig: SettingConfig = JSON.parse(settingContent);
+        // 自动重命名配置
+        let autoRenameConfig = cloneDeep(settingConfig.autoRename);
+        let findAutoIndex = autoRenameConfig.findIndex(
+          (item) => item.path == oldSortItemPath
+        );
+        if (findAutoIndex != -1) {
+          autoRenameConfig[findAutoIndex].path = newSortItemPath;
+          settingConfig.autoRename = autoRenameConfig;
+          await fs.promises.writeFile(
+            settingPath,
+            JSON.stringify(settingConfig, null, 2),
+            "utf-8"
+          );
+        }
+
+        return {
+          success: true,
+          conflict: false,
+          data: "",
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          conflict: false,
           data: errorLog,
         };
       }

@@ -18,6 +18,7 @@ const SortApi = {
   openSortItemFolder: window.DeskApi?.Sort_openSortItemFolder,
   getSortItemFolderInfo: window.DeskApi?.Sort_getSortItemFolderInfo,
   setTopList: window.DeskApi?.Sort_setTopList,
+  renameSortItem: window.DeskApi?.Sort_renameSortItem,
 };
 
 export default SortApi;

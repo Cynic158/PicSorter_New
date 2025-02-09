@@ -3,6 +3,7 @@ import SvgIcon from "../../components/SvgIcon";
 import TextOverflow from "react-text-overflow";
 import SortItemFolderDialog from "../Dialog/SortItemFolderDialog";
 import DeleteDialog from "../Dialog/DeleteDialog";
+import InputDialog from "../Dialog/InputDialog";
 import sortStore from "../../store/modules/sort";
 import { Observer } from "mobx-react";
 import { getFileSize } from "../../utils";
@@ -29,6 +30,32 @@ export default function ControlerSort() {
   const hideDeleteDialog = () => {
     setDeleteDialogShow(false);
   };
+  const deleteSortItem = () => {
+    if (
+      !sortStore.renameSortItemLoading &&
+      !sortStore.deleteSortFolderLoading &&
+      !sortStore.handlePicLoading
+    ) {
+      showDeleteDialog();
+    }
+  };
+
+  const [inputDialogShow, setInputDialogShow] = useState(false);
+  const showInputDialog = () => {
+    setInputDialogShow(true);
+  };
+  const hideInputDialog = () => {
+    setInputDialogShow(false);
+  };
+  const renameSortItem = () => {
+    if (
+      !sortStore.renameSortItemLoading &&
+      !sortStore.deleteSortFolderLoading &&
+      !sortStore.handlePicLoading
+    ) {
+      showInputDialog();
+    }
+  };
 
   return (
     <Observer>
@@ -43,6 +70,11 @@ export default function ControlerSort() {
             show={deleteDialogShow}
             hide={hideDeleteDialog}
           ></DeleteDialog>
+          <InputDialog
+            type="renameSortFolder"
+            show={inputDialogShow}
+            hide={hideInputDialog}
+          ></InputDialog>
           <div
             className={`controler-sort-setting${
               sortStore.sortItemSettingShow ? " show" : ""
@@ -82,7 +114,13 @@ export default function ControlerSort() {
                 ></SvgIcon>
               </div>
             </div>
-            <div className="controler-sort-setting-item">
+            <div
+              onClick={() => {
+                renameSortItem();
+                sortStore.hideSortItemSetting();
+              }}
+              className="controler-sort-setting-item"
+            >
               <span>重命名</span>
               <div className="controler-sort-setting-item-icon">
                 <SvgIcon
@@ -127,7 +165,7 @@ export default function ControlerSort() {
             </div>
             <div
               onClick={() => {
-                showDeleteDialog();
+                deleteSortItem();
                 sortStore.hideSortItemSetting();
               }}
               className="controler-sort-setting-item delete"

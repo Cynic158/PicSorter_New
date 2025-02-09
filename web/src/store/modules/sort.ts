@@ -23,7 +23,7 @@ const sortStore = observable(
     setSortFolderLoading(bool: boolean) {
       this.sortFolderLoading = bool;
     },
-    async getSortFolderList(setTop: boolean = false) {
+    async getSortFolderList(noClearList: boolean = false) {
       let funcAction = "获取分类文件夹列表";
       try {
         this.setSortFolderLoading(true);
@@ -36,7 +36,7 @@ const sortStore = observable(
             });
             this.setSortFolderList((res.data as GetSortFolderDataType).list);
 
-            if ((res.data as GetSortFolderDataType).clearList && !setTop) {
+            if ((res.data as GetSortFolderDataType).clearList && !noClearList) {
               // 根据设置来决定是否清空当前选择分类列表
               this.clearSelectingSortList();
             }
@@ -343,6 +343,7 @@ const sortStore = observable(
     async insertSortFolder(name: string) {
       let funcAction = "新增分类文件夹";
       try {
+        this.setHandleSortItemLoading(true);
         this.setInsertSortFolderLoading(true);
         let res = await SortApi.insertSortFolder(name);
         if (res.success) {
@@ -354,7 +355,7 @@ const sortStore = observable(
             };
           } else {
             // 无冲突，获取一次列表
-            this.getSortFolderList();
+            this.getSortFolderList(true);
             return {
               success: true,
               conflict: false,
@@ -377,6 +378,7 @@ const sortStore = observable(
           conflict: false,
         };
       } finally {
+        this.setHandleSortItemLoading(false);
         this.setInsertSortFolderLoading(false);
       }
     },
@@ -389,10 +391,11 @@ const sortStore = observable(
     async deleteSortFolder(item: boolean = false) {
       let funcAction = "删除分类文件夹";
       try {
+        this.setHandleSortItemLoading(true);
         this.setDeleteSortFolderLoading(true);
         let targets = cloneDeep(this.selectingSortList);
+        let sortName = cloneDeep(this.currentSortItem);
         if (item) {
-          let sortName = this.currentSortItem;
           targets = [sortName];
         }
         let res = await SortApi.deleteSortFolder(targets);
@@ -400,13 +403,13 @@ const sortStore = observable(
           // 删除完成，获取一次列表
           // 清空当前选择分类列表
           runInAction(() => {
-            if (item && this.selectingSortList.includes(this.currentSortItem)) {
-              this.setSelectingSortList(this.currentSortItem);
+            if (item && this.selectingSortList.includes(sortName)) {
+              this.setSelectingSortList(sortName);
             }
-            if (item && this.selectedSortList.includes(this.currentSortItem)) {
+            if (item && this.selectedSortList.includes(sortName)) {
               let cloneSelectedList = cloneDeep(this.selectedSortList);
               let filterSelectedList = cloneSelectedList.filter(
-                (item) => item != this.currentSortItem
+                (item) => item != sortName
               );
               this.setSelectedSortList(filterSelectedList);
             }
@@ -415,7 +418,11 @@ const sortStore = observable(
               this.clearSelectedSortList();
             }
           });
-          this.getSortFolderList();
+          if (!item) {
+            this.getSortFolderList();
+          } else {
+            this.getSortFolderList(true);
+          }
           return true;
         } else {
           // 报错
@@ -428,6 +435,7 @@ const sortStore = observable(
         winStore.setErrorDialog(log, funcAction);
         return false;
       } finally {
+        this.setHandleSortItemLoading(false);
         this.setDeleteSortFolderLoading(false);
       }
     },
@@ -792,6 +800,11 @@ const sortStore = observable(
     hideSortItemSetting() {
       this.sortItemSettingShow = false;
     },
+    handleSortItemLoading: false,
+    setHandleSortItemLoading(bool: boolean) {
+      this.handleSortItemLoading = bool;
+    },
+
     // 打开分类项所在目录
     async openSortItemFolder() {
       let funcAction = "打开分类项文件夹";
@@ -807,6 +820,7 @@ const sortStore = observable(
         winStore.setErrorDialog(log, funcAction);
       }
     },
+
     // 获取分类项信息
     sortItemFolderInfoLoading: false,
     setSortItemFolderInfoLoading(bool: boolean) {
@@ -833,6 +847,7 @@ const sortStore = observable(
         this.setSortItemFolderInfoLoading(false);
       }
     },
+
     // 设置分类项置顶
     topListLoading: false,
     setTopListLoading(bool: boolean) {
@@ -841,6 +856,7 @@ const sortStore = observable(
     async setTopList() {
       let funcAction = "设置分类项置顶";
       try {
+        this.setHandleSortItemLoading(true);
         this.setTopListLoading(true);
         let setType: "insert" | "delete" = "insert";
         if (this.currentTop) {
@@ -866,7 +882,73 @@ const sortStore = observable(
         winStore.setErrorDialog(log, funcAction);
         return false;
       } finally {
+        this.setHandleSortItemLoading(false);
         this.setTopListLoading(false);
+      }
+    },
+
+    // 重命名分类项
+    renameSortItemLoading: false,
+    setRenameSortItemLoading(bool: boolean) {
+      this.renameSortItemLoading = bool;
+    },
+    async renameSortItem(newName: string) {
+      let funcAction = "重命名分类文件夹";
+      try {
+        this.setHandleSortItemLoading(true);
+        this.setRenameSortItemLoading(true);
+        // 防止被修改指向
+        let oldName = cloneDeep(this.currentSortItem);
+        let res = await SortApi.renameSortItem(oldName, newName);
+        if (res.success) {
+          if (res.conflict) {
+            return {
+              success: true,
+              conflict: true,
+            };
+          } else {
+            // 修改当前选中列表以及上次选中列表
+            runInAction(() => {
+              if (this.selectingSortList.includes(oldName)) {
+                this.setSelectingSortList(oldName);
+                this.setSelectingSortList(newName);
+              }
+              let findIndex = this.selectedSortList.findIndex(
+                (item) => item == oldName
+              );
+              if (findIndex != -1) {
+                let cloneSelectedList = cloneDeep(this.selectedSortList);
+                cloneSelectedList[findIndex] = newName;
+                this.setSelectedSortList(cloneSelectedList);
+              }
+            });
+
+            // 获取一次列表
+            this.getSortFolderList(true);
+            return {
+              success: true,
+              conflict: false,
+            };
+          }
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return {
+            success: false,
+            conflict: false,
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          success: false,
+          conflict: false,
+        };
+      } finally {
+        this.setHandleSortItemLoading(false);
+        this.setRenameSortItemLoading(false);
       }
     },
   },
@@ -917,6 +999,9 @@ const sortStore = observable(
     getSortItemFolderInfo: action,
     setTopListLoading: action,
     setTopList: action,
+    setRenameSortItemLoading: action,
+    renameSortItem: action,
+    setHandleSortItemLoading: action,
   }
 );
 

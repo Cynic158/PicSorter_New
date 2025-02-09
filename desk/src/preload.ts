@@ -183,6 +183,14 @@ const Sort_setTopList = async (sortName: string, type: "insert" | "delete") => {
   );
   return res;
 };
+const Sort_renameSortItem = async (oldName: string, newName: string) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_renameSortItem" as SortApi,
+    oldName,
+    newName
+  );
+  return res;
+};
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
@@ -212,4 +220,5 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_openSortItemFolder,
   Sort_getSortItemFolderInfo,
   Sort_setTopList,
+  Sort_renameSortItem,
 });

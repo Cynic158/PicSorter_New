@@ -25,7 +25,8 @@ declare global {
     | "Sort_deletePicGroup"
     | "Sort_openSortItemFolder"
     | "Sort_getSortItemFolderInfo"
-    | "Sort_setTopList";
+    | "Sort_setTopList"
+    | "Sort_renameSortItem";
 
   // 其他类型
   // 通用部分
@@ -161,6 +162,7 @@ declare global {
   // 设置部分
   interface AutoRenameConfig {
     path: string;
+    enable: boolean;
   }
   interface SettingConfig {
     autoRename: Array<AutoRenameConfig>;

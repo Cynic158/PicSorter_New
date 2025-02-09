@@ -117,6 +117,10 @@ declare global {
         success: boolean;
         data: string;
       }>;
+      Sort_renameSortItem: (
+        oldName: string,
+        newName: string
+      ) => Promise<{ success: boolean; conflict: boolean; data: string }>;
     };
   }
 

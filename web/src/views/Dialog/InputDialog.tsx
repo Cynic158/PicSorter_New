@@ -18,7 +18,7 @@ interface InputDialogProps {
 
 const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
   const [inputTitle, setInputTitle] = useState("");
-  const [inputActive, setIputActive] = useState(false);
+  const [inputActive, setInputActive] = useState(false);
   const [inputPlaceholder, setInputPlaceholder] = useState("");
   const [inputVal, setInputVal] = useState("");
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -65,7 +65,7 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
       } else {
         return true;
       }
-    } else if (type == "insertSortFolder") {
+    } else if (type == "insertSortFolder" || type == "renameSortFolder") {
       if (inputVal.trim() == "") {
         winStore.setMessage({
           type: "error",
@@ -87,7 +87,11 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
   };
 
   const applyVal = async () => {
-    if (!picStore.renamePicLoading || !sortStore.insertSortFolderLoading) {
+    if (
+      !picStore.renamePicLoading &&
+      !sortStore.insertSortFolderLoading &&
+      !sortStore.renameSortItemLoading
+    ) {
       let validateRes = validateVal();
       if (validateRes) {
         if (type == "renamePic") {
@@ -138,13 +142,32 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
               msg: "此文件夹名称已被使用",
             });
           }
+        } else if (type == "renameSortFolder") {
+          let res = await sortStore.renameSortItem(inputVal.trim());
+          if (res.success && !res.conflict) {
+            // 重命名成功
+            winStore.setMessage({
+              type: "success",
+              msg: "重命名成功",
+            });
+            closeDialog();
+          } else if (res.conflict) {
+            winStore.setMessage({
+              type: "error",
+              msg: "已存在同名分类文件夹",
+            });
+          }
         }
       }
     }
   };
 
   const closeDialog = () => {
-    if (!picStore.renamePicLoading || !sortStore.insertSortFolderLoading) {
+    if (
+      !picStore.renamePicLoading &&
+      !sortStore.insertSortFolderLoading &&
+      !sortStore.renameSortItemLoading
+    ) {
       hide();
     }
   };
@@ -158,10 +181,10 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
 
   useEffect(() => {
     const setActive = () => {
-      setIputActive(true);
+      setInputActive(true);
     };
     const setInActive = () => {
-      setIputActive(false);
+      setInputActive(false);
     };
     let textareaEl: HTMLTextAreaElement = document.querySelector(
       ".inputdialog-textarea." + type
@@ -173,6 +196,9 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
       } else if (type == "insertSortFolder") {
         setInputPlaceholder("请输入新的分类文件夹名称");
         setInputTitle("新建分类文件夹");
+      } else if (type == "renameSortFolder") {
+        setInputPlaceholder("请输入新的分类文件夹名称");
+        setInputTitle("重命名分类文件夹");
       }
       setInputVal("");
       textareaEl.addEventListener("focus", setActive);
@@ -220,7 +246,11 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
               <button
                 onClick={applyVal}
                 className={`inputdialog-btn${
-                  picStore.renamePicLoading ? " loading" : ""
+                  picStore.renamePicLoading ||
+                  sortStore.insertSortFolderLoading ||
+                  sortStore.renameSortItemLoading
+                    ? " loading"
+                    : ""
                 }`}
               >
                 <div className="inputdialog-btn-icon">
