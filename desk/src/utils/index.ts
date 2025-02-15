@@ -364,4 +364,297 @@ const getFolderInfo = async (
   };
 };
 
-export { generateErrorLog, checkPathsExist, filterImages, getFolderInfo };
+const autoRenamer = async (
+  picTargets: Array<string>,
+  autoConfigs: Array<AutoRenameConfig>
+) => {
+  // 重命名映射
+  let renameMap: Array<{ from: string; to: string }> = [];
+  // 判断是否符合图片要求
+  const validPicTypes: Array<picType> = ["png", "jpg", "gif", "webp"];
+  const isImage = (file: string): boolean => {
+    const ext = path.extname(file).toLowerCase().replace(".", "");
+    return validPicTypes.includes(ext as picType);
+  };
+  // 判断是否符合格式
+  const validFormat = (
+    name: string,
+    separator: "-" | "_",
+    format: Array<FormatConfigType>
+  ) => {
+    let nameArr = name.split(separator);
+    if (nameArr.length != format.length) {
+      // 直接不符合
+      return false;
+    } else {
+      // 检查每个部分是否匹配 format 配置
+      let isMatched = true;
+      for (let i = 0; i < format.length; i++) {
+        const { type, value } = format[i];
+        const part = nameArr[i];
+
+        switch (type) {
+          case "date":
+            if (!/^\d{4}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$/.test(part)) {
+              isMatched = false;
+            }
+            break;
+          case "year":
+            if (!/^\d{4}$/.test(part)) {
+              isMatched = false;
+            }
+            break;
+          case "month":
+            if (!/^(0[1-9]|1[0-2])$/.test(part)) {
+              isMatched = false;
+            }
+            break;
+          case "day":
+            if (!/^(0[1-9]|[12][0-9]|3[01])$/.test(part)) {
+              isMatched = false;
+            }
+            break;
+          case "hour":
+            if (!/^(0[0-9]|1[0-9]|2[0-3])$/.test(part)) {
+              isMatched = false;
+            }
+            break;
+          case "minute":
+          case "second":
+            if (!/^[0-5][0-9]$/.test(part)) {
+              isMatched = false;
+            }
+            break;
+          case "str":
+            if (part !== value) {
+              isMatched = false;
+            }
+            break;
+          case "timestamp":
+            if (!/^\d+$/.test(part)) {
+              isMatched = false;
+            }
+            break;
+          case "serial":
+            if (!/^\d+$/.test(part)) {
+              isMatched = false;
+            }
+            break;
+          default:
+            isMatched = false;
+        }
+
+        if (!isMatched) break;
+      }
+      return isMatched;
+    }
+  };
+  // 获取图片名称、大小、创建时间、修改时间
+  const getBasePicInfo = async (picPath: string) => {
+    const stats = await fs.promises.stat(picPath);
+    let name = path.basename(picPath);
+    let size = stats.size;
+    let createdAt = stats.birthtimeMs;
+    let modifiedAt = stats.mtimeMs;
+    return {
+      picPath,
+      name,
+      size,
+      createdAt,
+      modifiedAt,
+    };
+  };
+  const compareFunctions: {
+    [key in SortTypeForPic]: (
+      a: {
+        name: string;
+        size: number;
+        createdAt: number;
+        modifiedAt: number;
+        picPath: string;
+      },
+      b: {
+        name: string;
+        size: number;
+        createdAt: number;
+        modifiedAt: number;
+        picPath: string;
+      }
+    ) => number;
+  } = {
+    nameAsc: (a, b) => {
+      const isAEnglish = /^[A-Za-z]/.test(a.name); // 判断图片名称首字符是否为英文
+      const isBEnglish = /^[A-Za-z]/.test(b.name);
+      const isAChinese = /^[\u4e00-\u9fa5]/.test(a.name); // 判断图片名称首字符是否为中文
+      const isBChinese = /^[\u4e00-\u9fa5]/.test(b.name);
+
+      // 如果 a 是非英文非中文，排最前面
+      if (!isAEnglish && !isAChinese && (isBEnglish || isBChinese)) return -1;
+      if ((isAEnglish || isAChinese) && !isBEnglish && !isBChinese) return 1;
+
+      // 英文名称排在中文名称前面
+      if (isAEnglish && !isBEnglish) return -1;
+      if (!isAEnglish && isBEnglish) return 1;
+
+      if (isAChinese && !isBChinese) return 1;
+      if (!isAChinese && isBChinese) return -1;
+
+      // 如果是同样类型的名称，按照字母顺序比较
+      return a.name.localeCompare(b.name);
+    },
+    nameDesc: (a, b) => {
+      const isAEnglish = /^[A-Za-z]/.test(a.name);
+      const isBEnglish = /^[A-Za-z]/.test(b.name);
+      const isAChinese = /^[\u4e00-\u9fa5]/.test(a.name);
+      const isBChinese = /^[\u4e00-\u9fa5]/.test(b.name);
+
+      // 如果 a 是非英文非中文，排最前面
+      if (!isAEnglish && !isAChinese && (isBEnglish || isBChinese)) return -1;
+      if ((isAEnglish || isAChinese) && !isBEnglish && !isBChinese) return 1;
+
+      // 英文名称排在中文名称前面
+      if (isAEnglish && !isBEnglish) return 1;
+      if (!isAEnglish && isBEnglish) return -1;
+
+      if (isAChinese && !isBChinese) return -1;
+      if (!isAChinese && isBChinese) return 1;
+
+      // 如果是同样类型的文件夹，按照字母顺序反向比较
+      return b.name.localeCompare(a.name);
+    },
+    sizeAsc: (a, b) => a.size - b.size,
+    sizeDesc: (a, b) => b.size - a.size,
+    createdAtAsc: (a, b) => a.createdAt - b.createdAt,
+    createdAtDesc: (a, b) => b.createdAt - a.createdAt,
+    modifiedAtAsc: (a, b) => a.modifiedAt - b.modifiedAt,
+    modifiedAtDesc: (a, b) => b.modifiedAt - a.modifiedAt,
+  };
+  // 创建映射
+  const generateMap = async (
+    picPathGroup: Array<string>,
+    config: AutoRenameConfig,
+    initSerial: number
+  ) => {
+    // 先进行排序
+    const sortFunction = compareFunctions[config.sortType];
+    let picInfoGroup = await Promise.all(picPathGroup.map(getBasePicInfo));
+    picInfoGroup.sort(sortFunction);
+    let picMap = picInfoGroup.map((item) => {
+      return { from: item.picPath, to: "" };
+    });
+
+    let now = new Date();
+    let timeParts = {
+      year: String(now.getFullYear()),
+      month: String(now.getMonth() + 1).padStart(2, "0"),
+      day: String(now.getDate()).padStart(2, "0"),
+      hour: String(now.getHours()).padStart(2, "0"),
+      minute: String(now.getMinutes()).padStart(2, "0"),
+      second: String(now.getSeconds()).padStart(2, "0"),
+    };
+
+    const updatePicMap = (part: string) => {
+      picMap.forEach((item, index) => {
+        picMap[index].to = item.to + part;
+      });
+    };
+    // 为picMap得到to的图片名称
+    let formatIndex = 0;
+    for (const item of config.format) {
+      if (item.type == "date") {
+        updatePicMap(timeParts.year + timeParts.month + timeParts.day);
+      } else if (item.type == "str") {
+        updatePicMap(item.value);
+      } else if (item.type == "serial") {
+        picMap.forEach((picItem, picIndex) => {
+          let serial = initSerial + picIndex;
+          picMap[picIndex].to = picItem.to + serial;
+        });
+      } else if (item.type == "timestamp") {
+        for (const picItem of picMap) {
+          await new Promise((resolve) => setTimeout(resolve, 5));
+          picItem.to = picItem.to + Date.now();
+        }
+      } else {
+        updatePicMap(timeParts[item.type]);
+      }
+
+      if (formatIndex != config.format.length - 1) {
+        updatePicMap(config.separator);
+      }
+      formatIndex = formatIndex + 1;
+    }
+
+    // 为to补充路径以及后缀
+    // 遍历 picMap，拼接新的 to 值
+    for (const picItem of picMap) {
+      const ext = path.extname(picItem.from); // 提取文件后缀（包含 .）
+      picItem.to = path.join(config.path, picItem.to + ext);
+      renameMap.push(picItem);
+    }
+  };
+
+  await Promise.all(
+    autoConfigs.map(async (config) => {
+      // 符合格式的图片组，用于计算最大序号值
+      let resolveGroup: Array<string> = [];
+      // 不符格式的图片组，合并至待重命名组
+      let rejectGroup: Array<string> = [];
+      // 获取分类文件夹内所有图片
+      let imageFiles = await fs.promises.readdir(config.path, {
+        withFileTypes: true,
+      });
+
+      await Promise.all(
+        imageFiles
+          .filter((file) => file.isFile() && isImage(file.name))
+          .map(async (file) => {
+            let fileNameWithoutExt = path.parse(file.name).name;
+            if (
+              validFormat(fileNameWithoutExt, config.separator, config.format)
+            ) {
+              resolveGroup.push(file.name);
+            } else {
+              rejectGroup.push(path.join(config.path, file.name));
+            }
+          })
+      );
+
+      // 检查需不需要提供序号
+      let serialItemIndex = config.format.findIndex(
+        (item) => item.type == "serial"
+      );
+      let initSerial = 0;
+      if (serialItemIndex != -1 && resolveGroup.length > 0) {
+        // 需要提供序号
+        let serialGroup = resolveGroup.map((item) =>
+          Number(item.split(config.separator)[serialItemIndex])
+        );
+        let maxSerial = Math.max(...serialGroup);
+        initSerial = maxSerial + 1;
+      }
+      // 如果仅处理新图片
+      if (config.applyNew) {
+        await generateMap(picTargets, config, initSerial);
+      } else {
+        let pathGroup = [...picTargets, ...rejectGroup];
+        await generateMap(pathGroup, config, initSerial);
+      }
+    })
+  );
+
+  // 得到处理好的renameMap，执行复制
+  await Promise.all(
+    renameMap.map(async (item) => {
+      await fs.promises.copyFile(item.from, item.to);
+    })
+  );
+};
+
+export {
+  generateErrorLog,
+  checkPathsExist,
+  filterImages,
+  getFolderInfo,
+  autoRenamer,
+};

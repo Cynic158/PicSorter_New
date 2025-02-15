@@ -192,6 +192,21 @@ const Sort_renameSortItem = async (oldName: string, newName: string) => {
   return res;
 };
 
+const Setting_getAutoConfig = async (sortName: string) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_getAutoConfig" as SettingApi,
+    sortName
+  );
+  return res;
+};
+const Setting_setAutoConfig = async (autoConfig: AutoRenameConfig) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_setAutoConfig" as SettingApi,
+    autoConfig
+  );
+  return res;
+};
+
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
   Win_hide,
@@ -221,4 +236,6 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_getSortItemFolderInfo,
   Sort_setTopList,
   Sort_renameSortItem,
+  Setting_getAutoConfig,
+  Setting_setAutoConfig,
 });

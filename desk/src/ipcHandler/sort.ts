@@ -3,6 +3,7 @@ import {
   generateErrorLog,
   checkPathsExist,
   getFolderInfo,
+  autoRenamer,
 } from "../utils/index";
 import fs from "fs";
 import path from "path";
@@ -246,6 +247,15 @@ const sortHandler = (
         return validPicTypes.includes(ext as picType);
       };
 
+      // 自动重命名配置
+      const settingPath = path.resolve(appPath, settingConfigPath);
+      // 读取当前配置文件内容
+      const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+      // 解析JSON内容
+      const settingConfig: SettingConfig = JSON.parse(settingContent);
+      // 自动重命名配置
+      let autoRenameConfig = settingConfig.autoRename;
+
       // 获取文件夹信息
       for (const folder of folders) {
         const folderPath = path.join(sortFolderPath, folder);
@@ -273,6 +283,12 @@ const sortHandler = (
 
           // 检查文件夹是否在 topList 中
           const isTop = topList.includes(folderPath);
+          // 检查是否有重命名配置
+          const isAuto = autoRenameConfig.find(
+            (item) => item.path == folderPath && item.enable
+          )
+            ? true
+            : false;
 
           // 创建文件夹信息对象
           const folderInfo: SortFolderListType = {
@@ -280,6 +296,7 @@ const sortHandler = (
             count: fileCount,
             size: totalSize,
             top: isTop,
+            auto: isAuto,
           };
 
           // 按照置顶与非置顶分开存储
@@ -858,17 +875,47 @@ const sortHandler = (
           };
         }
 
+        // 检查有没有需要自动重命名的
+        // 读取重命名配置
+        const settingPath = path.resolve(appPath, settingConfigPath);
+        // 读取当前配置文件内容
+        const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+        // 解析JSON内容
+        const settingConfig: SettingConfig = JSON.parse(settingContent);
+        // 自动重命名配置
+        let autoRenameConfig = settingConfig.autoRename;
+        // 需要自动重命名的分类组
+        let autoRenameTargets: Array<AutoRenameConfig> = [];
+        // 默认分类组
+        let defaultTargets: Array<string> = [];
+        targets.forEach((target) => {
+          let targetPath = path.join(sortFolderPath, target);
+          let findIndex = autoRenameConfig.findIndex(
+            (item) => item.path == targetPath
+          );
+          if (findIndex == -1) {
+            defaultTargets.push(target);
+          } else {
+            autoRenameTargets.push(autoRenameConfig[findIndex]);
+          }
+        });
+        if (autoRenameTargets.length > 0) {
+          await autoRenamer([picPath], autoRenameTargets);
+        }
+
         // 创建映射
         let picName = path.basename(picPath);
-        let mapTargets: Array<CopyPicDataType> = targets.map((target) => {
-          return {
-            picName: picName,
-            picPath: picPath,
-            sortName: target,
-            sortPath: path.join(sortFolderPath, target),
-            action: action,
-          };
-        });
+        let mapTargets: Array<CopyPicDataType> = defaultTargets.map(
+          (target) => {
+            return {
+              picName: picName,
+              picPath: picPath,
+              sortName: target,
+              sortPath: path.join(sortFolderPath, target),
+              action: action,
+            };
+          }
+        );
 
         // 检查有没有冲突
         let mapPaths = mapTargets.map((target) =>
@@ -963,13 +1010,41 @@ const sortHandler = (
         // 总分类文件夹路径
         let sortFolderPath = config.sortFolderPath;
 
+        // 检查有没有需要自动重命名的
+        // 读取重命名配置
+        const settingPath = path.resolve(appPath, settingConfigPath);
+        // 读取当前配置文件内容
+        const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+        // 解析JSON内容
+        const settingConfig: SettingConfig = JSON.parse(settingContent);
+        // 自动重命名配置
+        let autoRenameConfig = settingConfig.autoRename;
+        // 需要自动重命名的分类组
+        let autoRenameTargets: Array<AutoRenameConfig> = [];
+        // 默认分类组
+        let defaultTargets: Array<string> = [];
+        targets.forEach((target) => {
+          let targetPath = path.join(sortFolderPath, target);
+          let findIndex = autoRenameConfig.findIndex(
+            (item) => item.path == targetPath
+          );
+          if (findIndex == -1) {
+            defaultTargets.push(target);
+          } else {
+            autoRenameTargets.push(autoRenameConfig[findIndex]);
+          }
+        });
+        if (autoRenameTargets.length > 0) {
+          await autoRenamer(filterPicPathGroup, autoRenameTargets);
+        }
+
         // 构建所有待复制的映射数据
         // 每个图片在每个目标文件夹都有一份映射
         let mapTargets: Array<CopyPicDataType> = [];
         filterPicPathGroup.forEach((picPath) => {
           // 获取当前图片文件名（包含后缀）
           let picName = path.basename(picPath);
-          targets.forEach((target) => {
+          defaultTargets.forEach((target) => {
             mapTargets.push({
               picName: picName,
               picPath: picPath,

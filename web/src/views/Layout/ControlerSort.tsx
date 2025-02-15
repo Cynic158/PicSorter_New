@@ -4,6 +4,7 @@ import TextOverflow from "react-text-overflow";
 import SortItemFolderDialog from "../Dialog/SortItemFolderDialog";
 import DeleteDialog from "../Dialog/DeleteDialog";
 import InputDialog from "../Dialog/InputDialog";
+import AutoConfigDialog from "../Dialog/AutoConfigDialog";
 import sortStore from "../../store/modules/sort";
 import { Observer } from "mobx-react";
 import { getFileSize } from "../../utils";
@@ -31,11 +32,7 @@ export default function ControlerSort() {
     setDeleteDialogShow(false);
   };
   const deleteSortItem = () => {
-    if (
-      !sortStore.renameSortItemLoading &&
-      !sortStore.deleteSortFolderLoading &&
-      !sortStore.handlePicLoading
-    ) {
+    if (!sortStore.handleSortItemLoading && !sortStore.handlePicLoading) {
       showDeleteDialog();
     }
   };
@@ -48,12 +45,21 @@ export default function ControlerSort() {
     setInputDialogShow(false);
   };
   const renameSortItem = () => {
-    if (
-      !sortStore.renameSortItemLoading &&
-      !sortStore.deleteSortFolderLoading &&
-      !sortStore.handlePicLoading
-    ) {
+    if (!sortStore.handleSortItemLoading && !sortStore.handlePicLoading) {
       showInputDialog();
+    }
+  };
+
+  const [autoConfigDialogShow, setAutoConfigDialogShow] = useState(false);
+  const showAutoConfigDialog = () => {
+    setAutoConfigDialogShow(true);
+  };
+  const hideAutoConfigDialog = () => {
+    setAutoConfigDialogShow(false);
+  };
+  const setAutoConfig = () => {
+    if (!sortStore.handleSortItemLoading && !sortStore.handlePicLoading) {
+      showAutoConfigDialog();
     }
   };
 
@@ -75,6 +81,10 @@ export default function ControlerSort() {
             show={inputDialogShow}
             hide={hideInputDialog}
           ></InputDialog>
+          <AutoConfigDialog
+            show={autoConfigDialogShow}
+            hide={hideAutoConfigDialog}
+          ></AutoConfigDialog>
           <div
             className={`controler-sort-setting${
               sortStore.sortItemSettingShow ? " show" : ""
@@ -152,7 +162,13 @@ export default function ControlerSort() {
                 ></SvgIcon>
               </div>
             </div>
-            <div className="controler-sort-setting-item">
+            <div
+              onClick={() => {
+                setAutoConfig();
+                sortStore.hideSortItemSetting();
+              }}
+              className="controler-sort-setting-item"
+            >
               <span>自动重命名</span>
               <div className="controler-sort-setting-item-icon">
                 <SvgIcon
@@ -268,14 +284,18 @@ export default function ControlerSort() {
                       </div>
                     </div>
                     <div className="controler-sort-item-top-right">
-                      <div className="auto">
-                        <SvgIcon
-                          svgName="auto"
-                          svgSize="18px"
-                          clickable={true}
-                          color="var(--color-white2)"
-                        ></SvgIcon>
-                      </div>
+                      {item.auto ? (
+                        <div className="auto">
+                          <SvgIcon
+                            svgName="auto"
+                            svgSize="18px"
+                            clickable={true}
+                            color="var(--color-white2)"
+                          ></SvgIcon>
+                        </div>
+                      ) : (
+                        <></>
+                      )}
                       {item.top ? (
                         <div className="top">
                           <SvgIcon

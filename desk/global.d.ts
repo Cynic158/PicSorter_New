@@ -27,6 +27,7 @@ declare global {
     | "Sort_getSortItemFolderInfo"
     | "Sort_setTopList"
     | "Sort_renameSortItem";
+  type SettingApi = "Setting_getAutoConfig" | "Setting_setAutoConfig";
 
   // 其他类型
   // 通用部分
@@ -135,6 +136,7 @@ declare global {
     count: number;
     size: number;
     top: boolean;
+    auto: boolean;
   }
 
   interface FolderInfoType {
@@ -160,9 +162,28 @@ declare global {
   }
 
   // 设置部分
+  type FormatType =
+    | "date"
+    | "year"
+    | "month"
+    | "day"
+    | "hour"
+    | "minute"
+    | "second"
+    | "timestamp"
+    | "serial"
+    | "str";
+  interface FormatConfigType {
+    type: FormatType;
+    value: string;
+  }
   interface AutoRenameConfig {
     path: string;
     enable: boolean;
+    separator: "-" | "_";
+    applyNew: boolean;
+    sortType: SortTypeForPic;
+    format: Array<FormatConfigType>;
   }
   interface SettingConfig {
     autoRename: Array<AutoRenameConfig>;

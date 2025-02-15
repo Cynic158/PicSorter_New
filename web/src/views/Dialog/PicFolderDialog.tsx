@@ -760,7 +760,7 @@ const PicFolderDialog: React.FC<PicFolderDialogProps> = ({ show, hide }) => {
                       onClick={clearSelectForm}
                       className="picfolderdialog-config-title-btn"
                     >
-                      恢复默认配置
+                      清除配置
                     </span>
                   </p>
                   <div className="picfolderdialog-config-item">

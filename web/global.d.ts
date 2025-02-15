@@ -68,7 +68,6 @@ declare global {
         data: FolderInfoType | string;
       }>;
       Sort_openSortFolder: () => Promise<{ success: boolean; data: string }>;
-
       Sort_insertSortFolder: (
         name: string
       ) => Promise<{ success: boolean; conflict: boolean; data: string }>;
@@ -121,6 +120,13 @@ declare global {
         oldName: string,
         newName: string
       ) => Promise<{ success: boolean; conflict: boolean; data: string }>;
+
+      Setting_getAutoConfig: (
+        sortName: string
+      ) => Promise<{ success: boolean; data: string | AutoRenameConfig }>;
+      Setting_setAutoConfig: (
+        config: AutoRenameConfig
+      ) => Promise<{ success: boolean; data: string }>;
     };
   }
 
@@ -224,6 +230,7 @@ declare global {
     count: number;
     size: number;
     top: boolean;
+    auto: boolean;
   }
 
   type selectNameType = "all" | "include" | "exclude";
@@ -297,6 +304,31 @@ declare global {
     sortName: string;
     sortPath: string;
     action: "copy" | "cut";
+  }
+
+  // setting部分
+  type FormatType =
+    | "date"
+    | "year"
+    | "month"
+    | "day"
+    | "hour"
+    | "minute"
+    | "second"
+    | "timestamp"
+    | "serial"
+    | "str";
+  interface FormatConfigType {
+    type: FormatType;
+    value: string;
+  }
+  interface AutoRenameConfig {
+    path: string;
+    enable: boolean;
+    separator: "-" | "_";
+    applyNew: boolean;
+    sortType: SortTypeForPic;
+    format: Array<FormatConfigType>;
   }
 }
 

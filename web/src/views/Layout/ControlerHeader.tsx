@@ -50,7 +50,11 @@ export default function ControlerHeader() {
     setDeleteDialogShow(false);
   };
   const deleteSortFolder = () => {
-    if (sortStore.selectingSortList.length > 0 && !sortStore.handlePicLoading) {
+    if (
+      sortStore.selectingSortList.length > 0 &&
+      !sortStore.handlePicLoading &&
+      !sortStore.handleSortItemLoading
+    ) {
       // 允许执行
       showDeleteDialog();
     }
