@@ -20,7 +20,7 @@
     }
     .picfolderdialog-form-item-select {
       &.show {
-        top: 244px !important;
+        top: 228px !important;
         visibility: visible !important;
         opacity: 1 !important;
       }
@@ -84,10 +84,11 @@
         height: 100%;
         border-radius: 4px;
         background-color: var(--color-white3);
-        border-left: 4px solid var(--color-blue2);
+        // border-left: 4px solid var(--color-blue2);
         display: flex;
         flex-direction: column;
         padding: 8px 12px;
+        padding-left: 16px;
         .picfolderdialog-config-title {
           color: var(--color-white2);
           margin-bottom: 16px;
@@ -282,7 +283,7 @@
     .picfolderdialog-form-item-select {
       position: absolute;
       left: 32px;
-      top: 234px;
+      top: 218px;
       display: flex;
       flex-direction: column;
       align-items: center;

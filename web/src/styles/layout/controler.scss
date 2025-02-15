@@ -118,6 +118,62 @@
       100% - var(--controler-header-container-height) -
         var(--controler-btn-container-height)
     );
+    position: relative;
+    .controler-sort-setting {
+      position: absolute;
+      right: 12px;
+      top: 8px;
+      z-index: var(--controler-sort-item-setting-index);
+      background-color: var(--color-black1);
+      display: flex;
+      flex-direction: column;
+      width: 200px;
+      overflow: hidden;
+      border-radius: 4px;
+      box-shadow: 0 0 4px 2px rgba($color: #000000, $alpha: 0.2);
+      opacity: 0;
+      transform-origin: top right;
+      transform: scale(0.7);
+      visibility: hidden;
+      transition: all 0.3s ease;
+      &.show {
+        opacity: 1;
+        transform: scale(1);
+        visibility: visible;
+      }
+      .controler-sort-setting-item {
+        color: var(--color-white2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        font-size: 14px;
+        transition: background-color 0.2s ease;
+        cursor: pointer;
+        span {
+          transition: transform 0.2s ease;
+        }
+        &:hover {
+          background-color: var(--color-white9);
+          span {
+            transform: translateX(4px);
+          }
+        }
+        &.delete {
+          &:hover {
+            background-color: var(--color-red7);
+          }
+        }
+        .controler-sort-setting-item-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          &.padding {
+            padding-right: 2px;
+          }
+        }
+      }
+    }
     .controler-sort {
       width: 100%;
       height: 100%;
@@ -236,17 +292,29 @@
               .name {
                 margin-left: 28px;
                 color: var(--color-white2);
+                max-width: 120px;
               }
             }
             .controler-sort-item-top-right {
               display: flex;
               align-items: center;
               margin-right: 12px;
+              .auto {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 8px;
+              }
               .top {
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 margin-right: 8px;
+              }
+              .setting {
+                display: flex;
+                align-items: center;
+                justify-content: center;
               }
             }
           }

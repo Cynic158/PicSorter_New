@@ -59,7 +59,7 @@ const MainFolderDialog: React.FC<MainFolderDialogProps> = ({ show, hide }) => {
     if (sortStore.picFolderConfig.folderPath) {
       sortStore.getPicFolderInfo().then((res) => {
         if (res) {
-          let cloneRes = cloneDeep(res as FolderInfoType);
+          let cloneRes = cloneDeep(res);
           cloneRes.sizeTotal = getFileSize(cloneRes.sizeTotal as number);
           if (cloneRes.sizeRange.length == 0) {
             cloneRes.sizeRange = "无";
@@ -103,7 +103,7 @@ const MainFolderDialog: React.FC<MainFolderDialogProps> = ({ show, hide }) => {
     if (sortStore.sortFolderConfig.folderPath) {
       sortStore.getSortFolderInfo().then((res) => {
         if (res) {
-          let cloneRes = cloneDeep(res as FolderInfoType);
+          let cloneRes = cloneDeep(res);
           cloneRes.sizeTotal = getFileSize(cloneRes.sizeTotal as number);
           if (cloneRes.sizeRange.length == 0) {
             cloneRes.sizeRange = "无";
@@ -288,7 +288,7 @@ const MainFolderDialog: React.FC<MainFolderDialogProps> = ({ show, hide }) => {
                   ></Folder>
                 </div>
                 <div className="mainfolderdialog-form-item-load">
-                  {!picError ? <Loader width="24px"></Loader> : <></>}
+                  {!sortError ? <Loader width="24px"></Loader> : <></>}
                   <span>{!sortError ? "读取中..." : "读取失败"}</span>
                 </div>
                 {sortStore.sortFolderConfig.folderPath ? (

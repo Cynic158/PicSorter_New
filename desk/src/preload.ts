@@ -161,6 +161,51 @@ const Sort_copyPicGroup = async (
   );
   return res;
 };
+const Sort_openSortItemFolder = async (sortName: string) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_openSortItemFolder" as SortApi,
+    sortName
+  );
+  return res;
+};
+const Sort_getSortItemFolderInfo = async (sortName: string) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_getSortItemFolderInfo" as SortApi,
+    sortName
+  );
+  return res;
+};
+const Sort_setTopList = async (sortName: string, type: "insert" | "delete") => {
+  const res = await ipcRenderer.invoke(
+    "Sort_setTopList" as SortApi,
+    sortName,
+    type
+  );
+  return res;
+};
+const Sort_renameSortItem = async (oldName: string, newName: string) => {
+  const res = await ipcRenderer.invoke(
+    "Sort_renameSortItem" as SortApi,
+    oldName,
+    newName
+  );
+  return res;
+};
+
+const Setting_getAutoConfig = async (sortName: string) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_getAutoConfig" as SettingApi,
+    sortName
+  );
+  return res;
+};
+const Setting_setAutoConfig = async (autoConfig: AutoRenameConfig) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_setAutoConfig" as SettingApi,
+    autoConfig
+  );
+  return res;
+};
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
@@ -187,4 +232,10 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_deletePicGroup,
   Sort_copyPic,
   Sort_copyPicGroup,
+  Sort_openSortItemFolder,
+  Sort_getSortItemFolderInfo,
+  Sort_setTopList,
+  Sort_renameSortItem,
+  Setting_getAutoConfig,
+  Setting_setAutoConfig,
 });

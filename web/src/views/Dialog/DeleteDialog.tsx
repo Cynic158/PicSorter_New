@@ -8,7 +8,7 @@ import winStore from "../../store/modules/win";
 import "../../styles/dialog/deletedialog.scss";
 
 interface DeleteDialogProps {
-  type: "deletePic" | "deleteSortFolder";
+  type: "deletePic" | "deleteSortFolder" | "deleteSortItemFolder";
   show: boolean;
   hide: () => void;
 }
@@ -17,6 +17,18 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ type, show, hide }) => {
   const handleDelete = async () => {
     if (type == "deleteSortFolder" && !sortStore.deleteSortFolderLoading) {
       let res = await sortStore.deleteSortFolder();
+      if (res) {
+        winStore.setMessage({
+          type: "success",
+          msg: "删除成功",
+        });
+        closeDialog();
+      }
+    } else if (
+      type == "deleteSortItemFolder" &&
+      !sortStore.deleteSortFolderLoading
+    ) {
+      let res = await sortStore.deleteSortFolder(true);
       if (res) {
         winStore.setMessage({
           type: "success",
@@ -92,6 +104,7 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ type, show, hide }) => {
                           "个") +
                       " 分类文件夹吗？"
                     : ""}
+                  {type == "deleteSortItemFolder" ? "确定要删除该分类吗？" : ""}
                   {type == "deletePic"
                     ? "确定要删除" +
                       (picStore.viewMode == "view"
@@ -102,7 +115,7 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ type, show, hide }) => {
                     : ""}
                 </span>
                 <span className="deletedialog-form-item-tip">
-                  {type == "deleteSortFolder"
+                  {type == "deleteSortFolder" || type == "deleteSortItemFolder"
                     ? "将对应分类文件夹以及其内容移动到回收站"
                     : ""}
                   {type == "deletePic" ? "将对应图片移动到回收站" : ""}

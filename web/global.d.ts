@@ -68,7 +68,6 @@ declare global {
         data: FolderInfoType | string;
       }>;
       Sort_openSortFolder: () => Promise<{ success: boolean; data: string }>;
-
       Sort_insertSortFolder: (
         name: string
       ) => Promise<{ success: boolean; conflict: boolean; data: string }>;
@@ -102,6 +101,31 @@ declare global {
       Sort_deletePicGroup: (
         picPathGroup: Array<string>,
         cut?: boolean
+      ) => Promise<{ success: boolean; data: string }>;
+      Sort_openSortItemFolder: (
+        sortName: string
+      ) => Promise<{ success: boolean; data: string }>;
+      Sort_getSortItemFolderInfo: (sortName: string) => Promise<{
+        success: boolean;
+        data: FolderInfoType | string;
+      }>;
+      Sort_setTopList: (
+        sortName: string,
+        type: "insert" | "delete"
+      ) => Promise<{
+        success: boolean;
+        data: string;
+      }>;
+      Sort_renameSortItem: (
+        oldName: string,
+        newName: string
+      ) => Promise<{ success: boolean; conflict: boolean; data: string }>;
+
+      Setting_getAutoConfig: (
+        sortName: string
+      ) => Promise<{ success: boolean; data: string | AutoRenameConfig }>;
+      Setting_setAutoConfig: (
+        config: AutoRenameConfig
       ) => Promise<{ success: boolean; data: string }>;
     };
   }
@@ -206,6 +230,7 @@ declare global {
     count: number;
     size: number;
     top: boolean;
+    auto: boolean;
   }
 
   type selectNameType = "all" | "include" | "exclude";
@@ -279,6 +304,31 @@ declare global {
     sortName: string;
     sortPath: string;
     action: "copy" | "cut";
+  }
+
+  // setting部分
+  type FormatType =
+    | "date"
+    | "year"
+    | "month"
+    | "day"
+    | "hour"
+    | "minute"
+    | "second"
+    | "timestamp"
+    | "serial"
+    | "str";
+  interface FormatConfigType {
+    type: FormatType;
+    value: string;
+  }
+  interface AutoRenameConfig {
+    path: string;
+    enable: boolean;
+    separator: "-" | "_";
+    applyNew: boolean;
+    sortType: SortTypeForPic;
+    format: Array<FormatConfigType>;
   }
 }
 

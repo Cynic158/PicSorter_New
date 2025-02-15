@@ -20,7 +20,7 @@ const generateErrorLog = (error: Error | unknown) => {
   }
 
   // 构造错误日志字符串
-  const errorLog = `Error Report:\nTimestamp: ${timestamp}\nMessage: ${errorMessage}\nStack Trace:\n${stackTrace}`;
+  const errorLog = `FrontEnd Error Report:\nTimestamp: ${timestamp}\nMessage: ${errorMessage}\nStack Trace:\n${stackTrace}`;
 
   return errorLog;
 };
