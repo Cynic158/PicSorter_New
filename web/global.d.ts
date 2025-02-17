@@ -133,7 +133,7 @@ declare global {
   // 通用部分
   type picType = "png" | "jpg" | "gif" | "webp";
   type sizeType = "B" | "KB" | "MB" | "GB";
-  type viewType = "view" | "horizontal" | "vertical";
+  type viewType = "view" | "horizontal" | "vertical" | "total";
 
   // win部分
   interface MessageType {

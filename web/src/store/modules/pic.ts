@@ -38,6 +38,11 @@ const picStore = observable(
         this.picList = list;
       }
     },
+    // 总预览列表
+    previewList: [] as Array<PicInfo>,
+    setPreviewList(list: Array<PicInfo>) {
+      this.previewList = list;
+    },
     // 获取图片列表
     picListLoading: false,
     setPicListLoading(bool: boolean) {
@@ -57,6 +62,19 @@ const picStore = observable(
         }
         let res = await PicApi.getPicList(mode, refresh, currentPicPath);
         if (res.success) {
+          // 单图时额外异步获取总预览列表
+          if (mode == "view") {
+            let previewRes = await PicApi.getPicList("total", false);
+            if (previewRes.success) {
+              this.setPreviewList(
+                (previewRes.data as GetPicListDataType).picList
+              );
+            } else {
+              this.setPreviewList([]);
+              // 报错
+              winStore.setErrorDialog(res.data as string, "获取总预览图片组");
+            }
+          }
           runInAction(() => {
             if (preload) {
               this.setViewMode(preload);
@@ -214,6 +232,7 @@ const picStore = observable(
     getPicUrl: action,
     setViewMode: action,
     setPicTotal: action,
+    setPreviewList: action,
     setPicList: action,
     setPicListLoading: action,
     getPicList: action,

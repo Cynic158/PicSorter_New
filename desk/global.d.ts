@@ -32,7 +32,7 @@ declare global {
   // 其他类型
   // 通用部分
   type picType = "png" | "jpg" | "gif" | "webp";
-  type viewType = "view" | "horizontal" | "vertical";
+  type viewType = "view" | "horizontal" | "vertical" | "total";
 
   // pic部分
   type GetPicListSaveType = () => Array<PicInfo>;

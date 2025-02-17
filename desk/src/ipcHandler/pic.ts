@@ -207,7 +207,25 @@ const picHandler = (
             selectConfig: config!.selectConfig,
           };
         }
-        if (mode == "view") {
+        if (mode == "total") {
+          // 单图时的总预览列表
+          // 获取picConfig的完整路径
+          const configPath = path.resolve(appPath, picConfigPath);
+          // 读取当前配置文件内容
+          const fileContent = await fs.promises.readFile(configPath, "utf-8");
+          // 解析JSON内容
+          const picConfig: PicConfig = JSON.parse(fileContent);
+          // 限制值
+          const limit = picConfig.picLoadLimit;
+          return {
+            success: true,
+            data: {
+              config: returnConfig,
+              picList: picList.slice(0, limit),
+              total: picList.length,
+            },
+          };
+        } else if (mode == "view") {
           // 提供三张图片
           if (picList.length == 0) {
             return {

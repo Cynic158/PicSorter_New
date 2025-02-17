@@ -11,12 +11,13 @@ import {
 } from "react-zoom-pan-pinch";
 import { useEffect, useRef, useState } from "react";
 import sortStore from "../../store/modules/sort";
+import PreviewPic from "../../components/PreviewPic";
 
 export default function DefaultViewer() {
   const [picUrl, setPicUrl] = useState("");
-  const [loadingShow, setLoadingShow] = useState(false);
+  const [loadingShow, setLoadingShow] = useState(true);
   const [errorShow, setErrorShow] = useState(false);
-  const [picShow, setPicShow] = useState(true);
+  const [picShow, setPicShow] = useState(false);
   const handleLoad = () => {
     // 图片加载中
     setLoadingShow(true);
@@ -55,6 +56,77 @@ export default function DefaultViewer() {
     }
   };
 
+  // 总预览列表
+  const [previewShow, setPreviewShow] = useState(false);
+  const [previewMark, setPreviewMark] = useState("");
+  const switchPreview = (path: string) => {
+    if (
+      !picStore.picListLoading &&
+      !sortStore.handlePicLoading &&
+      path != picStore.picList[1]!.path
+    ) {
+      picStore.getPicList(false, path);
+    }
+  };
+  const scrollToMark = async () => {
+    const container = document.querySelector<HTMLElement>(
+      ".defaultviewer-preview-main"
+    );
+    const itemContainer = document.querySelector<HTMLElement>(
+      ".defaultviewer-preview-item-container"
+    );
+    const target = document.getElementById(previewMark);
+
+    if (!container || !itemContainer || !target) return;
+
+    // await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    const containerWidth = container.clientWidth; // 可视区域宽度
+    const targetRect = target.getBoundingClientRect();
+    const itemContainerRect = itemContainer.getBoundingClientRect();
+
+    // 计算目标图片相对于 defaultviewer-preview-item-container 的偏移量
+    const targetOffset =
+      targetRect.left - itemContainerRect.left + targetRect.width / 2;
+
+    // 计算滚动距离，使目标图片居中
+    const scrollLeft = targetOffset - containerWidth / 2;
+
+    const scrollLength = Math.max(
+      0,
+      Math.min(scrollLeft, container.scrollWidth - container.clientWidth)
+    );
+
+    if (Math.abs(scrollLength - container.scrollLeft) < 3000) {
+      container.scrollTo({
+        left: scrollLength, // 限制滚动范围
+        behavior: "smooth",
+      });
+    } else {
+      container.scrollLeft = scrollLength;
+    }
+  };
+
+  useEffect(() => {
+    if (previewShow && previewMark) {
+      // 滚动到mark指定的图片
+      let timer = setTimeout(() => {
+        scrollToMark();
+        clearTimeout(timer);
+      }, 500);
+    }
+
+    return () => {};
+  }, [previewShow]);
+  useEffect(() => {
+    if (previewShow && previewMark) {
+      // 滚动到mark指定的图片
+      scrollToMark();
+    }
+
+    return () => {};
+  }, [previewMark]);
+
   const transformComponentRef = useRef<ReactZoomPanPinchRef | null>(null);
   useEffect(() => {
     if (picStore.picList[1] && picStore.picList[1].path) {
@@ -64,6 +136,15 @@ export default function DefaultViewer() {
         transformComponentRef.current?.resetTransform();
         handleLoad();
         setPicUrl(url);
+      }
+
+      if (picStore.previewList.length > 0) {
+        let findIndex = picStore.previewList.findIndex(
+          (item) => item!.path == picStore.picList[1]!.path
+        );
+        if (findIndex != -1) {
+          setPreviewMark(findIndex.toString());
+        }
       }
     }
 
@@ -124,6 +205,57 @@ export default function DefaultViewer() {
                   }
                 ></SvgIcon>
               </button>
+            </div>
+          </div>
+          <div
+            className={`defaultviewer-preview-container${
+              previewShow ? " show" : ""
+            }`}
+          >
+            <div className="defaultviewer-preview-main">
+              <div className="defaultviewer-preview-item-container">
+                {picStore.previewList.map((item, index) => (
+                  <PreviewPic
+                    click={() => {
+                      switchPreview(item!.path);
+                    }}
+                    key={item!.path}
+                    active={previewMark == index.toString()}
+                    url={picStore.getPicUrl(item!.path, "pic")}
+                    id={index.toString()}
+                  ></PreviewPic>
+                ))}
+              </div>
+            </div>
+            <div className="defaultviewer-preview-fold-container">
+              <div className="defaultviewer-preview-fold-main">
+                <div
+                  onClick={() => {
+                    setPreviewShow(false);
+                  }}
+                  className="defaultviewer-preview-fold"
+                >
+                  <SvgIcon
+                    svgName="arrowprev"
+                    svgSize="24px"
+                    clickable={true}
+                    color="var(--color-white2)"
+                  ></SvgIcon>
+                </div>
+                <div
+                  onClick={() => {
+                    setPreviewShow(true);
+                  }}
+                  className="defaultviewer-preview-fold"
+                >
+                  <SvgIcon
+                    svgName="arrownext"
+                    svgSize="24px"
+                    clickable={true}
+                    color="var(--color-white2)"
+                  ></SvgIcon>
+                </div>
+              </div>
             </div>
           </div>
           <div className={`defaultviewer-main${picShow ? " show" : ""}`}>
