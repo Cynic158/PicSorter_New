@@ -19,7 +19,6 @@ export default function ControlerHeader() {
 
   const switchMode = (mode: viewType) => {
     if (
-      picStore.picTotal != 0 &&
       !picStore.picListLoading &&
       picStore.viewMode != mode &&
       !sortStore.handlePicLoading
@@ -90,9 +89,7 @@ export default function ControlerHeader() {
                 switchMode("view");
               }}
               className={`controler-header-item${
-                picStore.picTotal == 0 ||
-                picStore.viewMode == "view" ||
-                picStore.picListLoading
+                picStore.viewMode == "view" || picStore.picListLoading
                   ? " disabled"
                   : ""
               }`}
@@ -112,9 +109,7 @@ export default function ControlerHeader() {
                 switchMode("horizontal");
               }}
               className={`controler-header-item${
-                picStore.picTotal == 0 ||
-                picStore.viewMode == "horizontal" ||
-                picStore.picListLoading
+                picStore.viewMode == "horizontal" || picStore.picListLoading
                   ? " disabled"
                   : ""
               }`}
@@ -134,9 +129,7 @@ export default function ControlerHeader() {
                 switchMode("vertical");
               }}
               className={`controler-header-item${
-                picStore.picTotal == 0 ||
-                picStore.viewMode == "vertical" ||
-                picStore.picListLoading
+                picStore.viewMode == "vertical" || picStore.picListLoading
                   ? " disabled"
                   : ""
               }`}

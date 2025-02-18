@@ -41,6 +41,16 @@ export default function Header() {
     });
   };
 
+  const allSelect = () => {
+    if (
+      picStore.picList.length > 0 &&
+      !picStore.picListLoading &&
+      !sortStore.handlePicLoading
+    ) {
+      picStore.allSelectingPicList();
+    }
+  };
+
   return (
     <Observer>
       {() => (
@@ -140,6 +150,15 @@ export default function Header() {
                           color="var(--color-black3)"
                           clickable={true}
                         ></SvgIcon>
+                      </li>
+                      <li
+                        onClick={allSelect}
+                        className="header-info-item clickable"
+                      >
+                        {picStore.picList.length ==
+                        picStore.selectingPicList.length
+                          ? "取消全选"
+                          : "双击全选"}
                       </li>
                     </>
                   ) : (

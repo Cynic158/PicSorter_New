@@ -6,6 +6,9 @@ import sortStore from "./sort";
 import { cloneDeep } from "lodash";
 import { picStaticPath, sortStaticPath } from "../../utils/config";
 
+// 全选点击定时器
+let allSelectingClickTimeout: ReturnType<typeof setTimeout>;
+
 const picStore = observable(
   {
     getPicUrl(picPath: string, folder: "pic" | "sort") {
@@ -227,6 +230,29 @@ const picStore = observable(
     clearSelectingPicList() {
       this.selectingPicList = [];
     },
+    allSelectingClickTimes: 0,
+    setAllSelectingClickTimes(num: number) {
+      this.allSelectingClickTimes = num;
+    },
+    allSelectingPicList() {
+      if (this.selectingPicList.length != this.picList.length) {
+        if (allSelectingClickTimeout) {
+          clearTimeout(allSelectingClickTimeout);
+        }
+        allSelectingClickTimeout = setTimeout(() => {
+          this.setAllSelectingClickTimes(0);
+        }, 1500);
+        this.setAllSelectingClickTimes(this.allSelectingClickTimes + 1);
+        if (this.allSelectingClickTimes == 2) {
+          let indexList = this.picList.map((_item, index) => index);
+          this.selectingPicList = indexList;
+          this.setAllSelectingClickTimes(0);
+          clearTimeout(allSelectingClickTimeout);
+        }
+      } else {
+        this.clearSelectingPicList();
+      }
+    },
   },
   {
     getPicUrl: action,
@@ -243,6 +269,8 @@ const picStore = observable(
     showPic: action,
     setSelectingPicList: action,
     clearSelectingPicList: action,
+    setAllSelectingClickTimes: action,
+    allSelectingPicList: action,
   }
 );
 
