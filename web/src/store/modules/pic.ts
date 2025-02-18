@@ -253,6 +253,12 @@ const picStore = observable(
         this.clearSelectingPicList();
       }
     },
+
+    // 当前图片缩放比例
+    zoomPercent: 1,
+    setZoomPercent(percent: number) {
+      this.zoomPercent = percent;
+    },
   },
   {
     getPicUrl: action,
@@ -271,6 +277,7 @@ const picStore = observable(
     clearSelectingPicList: action,
     setAllSelectingClickTimes: action,
     allSelectingPicList: action,
+    setZoomPercent: action,
   }
 );
 

@@ -116,6 +116,9 @@ export default function Header() {
                   <li className="header-info-item">
                     {picStore.picList[1].type}
                   </li>
+                  <li className="header-info-item">
+                    {Math.round(picStore.zoomPercent * 100)}%
+                  </li>
                   {/* 余数 */}
                   <li className="header-info-item withicon">{`余 ${picStore.picTotal} 张`}</li>
                   {/* dpi、位深度、创建时间、修改时间、路径 */}

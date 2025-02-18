@@ -264,6 +264,7 @@ export default function DefaultViewer() {
               centerOnInit={true}
               maxScale={10}
               ref={transformComponentRef}
+              onTransformed={(ref) => picStore.setZoomPercent(ref.state.scale)}
             >
               <TransformComponent
                 wrapperClass="defaultviewer-zoom-container"
