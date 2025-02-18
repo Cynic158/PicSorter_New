@@ -6,6 +6,9 @@ import sortStore from "./sort";
 import { cloneDeep } from "lodash";
 import { picStaticPath, sortStaticPath } from "../../utils/config";
 
+// 全选点击定时器
+let allSelectingClickTimeout: ReturnType<typeof setTimeout>;
+
 const picStore = observable(
   {
     getPicUrl(picPath: string, folder: "pic" | "sort") {
@@ -38,6 +41,11 @@ const picStore = observable(
         this.picList = list;
       }
     },
+    // 总预览列表
+    previewList: [] as Array<PicInfo>,
+    setPreviewList(list: Array<PicInfo>) {
+      this.previewList = list;
+    },
     // 获取图片列表
     picListLoading: false,
     setPicListLoading(bool: boolean) {
@@ -57,6 +65,19 @@ const picStore = observable(
         }
         let res = await PicApi.getPicList(mode, refresh, currentPicPath);
         if (res.success) {
+          // 单图时额外异步获取总预览列表
+          if (mode == "view") {
+            let previewRes = await PicApi.getPicList("total", false);
+            if (previewRes.success) {
+              this.setPreviewList(
+                (previewRes.data as GetPicListDataType).picList
+              );
+            } else {
+              this.setPreviewList([]);
+              // 报错
+              winStore.setErrorDialog(res.data as string, "获取总预览图片组");
+            }
+          }
           runInAction(() => {
             if (preload) {
               this.setViewMode(preload);
@@ -209,11 +230,41 @@ const picStore = observable(
     clearSelectingPicList() {
       this.selectingPicList = [];
     },
+    allSelectingClickTimes: 0,
+    setAllSelectingClickTimes(num: number) {
+      this.allSelectingClickTimes = num;
+    },
+    allSelectingPicList() {
+      if (this.selectingPicList.length != this.picList.length) {
+        if (allSelectingClickTimeout) {
+          clearTimeout(allSelectingClickTimeout);
+        }
+        allSelectingClickTimeout = setTimeout(() => {
+          this.setAllSelectingClickTimes(0);
+        }, 1500);
+        this.setAllSelectingClickTimes(this.allSelectingClickTimes + 1);
+        if (this.allSelectingClickTimes == 2) {
+          let indexList = this.picList.map((_item, index) => index);
+          this.selectingPicList = indexList;
+          this.setAllSelectingClickTimes(0);
+          clearTimeout(allSelectingClickTimeout);
+        }
+      } else {
+        this.clearSelectingPicList();
+      }
+    },
+
+    // 当前图片缩放比例
+    zoomPercent: 1,
+    setZoomPercent(percent: number) {
+      this.zoomPercent = percent;
+    },
   },
   {
     getPicUrl: action,
     setViewMode: action,
     setPicTotal: action,
+    setPreviewList: action,
     setPicList: action,
     setPicListLoading: action,
     getPicList: action,
@@ -224,6 +275,9 @@ const picStore = observable(
     showPic: action,
     setSelectingPicList: action,
     clearSelectingPicList: action,
+    setAllSelectingClickTimes: action,
+    allSelectingPicList: action,
+    setZoomPercent: action,
   }
 );
 

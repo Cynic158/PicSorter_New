@@ -41,6 +41,16 @@ export default function Header() {
     });
   };
 
+  const allSelect = () => {
+    if (
+      picStore.picList.length > 0 &&
+      !picStore.picListLoading &&
+      !sortStore.handlePicLoading
+    ) {
+      picStore.allSelectingPicList();
+    }
+  };
+
   return (
     <Observer>
       {() => (
@@ -106,6 +116,9 @@ export default function Header() {
                   <li className="header-info-item">
                     {picStore.picList[1].type}
                   </li>
+                  <li className="header-info-item">
+                    {Math.round(picStore.zoomPercent * 100)}%
+                  </li>
                   {/* 余数 */}
                   <li className="header-info-item withicon">{`余 ${picStore.picTotal} 张`}</li>
                   {/* dpi、位深度、创建时间、修改时间、路径 */}
@@ -140,6 +153,15 @@ export default function Header() {
                           color="var(--color-black3)"
                           clickable={true}
                         ></SvgIcon>
+                      </li>
+                      <li
+                        onClick={allSelect}
+                        className="header-info-item clickable"
+                      >
+                        {picStore.picList.length ==
+                        picStore.selectingPicList.length
+                          ? "取消全选"
+                          : "双击全选"}
                       </li>
                     </>
                   ) : (

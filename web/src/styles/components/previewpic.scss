@@ -1,0 +1,39 @@
+.previewpic-container {
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  visibility: hidden;
+  margin-right: 8px;
+  border-radius: 4px;
+  &.load {
+    opacity: 0;
+    visibility: hidden;
+  }
+  &.show {
+    opacity: 1;
+    visibility: visible;
+  }
+  &.hide {
+    display: none;
+    margin-right: 0;
+    visibility: hidden;
+  }
+  &.active {
+    border: 2px solid var(--color-blue5);
+    padding: 4px;
+    .previewpic-pic {
+      border-radius: 2px;
+    }
+  }
+  .previewpic-pic {
+    height: 100%;
+    width: auto;
+    min-width: 30px;
+    object-fit: cover;
+    border-radius: 4px;
+    transition: height 0.3s ease;
+  }
+}
