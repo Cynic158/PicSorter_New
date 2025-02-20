@@ -18,6 +18,7 @@ declare global {
       Win_copy: (
         content: string
       ) => Promise<{ success: boolean; data: string }>;
+      Win_link: (url: string) => Promise<{ success: boolean; data: string }>;
 
       Pic_getPicList: (
         mode: viewType,

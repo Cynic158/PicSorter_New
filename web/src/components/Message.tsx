@@ -8,7 +8,9 @@ export default function Message() {
     <Observer>
       {() => (
         <div
-          className={`message-container${winStore.showMessage ? " show" : ""}${
+          className={`message-container${
+            winStore.showMessage && winStore.messageList[0] ? " show" : ""
+          }${
             winStore.messageList[0]
               ? " " + winStore.messageList[0].type
               : " success"

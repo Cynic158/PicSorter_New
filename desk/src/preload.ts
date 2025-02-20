@@ -14,6 +14,10 @@ const Win_copy = async (content: string) => {
   const res = await ipcRenderer.invoke("Win_copy" as WinApi, content);
   return res;
 };
+const Win_link = async (url: string) => {
+  const res = await ipcRenderer.invoke("Win_link" as WinApi, url);
+  return res;
+};
 
 // picipc
 const Pic_getPicList = async (
@@ -212,6 +216,7 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Win_hide,
   Win_max,
   Win_copy,
+  Win_link,
   Pic_getPicList,
   Pic_renamePic,
   Pic_getPicInfo,
