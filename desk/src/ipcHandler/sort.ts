@@ -14,7 +14,8 @@ const sortHandler = (
   resetPicStatic: ResetPicStaticType,
   resetSortStatic: ResetSortStaticType,
   getPicListSave: GetPicListSaveType,
-  setPicListSave: SetPicListSave
+  setPicListSave: SetPicListSave,
+  updateHandlePicCount: UpdateHandlePicCountType
 ) => {
   const appPath = app.getAppPath();
   const sortConfigPath = pathManager.sortConfigPath;
@@ -741,6 +742,7 @@ const sortHandler = (
         let findPicIndex = picList.findIndex((item) => item.path == picPath);
         if (findPicIndex == -1) {
           // 没找到
+          updateHandlePicCount(1);
           return {
             success: true,
             data: "",
@@ -754,6 +756,7 @@ const sortHandler = (
         // 检查在文件夹中有没有这个图片
         if (!checkRes.success) {
           // 文件夹内不存在这个图片
+          updateHandlePicCount(1);
           return {
             success: true,
             data: "",
@@ -772,6 +775,7 @@ const sortHandler = (
         cloneList.splice(findPicIndex, 1);
         // 重新设置缓存列表
         setPicListSave(cloneList);
+        updateHandlePicCount(1);
         return {
           success: true,
           data: "",
@@ -808,6 +812,7 @@ const sortHandler = (
         );
         if (filterList.length == 0) {
           resetList();
+          updateHandlePicCount(picPathGroup.length);
           return {
             success: true,
             data: "",
@@ -830,6 +835,7 @@ const sortHandler = (
         }
 
         resetList();
+        updateHandlePicCount(picPathGroup.length);
         return {
           success: true,
           data: "",
@@ -930,6 +936,7 @@ const sortHandler = (
               await fs.promises.copyFile(picPath, item);
             })
           );
+          updateHandlePicCount(targets.length);
           return {
             success: true,
             conflict: false,
@@ -961,6 +968,7 @@ const sortHandler = (
 
         if (conflictTargets.length == 0) {
           // 无冲突
+          updateHandlePicCount(targets.length);
           return {
             success: true,
             conflict: false,
@@ -968,6 +976,7 @@ const sortHandler = (
           };
         } else {
           // 有冲突
+          updateHandlePicCount(allowCopyRes.length);
           return {
             success: true,
             conflict: true,
@@ -1068,6 +1077,7 @@ const sortHandler = (
               await fs.promises.copyFile(target.picPath, destPath);
             })
           );
+          updateHandlePicCount(picPathGroup.length * targets.length);
           return {
             success: true,
             conflict: false,
@@ -1105,6 +1115,7 @@ const sortHandler = (
 
         if (conflictTargets.length === 0) {
           // 无冲突，全部复制成功
+          updateHandlePicCount(picPathGroup.length * targets.length);
           return {
             success: true,
             conflict: false,
@@ -1112,6 +1123,7 @@ const sortHandler = (
           };
         } else {
           // 存在冲突，返回冲突对象
+          updateHandlePicCount(allowTargets.length);
           return {
             success: true,
             conflict: true,

@@ -182,6 +182,30 @@ const settingHandler = () => {
       }
     }
   );
+
+  // 获取图片处理数
+  ipcMain.handle("Setting_getHandlePicCount" as SettingApi, async () => {
+    try {
+      // 读取重命名配置
+      const settingPath = path.resolve(appPath, settingConfigPath);
+      // 读取当前配置文件内容
+      const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+      // 解析JSON内容
+      const settingConfig: SettingConfig = JSON.parse(settingContent);
+      let handlePicCount = settingConfig.handlePicCount.toString();
+      return {
+        success: true,
+        data: handlePicCount,
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
+    }
+  });
 };
 
 export default settingHandler;

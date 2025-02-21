@@ -11,6 +11,7 @@ import qq_1 from "../../assets/images/qq_1.jpg";
 import bilibili from "../../assets/images/bilibili.jpg";
 import qrcode from "../../assets/images/qrcode.png";
 import winStore from "../../store/modules/win";
+import settingStore from "../../store/modules/setting";
 
 interface SettingDialogProps {
   show: boolean;
@@ -35,7 +36,6 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
   const [clearList, setClearList] = useState(true);
   const [picLoadLimit, setPicLoadLimit] = useState("100");
   const [configPath, setConfigPath] = useState("");
-  const [handlePicCount, setHandlePicCount] = useState(0);
   // 置顶配置
   const [topList, setTopList] = useState<Array<string>>([]);
   // 自动重命名配置
@@ -58,6 +58,13 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
     }
   };
 
+  const [handlePicCount, setHandlePicCount] = useState("--");
+  const [qrcodeShow, setQrcodeShow] = useState(false);
+  const getHandlePicCount = async () => {
+    let res = await settingStore.getHandlePicCount();
+    setHandlePicCount(res);
+  };
+
   return ReactDOM.createPortal(
     <Observer>
       {() => (
@@ -65,7 +72,7 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
           onClick={(event) => {
             maskClick(event);
           }}
-          className={`settingdialog-container show${show ? " show" : ""}`}
+          className={`settingdialog-container${show ? " show" : ""}`}
         >
           <div className="settingdialog-main">
             <p className="settingdialog-title">设置</p>
@@ -153,7 +160,10 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                 </div>
                 <div
                   onClick={() => {
-                    setActiveIndex(5);
+                    if (!settingStore.handleSettingLoading) {
+                      setActiveIndex(5);
+                      getHandlePicCount();
+                    }
                   }}
                   className={`settingdialog-nav-item${
                     activeIndex == 5 ? " active" : ""
@@ -211,7 +221,7 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                           ></TextOverflow>
                         </div>
                         <div className="settingdialog-setting-item-tip">
-                          记录了各个方面的设置的配置文件所在位置，因为开发者没有做软件的自动更新，所以当有软件更新需求时，需自行备份配置文件，防止配置丢失
+                          记录了各个方面的设置的配置文件所在位置，因为开发者没有做软件的自动更新，所以当有软件更新需求时，需自行备份配置文件，防止配置丢失。!!!请勿手动修改配置文件!!!
                         </div>
                       </div>
                       <div className="settingdialog-setting-apply withtext">
@@ -419,7 +429,7 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                           color="var(--color-white2)"
                         ></SvgIcon>
                         <div className="settingdialog-setting-support-item-text">
-                          当前已处理<span>15755272</span>张图片
+                          当前已处理<span>{handlePicCount}</span>张图片
                           <span className="tip">{"(非准确数据)"}</span>
                         </div>
                       </div>
@@ -427,9 +437,20 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                         <span>
                           如果应用有帮助到你，你可以点左边“帮助”，去我的B站页面投俩币或点个赞都非常感谢，当然如果你有兴致，打赏支持我也非常感谢
                         </span>
-                        <span className="btn">点我显示收款码</span>
+                        <span
+                          onClick={() => {
+                            setQrcodeShow(!qrcodeShow);
+                          }}
+                          className="btn"
+                        >
+                          {qrcodeShow ? "点我隐藏收款码" : "点我显示收款码"}
+                        </span>
                       </div>
-                      <div className="settingdialog-setting-support-item qrcode">
+                      <div
+                        className={`settingdialog-setting-support-item qrcode${
+                          qrcodeShow ? " show" : ""
+                        }`}
+                      >
                         <img src={qrcode} alt="qrcode" />
                       </div>
                     </div>

@@ -128,6 +128,14 @@ declare global {
       Setting_setAutoConfig: (
         config: AutoRenameConfig
       ) => Promise<{ success: boolean; data: string }>;
+      Setting_setDefaultSetting: (
+        clearList: boolean,
+        picLoadLimit: number
+      ) => Promise<{ success: boolean; data: string }>;
+      Setting_getHandlePicCount: () => Promise<{
+        success: boolean;
+        data: string;
+      }>;
     };
   }
 

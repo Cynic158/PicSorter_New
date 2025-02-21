@@ -185,7 +185,7 @@ export default function Header() {
             </ul>
           </div>
           <ul className="header-right">
-            <li className="header-btn">
+            <li onClick={showSettingDialog} className="header-btn">
               <SvgIcon
                 svgName="setting"
                 svgSize="18px"

@@ -10,6 +10,7 @@ import express from "express";
 const appPath = app.getAppPath();
 const iconPath = pathManager.iconPath;
 const sortConfigPath = pathManager.sortConfigPath;
+const settingConfigPath = pathManager.settingConfigPath;
 const webDistPath = pathManager.webDistPath;
 
 // 先提供一个无效默认的地址
@@ -114,13 +115,34 @@ function createMainWindow() {
     });
   };
 
+  // 记录处理图片数量
+  const updateHandlePicCount = async (count: number) => {
+    if (count > 0) {
+      // 读取重命名配置
+      const settingPath = path.resolve(appPath, settingConfigPath);
+      // 读取当前配置文件内容
+      const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+      // 解析JSON内容
+      const settingConfig: SettingConfig = JSON.parse(settingContent);
+      let cloneSettingConfig = cloneDeep(settingConfig);
+      cloneSettingConfig.handlePicCount =
+        cloneSettingConfig.handlePicCount + count;
+      await fs.promises.writeFile(
+        settingPath,
+        JSON.stringify(cloneSettingConfig, null, 2),
+        "utf-8"
+      );
+    }
+  };
+
   // 导入ipc通信主入口
   ipcHandler(
     mainWindow,
     getPicListSave,
     setPicListSave,
     resetPicStatic,
-    resetSortStatic
+    resetSortStatic,
+    updateHandlePicCount
   );
 
   function createTray(mainWindow: BrowserWindow) {

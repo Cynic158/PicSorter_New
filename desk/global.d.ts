@@ -31,7 +31,8 @@ declare global {
     | "Setting_getAutoConfig"
     | "Setting_setAutoConfig"
     | "Setting_getDefaultSetting"
-    | "Setting_setDefaultSetting";
+    | "Setting_setDefaultSetting"
+    | "Setting_getHandlePicCount";
 
   // 其他类型
   // 通用部分
@@ -191,7 +192,10 @@ declare global {
   }
   interface SettingConfig {
     autoRename: Array<AutoRenameConfig>;
+    handlePicCount: number;
   }
+
+  type UpdateHandlePicCountType = (count: number) => Promise<void>;
 }
 
 export {};

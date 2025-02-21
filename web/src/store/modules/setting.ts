@@ -79,12 +79,44 @@ const settingStore = observable(
         this.setSetAutoConfigLoading(false);
       }
     },
+
+    // 处理设置加载
+    handleSettingLoading: false,
+    setHandleSettingLoading(bool: boolean) {
+      this.handleSettingLoading = bool;
+    },
+    // 获取图片处理数
+    async getHandlePicCount() {
+      let funcAction = "获取已处理图片数记录";
+      try {
+        this.setHandleSettingLoading(true);
+        let res = await SettingApi.getHandlePicCount();
+        if (res.success) {
+          return res.data;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          let count = "--";
+          return count;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        let count = "--";
+        return count;
+      } finally {
+        this.setHandleSettingLoading(false);
+      }
+    },
   },
   {
     setGetAutoConfigLoading: action,
     getAutoConfig: action,
     setSetAutoConfigLoading: action,
     setAutoConfig: action,
+    setHandleSettingLoading: action,
+    getHandlePicCount: action,
   }
 );
 

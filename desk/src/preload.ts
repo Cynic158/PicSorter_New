@@ -210,6 +210,23 @@ const Setting_setAutoConfig = async (autoConfig: AutoRenameConfig) => {
   );
   return res;
 };
+const Setting_setDefaultSetting = async (
+  clearList: boolean,
+  picLoadLimit: number
+) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_setDefaultSetting" as SettingApi,
+    clearList,
+    picLoadLimit
+  );
+  return res;
+};
+const Setting_getHandlePicCount = async () => {
+  const res = await ipcRenderer.invoke(
+    "Setting_getHandlePicCount" as SettingApi
+  );
+  return res;
+};
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
@@ -243,4 +260,6 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_renameSortItem,
   Setting_getAutoConfig,
   Setting_setAutoConfig,
+  Setting_setDefaultSetting,
+  Setting_getHandlePicCount,
 });

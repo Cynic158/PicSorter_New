@@ -9,11 +9,18 @@ const ipcHandler = (
   getPicListSave: GetPicListSaveType,
   setPicListSave: SetPicListSave,
   resetPicStatic: ResetPicStaticType,
-  resetSortStatic: ResetSortStaticType
+  resetSortStatic: ResetSortStaticType,
+  updateHandlePicCount: UpdateHandlePicCountType
 ) => {
   winHandler(mainWindow);
-  picHandler(getPicListSave, setPicListSave);
-  sortHandler(resetPicStatic, resetSortStatic, getPicListSave, setPicListSave);
+  picHandler(getPicListSave, setPicListSave, updateHandlePicCount);
+  sortHandler(
+    resetPicStatic,
+    resetSortStatic,
+    getPicListSave,
+    setPicListSave,
+    updateHandlePicCount
+  );
   settingHandler();
 };
 
