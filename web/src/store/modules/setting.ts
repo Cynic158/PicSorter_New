@@ -85,9 +85,104 @@ const settingStore = observable(
     setHandleSettingLoading(bool: boolean) {
       this.handleSettingLoading = bool;
     },
+    // 获取通用设置
+    async getDefaultSetting() {
+      let funcAction = "读取通用设置";
+      try {
+        this.setHandleSettingLoading(true);
+        let res = await SettingApi.getDefaultSetting();
+        if (res.success) {
+          return res.data as GetDefaultSettingDataType;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return {
+            clearList: true,
+            picLoadLimit: "",
+            configPath: "",
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          clearList: true,
+          picLoadLimit: "",
+          configPath: "",
+        };
+      } finally {
+        this.setHandleSettingLoading(false);
+      }
+    },
+    // 设置通用设置
+    async setDefaultSetting(clearList: boolean, picLoadLimit: string) {
+      let picLoadLimitVal = picLoadLimit.trim();
+      if (picLoadLimitVal == "") {
+        winStore.setMessage({
+          type: "error",
+          msg: "加载图片上限不能为空",
+        });
+        return false;
+      } else if (!/^[0-9]+$/.test(picLoadLimitVal)) {
+        winStore.setMessage({
+          type: "error",
+          msg: "加载图片上限必须为数值",
+        });
+        return false;
+      } else {
+        let numVal = Number(picLoadLimitVal);
+        if (numVal < 50 || numVal > 500) {
+          winStore.setMessage({
+            type: "error",
+            msg: "加载图片上限应在50到500之间",
+          });
+          return false;
+        }
+      }
+      let funcAction = "更新通用设置";
+      try {
+        this.setHandleSettingLoading(true);
+        let res = await SettingApi.setDefaultSetting(
+          clearList,
+          Number(picLoadLimitVal)
+        );
+        if (res.success) {
+          return true;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setHandleSettingLoading(false);
+      }
+    },
+
+    // 打开配置文件目录
+    async openConfigFolder() {
+      let funcAction = "打开配置文件目录";
+      try {
+        let res = await SettingApi.openConfigFolder();
+        if (!res.success) {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+      }
+    },
+
     // 获取图片处理数
     async getHandlePicCount() {
-      let funcAction = "获取已处理图片数记录";
+      let funcAction = "读取已处理图片数记录";
       try {
         this.setHandleSettingLoading(true);
         let res = await SettingApi.getHandlePicCount();
@@ -116,6 +211,9 @@ const settingStore = observable(
     setSetAutoConfigLoading: action,
     setAutoConfig: action,
     setHandleSettingLoading: action,
+    getDefaultSetting: action,
+    setDefaultSetting: action,
+    openConfigFolder: action,
     getHandlePicCount: action,
   }
 );

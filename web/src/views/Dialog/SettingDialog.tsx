@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { Observer } from "mobx-react";
 import SvgIcon from "../../components/SvgIcon";
 import Switcher from "../../components/Switcher";
 import Inputer from "../../components/Inputer";
 import TextOverflow from "react-text-overflow";
+import Loader from "../../components/Loader";
 import "../../styles/dialog/settingdialog.scss";
 import qq_0 from "../../assets/images/qq_0.jpg";
 import qq_1 from "../../assets/images/qq_1.jpg";
@@ -20,7 +21,9 @@ interface SettingDialogProps {
 
 const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
   const closeDialog = () => {
-    hide();
+    if (!settingStore.handleSettingLoading) {
+      hide();
+    }
   };
   const maskClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     // 点击对话框外容器关闭对话框
@@ -42,10 +45,32 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
   const [autoConfigList, setAutoConfigList] = useState<Array<AutoRenameConfig>>(
     []
   );
-  // 壁纸配置
-  const [desktopWallpaper, setDesktopWallpaper] = useState("");
-  const [lockWallpaper, setLockWallpaper] = useState("");
-  const [wallpaperPath, setWallpaperPath] = useState("");
+
+  const getDefaultSetting = async () => {
+    let res = await settingStore.getDefaultSetting();
+    setClearList(res.clearList);
+    setPicLoadLimit(res.picLoadLimit);
+    setConfigPath(res.configPath);
+  };
+  const setDefaultSetting = async () => {
+    if (!settingStore.handleSettingLoading) {
+      let res = await settingStore.setDefaultSetting(clearList, picLoadLimit);
+      if (res) {
+        winStore.setMessage({
+          type: "success",
+          msg: "设置成功",
+        });
+      }
+    }
+  };
+  useEffect(() => {
+    if (show) {
+      setActiveIndex(0);
+      getDefaultSetting();
+    }
+
+    return () => {};
+  }, [show]);
 
   // 复制群号
   const copyContent = async (content: string) => {
@@ -80,7 +105,13 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
               <div className="settingdialog-nav-container">
                 <div
                   onClick={() => {
-                    setActiveIndex(0);
+                    if (
+                      !settingStore.handleSettingLoading &&
+                      activeIndex != 0
+                    ) {
+                      setActiveIndex(0);
+                      getDefaultSetting();
+                    }
                   }}
                   className={`settingdialog-nav-item${
                     activeIndex == 0 ? " active" : ""
@@ -160,7 +191,10 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                 </div>
                 <div
                   onClick={() => {
-                    if (!settingStore.handleSettingLoading) {
+                    if (
+                      !settingStore.handleSettingLoading &&
+                      activeIndex != 5
+                    ) {
                       setActiveIndex(5);
                       getHandlePicCount();
                     }
@@ -214,22 +248,36 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                         <p className="settingdialog-setting-item-title">
                           配置文件路径
                         </p>
-                        <div className="settingdialog-setting-item-path">
+                        <div
+                          onClick={() => {
+                            if (configPath) {
+                              settingStore.openConfigFolder();
+                            }
+                          }}
+                          className="settingdialog-setting-item-path"
+                        >
                           <TextOverflow
                             truncatePosition="middle"
                             text={configPath}
                           ></TextOverflow>
                         </div>
                         <div className="settingdialog-setting-item-tip">
-                          记录了各个方面的设置的配置文件所在位置，因为开发者没有做软件的自动更新，所以当有软件更新需求时，需自行备份配置文件，防止配置丢失。!!!请勿手动修改配置文件!!!
+                          记录了各个方面的设置的配置文件所在位置，因为开发者没有做软件的自动更新，所以当有软件更新需求时，需自行备份配置文件，防止配置丢失。注：!!!请勿手动修改配置文件!!!
                         </div>
                       </div>
-                      <div className="settingdialog-setting-apply withtext">
-                        <span className="settingdialog-setting-apply-text">
-                          恢复所有配置文件为默认配置
-                        </span>
-                        <button className="settingdialog-setting-apply-btn">
-                          应用
+                      <div className="settingdialog-setting-apply">
+                        <button
+                          onClick={setDefaultSetting}
+                          className={`settingdialog-setting-apply-btn${
+                            settingStore.handleSettingLoading ? " loading" : ""
+                          }`}
+                        >
+                          <span className="settingdialog-setting-apply-btn-text">
+                            应用
+                          </span>
+                          <div className="settingdialog-setting-apply-btn-loading">
+                            <Loader width="18px"></Loader>
+                          </div>
                         </button>
                       </div>
                     </div>

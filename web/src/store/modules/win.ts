@@ -21,7 +21,7 @@ const winStore = observable(
         });
       } else {
         runInAction(() => {
-          this.errorLog = log;
+          this.errorLog = action + log;
           this.errorAction = action;
           this.showErrorDialog = true;
         });

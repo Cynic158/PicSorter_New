@@ -1,4 +1,4 @@
-import { ipcMain, app } from "electron";
+import { ipcMain, app, shell } from "electron";
 import { generateErrorLog, checkPathsExist } from "../utils/index";
 import pathManager from "../utils/path";
 import fs from "fs";
@@ -10,6 +10,7 @@ const settingHandler = () => {
   const settingConfigPath = pathManager.settingConfigPath;
   const sortConfigPath = pathManager.sortConfigPath;
   const picConfigPath = pathManager.picConfigPath;
+  const configFilesPath = pathManager.configPath;
 
   // 获取指定分类项的自动重命名配置
   ipcMain.handle(
@@ -132,6 +133,48 @@ const settingHandler = () => {
     }
   );
 
+  // 获取通用设置
+  ipcMain.handle("Setting_getDefaultSetting" as SettingApi, async () => {
+    try {
+      // 获取sortConfig的完整路径
+      const configPath = path.resolve(appPath, sortConfigPath);
+      // 读取当前配置文件内容
+      const fileContent = await fs.promises.readFile(configPath, "utf-8");
+      // 解析JSON内容
+      const config: SortConfig = JSON.parse(fileContent);
+      let clearList = config.clearList;
+
+      // 获取picConfig的完整路径
+      const configPathForPic = path.resolve(appPath, picConfigPath);
+      // 读取当前配置文件内容
+      const fileContentForPic = await fs.promises.readFile(
+        configPathForPic,
+        "utf-8"
+      );
+      // 解析JSON内容
+      const configForPic: PicConfig = JSON.parse(fileContentForPic);
+      let picLoadLimit = configForPic.picLoadLimit.toString();
+
+      let configFilesPathVal = path.resolve(appPath, configFilesPath);
+
+      return {
+        success: true,
+        data: {
+          clearList,
+          picLoadLimit,
+          configPath: configFilesPathVal,
+        },
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
+    }
+  });
+
   // 设置通用设置
   ipcMain.handle(
     "Setting_setDefaultSetting" as SettingApi,
@@ -182,6 +225,25 @@ const settingHandler = () => {
       }
     }
   );
+
+  // 打开配置文件目录
+  ipcMain.handle("Setting_openConfigFolder" as SettingApi, async () => {
+    try {
+      let configFilesPathVal = path.resolve(appPath, configFilesPath);
+      await shell.openPath(configFilesPathVal);
+      return {
+        success: true,
+        data: "",
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
+    }
+  });
 
   // 获取图片处理数
   ipcMain.handle("Setting_getHandlePicCount" as SettingApi, async () => {

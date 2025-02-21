@@ -31,7 +31,9 @@ declare global {
     | "Setting_getAutoConfig"
     | "Setting_setAutoConfig"
     | "Setting_getDefaultSetting"
+    | "Setting_getDefaultSetting"
     | "Setting_setDefaultSetting"
+    | "Setting_openConfigFolder"
     | "Setting_getHandlePicCount";
 
   // 其他类型

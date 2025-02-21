@@ -10,6 +10,11 @@ declare global {
     list: Array<SortFolderListType>;
     clearList: boolean;
   }
+  interface GetDefaultSettingDataType {
+    clearList: boolean;
+    picLoadLimit: string;
+    configPath: string;
+  }
   interface Window {
     DeskApi: {
       Win_quit: () => void;
@@ -128,10 +133,18 @@ declare global {
       Setting_setAutoConfig: (
         config: AutoRenameConfig
       ) => Promise<{ success: boolean; data: string }>;
+      Setting_getDefaultSetting: () => Promise<{
+        success: boolean;
+        data: string | GetDefaultSettingDataType;
+      }>;
       Setting_setDefaultSetting: (
         clearList: boolean,
         picLoadLimit: number
       ) => Promise<{ success: boolean; data: string }>;
+      Setting_openConfigFolder: () => Promise<{
+        success: boolean;
+        data: string;
+      }>;
       Setting_getHandlePicCount: () => Promise<{
         success: boolean;
         data: string;
