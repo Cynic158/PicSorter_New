@@ -145,6 +145,24 @@ declare global {
         success: boolean;
         data: string;
       }>;
+      Setting_getTopList: () => Promise<{
+        success: boolean;
+        data: string | Array<string>;
+      }>;
+      Setting_setTopList: (
+        topList: Array<string>
+      ) => Promise<{ success: boolean; data: string }>;
+      Setting_getAutoConfigList: () => Promise<{
+        success: boolean;
+        data: string | Array<string>;
+      }>;
+      Setting_setAutoConfigList: (
+        autoList: Array<string>
+      ) => Promise<{ success: boolean; data: string }>;
+      Setting_openFolder: (folderPath: string) => Promise<{
+        success: boolean;
+        data: string;
+      }>;
       Setting_getHandlePicCount: () => Promise<{
         success: boolean;
         data: string;

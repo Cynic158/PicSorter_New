@@ -233,6 +233,37 @@ const Setting_openConfigFolder = async () => {
   );
   return res;
 };
+const Setting_getTopList = async () => {
+  const res = await ipcRenderer.invoke("Setting_getTopList" as SettingApi);
+  return res;
+};
+const Setting_setTopList = async (topList: Array<string>) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_setTopList" as SettingApi,
+    topList
+  );
+  return res;
+};
+const Setting_getAutoConfigList = async () => {
+  const res = await ipcRenderer.invoke(
+    "Setting_getAutoConfigList" as SettingApi
+  );
+  return res;
+};
+const Setting_setAutoConfigList = async (autoList: Array<string>) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_setAutoConfigList" as SettingApi,
+    autoList
+  );
+  return res;
+};
+const Setting_openFolder = async (folderPath: string) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_openFolder" as SettingApi,
+    folderPath
+  );
+  return res;
+};
 const Setting_getHandlePicCount = async () => {
   const res = await ipcRenderer.invoke(
     "Setting_getHandlePicCount" as SettingApi
@@ -275,5 +306,10 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Setting_getDefaultSetting,
   Setting_setDefaultSetting,
   Setting_openConfigFolder,
+  Setting_getTopList,
+  Setting_setTopList,
+  Setting_getAutoConfigList,
+  Setting_setAutoConfigList,
+  Setting_openFolder,
   Setting_getHandlePicCount,
 });

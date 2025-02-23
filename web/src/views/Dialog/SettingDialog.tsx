@@ -42,9 +42,7 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
   // 置顶配置
   const [topList, setTopList] = useState<Array<string>>([]);
   // 自动重命名配置
-  const [autoConfigList, setAutoConfigList] = useState<Array<AutoRenameConfig>>(
-    []
-  );
+  const [autoConfigList, setAutoConfigList] = useState<Array<string>>([]);
 
   const getDefaultSetting = async () => {
     let res = await settingStore.getDefaultSetting();
@@ -71,6 +69,68 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
 
     return () => {};
   }, [show]);
+
+  const getTopList = async () => {
+    let res = await settingStore.getTopList();
+    setTopList(res);
+  };
+  const deleteTopList = (sortPath: string) => {
+    if (!settingStore.handleSettingLoading) {
+      let filterList = topList.filter((item) => item != sortPath);
+      setTopList(filterList);
+    }
+  };
+  const clearTopList = () => {
+    if (!settingStore.handleSettingLoading) {
+      setTopList([]);
+    }
+  };
+  const applyTopList = async () => {
+    if (!settingStore.handleSettingLoading) {
+      let res = await settingStore.setTopList(topList);
+      if (res.success) {
+        setTopList(res.topList);
+        winStore.setMessage({
+          type: "success",
+          msg: "设置成功",
+        });
+      }
+    }
+  };
+
+  const getAutoList = async () => {
+    let res = await settingStore.getAutoConfigList();
+    setAutoConfigList(res);
+  };
+  const deleteAutoList = (sortPath: string) => {
+    if (!settingStore.handleSettingLoading) {
+      let filterList = autoConfigList.filter((item) => item != sortPath);
+      setAutoConfigList(filterList);
+    }
+  };
+  const clearAutoList = () => {
+    if (!settingStore.handleSettingLoading) {
+      setAutoConfigList([]);
+    }
+  };
+  const applyAutoList = async () => {
+    if (!settingStore.handleSettingLoading) {
+      let res = await settingStore.setAutoConfigList(autoConfigList);
+      if (res.success) {
+        setAutoConfigList(res.autoList);
+        winStore.setMessage({
+          type: "success",
+          msg: "设置成功",
+        });
+      }
+    }
+  };
+
+  const openFolder = (folderPath: string) => {
+    if (!settingStore.handleSettingLoading) {
+      settingStore.openFolder(folderPath);
+    }
+  };
 
   // 复制群号
   const copyContent = async (content: string) => {
@@ -127,7 +187,13 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                 </div>
                 <div
                   onClick={() => {
-                    setActiveIndex(1);
+                    if (
+                      !settingStore.handleSettingLoading &&
+                      activeIndex != 1
+                    ) {
+                      setActiveIndex(1);
+                      getTopList();
+                    }
                   }}
                   className={`settingdialog-nav-item${
                     activeIndex == 1 ? " active" : ""
@@ -143,7 +209,13 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                 </div>
                 <div
                   onClick={() => {
-                    setActiveIndex(2);
+                    if (
+                      !settingStore.handleSettingLoading &&
+                      activeIndex != 2
+                    ) {
+                      setActiveIndex(2);
+                      getAutoList();
+                    }
                   }}
                   className={`settingdialog-nav-item${
                     activeIndex == 2 ? " active" : ""
@@ -159,7 +231,12 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                 </div>
                 <div
                   onClick={() => {
-                    setActiveIndex(3);
+                    if (
+                      !settingStore.handleSettingLoading &&
+                      activeIndex != 3
+                    ) {
+                      setActiveIndex(3);
+                    }
                   }}
                   className={`settingdialog-nav-item${
                     activeIndex == 3 ? " active" : ""
@@ -175,7 +252,12 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                 </div>
                 <div
                   onClick={() => {
-                    setActiveIndex(4);
+                    if (
+                      !settingStore.handleSettingLoading &&
+                      activeIndex != 4
+                    ) {
+                      setActiveIndex(4);
+                    }
                   }}
                   className={`settingdialog-nav-item${
                     activeIndex == 4 ? " active" : ""
@@ -293,22 +375,35 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                         <span>
                           列出了所有被置顶的分类文件夹；修改后非立即生效
                         </span>
-                        <span className="settingdialog-setting-top-tip-btn">
+                        <span
+                          onClick={clearTopList}
+                          className="settingdialog-setting-top-tip-btn"
+                        >
                           清空置顶
                         </span>
                       </div>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => (
+                      {topList.map((item) => (
                         <div
                           key={item}
                           className="settingdialog-setting-top-item"
                         >
-                          <div className="settingdialog-setting-top-left">
+                          <div
+                            onClick={() => {
+                              openFolder(item);
+                            }}
+                            className="settingdialog-setting-top-left"
+                          >
                             <TextOverflow
                               truncatePosition="middle"
-                              text="非常非常长的某个置顶分类文件夹路径"
+                              text={item}
                             ></TextOverflow>
                           </div>
-                          <div className="settingdialog-setting-top-right">
+                          <div
+                            onClick={() => {
+                              deleteTopList(item);
+                            }}
+                            className="settingdialog-setting-top-right"
+                          >
                             <SvgIcon
                               svgName="delete"
                               svgSize="20px"
@@ -319,8 +414,18 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                         </div>
                       ))}
                       <div className="settingdialog-setting-apply">
-                        <button className="settingdialog-setting-apply-btn">
-                          应用
+                        <button
+                          onClick={applyTopList}
+                          className={`settingdialog-setting-apply-btn${
+                            settingStore.handleSettingLoading ? " loading" : ""
+                          }`}
+                        >
+                          <span className="settingdialog-setting-apply-btn-text">
+                            应用
+                          </span>
+                          <div className="settingdialog-setting-apply-btn-loading">
+                            <Loader width="18px"></Loader>
+                          </div>
                         </button>
                       </div>
                     </div>
@@ -340,22 +445,35 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                           <span>修改后非立即生效</span>
                         </div>
 
-                        <span className="settingdialog-setting-top-tip-btn">
+                        <span
+                          onClick={clearAutoList}
+                          className="settingdialog-setting-top-tip-btn"
+                        >
                           清空配置
                         </span>
                       </div>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => (
+                      {autoConfigList.map((item) => (
                         <div
                           key={item}
                           className="settingdialog-setting-top-item"
                         >
-                          <div className="settingdialog-setting-top-left">
+                          <div
+                            onClick={() => {
+                              openFolder(item);
+                            }}
+                            className="settingdialog-setting-top-left"
+                          >
                             <TextOverflow
                               truncatePosition="middle"
-                              text="非常非常长的某个置顶分类文件夹路径"
+                              text={item}
                             ></TextOverflow>
                           </div>
-                          <div className="settingdialog-setting-top-right">
+                          <div
+                            onClick={() => {
+                              deleteAutoList(item);
+                            }}
+                            className="settingdialog-setting-top-right"
+                          >
                             <SvgIcon
                               svgName="delete"
                               svgSize="20px"
@@ -366,8 +484,18 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                         </div>
                       ))}
                       <div className="settingdialog-setting-apply">
-                        <button className="settingdialog-setting-apply-btn">
-                          应用
+                        <button
+                          onClick={applyAutoList}
+                          className={`settingdialog-setting-apply-btn${
+                            settingStore.handleSettingLoading ? " loading" : ""
+                          }`}
+                        >
+                          <span className="settingdialog-setting-apply-btn-text">
+                            应用
+                          </span>
+                          <div className="settingdialog-setting-apply-btn-loading">
+                            <Loader width="18px"></Loader>
+                          </div>
                         </button>
                       </div>
                     </div>

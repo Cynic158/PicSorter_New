@@ -180,6 +180,134 @@ const settingStore = observable(
       }
     },
 
+    // 获取置顶列表
+    async getTopList() {
+      let funcAction = "读取置顶列表";
+      try {
+        this.setHandleSettingLoading(true);
+        let res = await SettingApi.getTopList();
+        if (res.success) {
+          return res.data as Array<string>;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return [] as Array<string>;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return [] as Array<string>;
+      } finally {
+        this.setHandleSettingLoading(false);
+      }
+    },
+
+    // 设置置顶列表
+    async setTopList(topList: Array<string>) {
+      let funcAction = "设置置顶列表";
+      try {
+        this.setHandleSettingLoading(true);
+        let res = await SettingApi.setTopList(topList);
+        if (res.success) {
+          let GetRes = await this.getTopList();
+          return {
+            success: true,
+            topList: GetRes,
+          };
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return {
+            success: false,
+            topList: [],
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          success: false,
+          topList: [],
+        };
+      } finally {
+        this.setHandleSettingLoading(false);
+      }
+    },
+
+    // 获取自动重命名配置列表
+    async getAutoConfigList() {
+      let funcAction = "读取自动重命名配置列表";
+      try {
+        this.setHandleSettingLoading(true);
+        let res = await SettingApi.getAutoConfigList();
+        if (res.success) {
+          return res.data as Array<string>;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          return [] as Array<string>;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return [] as Array<string>;
+      } finally {
+        this.setHandleSettingLoading(false);
+      }
+    },
+
+    // 设置自动重命名配置列表
+    async setAutoConfigList(autoList: Array<string>) {
+      let funcAction = "设置自动重命名配置列表";
+      try {
+        this.setHandleSettingLoading(true);
+        let res = await SettingApi.setAutoConfigList(autoList);
+        if (res.success) {
+          let GetRes = await this.getAutoConfigList();
+          return {
+            success: true,
+            autoList: GetRes,
+          };
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return {
+            success: false,
+            autoList: [],
+          };
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return {
+          success: false,
+          autoList: [],
+        };
+      } finally {
+        this.setHandleSettingLoading(false);
+      }
+    },
+
+    // 打开指定文件夹
+    async openFolder(folderPath: string) {
+      let funcAction = "打开指定文件夹";
+      try {
+        let res = await SettingApi.openFolder(folderPath);
+        if (!res.success) {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+      }
+    },
+
     // 获取图片处理数
     async getHandlePicCount() {
       let funcAction = "读取已处理图片数记录";
@@ -214,6 +342,11 @@ const settingStore = observable(
     getDefaultSetting: action,
     setDefaultSetting: action,
     openConfigFolder: action,
+    getTopList: action,
+    setTopList: action,
+    getAutoConfigList: action,
+    setAutoConfigList: action,
+    openFolder: action,
     getHandlePicCount: action,
   }
 );
