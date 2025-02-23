@@ -21,7 +21,7 @@ const winStore = observable(
         });
       } else {
         runInAction(() => {
-          this.errorLog = log;
+          this.errorLog = action + log;
           this.errorAction = action;
           this.showErrorDialog = true;
         });
@@ -32,10 +32,40 @@ const winStore = observable(
       this.showErrorDialog = false;
     },
 
-    async copyContent() {
+    async copyContent(content?: string) {
       let funcAction = "复制内容";
       try {
-        let res = await WinApi.COPY(this.errorLog);
+        if (!content) {
+          let res = await WinApi.COPY(this.errorLog);
+          if (res.success) {
+            return true;
+          } else {
+            // 报错
+            this.setErrorDialog(res.data, funcAction);
+            return false;
+          }
+        } else {
+          let res = await WinApi.COPY(content);
+          if (res.success) {
+            return true;
+          } else {
+            // 报错
+            this.setErrorDialog(res.data, funcAction);
+            return false;
+          }
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        this.setErrorDialog(log, funcAction);
+        return false;
+      }
+    },
+
+    async openLink(url: string) {
+      let funcAction = "打开链接";
+      try {
+        let res = await WinApi.LINK(url);
         if (res.success) {
           return true;
         } else {
@@ -118,6 +148,7 @@ const winStore = observable(
     setErrorDialog: action,
     hideErrorDialog: action,
     copyContent: action,
+    openLink: action,
     setShowMessage: action,
     addMessage: action,
     clearMessage: action,

@@ -10,6 +10,11 @@ declare global {
     list: Array<SortFolderListType>;
     clearList: boolean;
   }
+  interface GetDefaultSettingDataType {
+    clearList: boolean;
+    picLoadLimit: string;
+    configPath: string;
+  }
   interface Window {
     DeskApi: {
       Win_quit: () => void;
@@ -18,6 +23,7 @@ declare global {
       Win_copy: (
         content: string
       ) => Promise<{ success: boolean; data: string }>;
+      Win_link: (url: string) => Promise<{ success: boolean; data: string }>;
 
       Pic_getPicList: (
         mode: viewType,
@@ -127,6 +133,40 @@ declare global {
       Setting_setAutoConfig: (
         config: AutoRenameConfig
       ) => Promise<{ success: boolean; data: string }>;
+      Setting_getDefaultSetting: () => Promise<{
+        success: boolean;
+        data: string | GetDefaultSettingDataType;
+      }>;
+      Setting_setDefaultSetting: (
+        clearList: boolean,
+        picLoadLimit: number
+      ) => Promise<{ success: boolean; data: string }>;
+      Setting_openConfigFolder: () => Promise<{
+        success: boolean;
+        data: string;
+      }>;
+      Setting_getTopList: () => Promise<{
+        success: boolean;
+        data: string | Array<string>;
+      }>;
+      Setting_setTopList: (
+        topList: Array<string>
+      ) => Promise<{ success: boolean; data: string }>;
+      Setting_getAutoConfigList: () => Promise<{
+        success: boolean;
+        data: string | Array<string>;
+      }>;
+      Setting_setAutoConfigList: (
+        autoList: Array<string>
+      ) => Promise<{ success: boolean; data: string }>;
+      Setting_openFolder: (folderPath: string) => Promise<{
+        success: boolean;
+        data: string;
+      }>;
+      Setting_getHandlePicCount: () => Promise<{
+        success: boolean;
+        data: string;
+      }>;
     };
   }
 

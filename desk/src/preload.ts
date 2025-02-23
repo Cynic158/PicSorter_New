@@ -14,6 +14,10 @@ const Win_copy = async (content: string) => {
   const res = await ipcRenderer.invoke("Win_copy" as WinApi, content);
   return res;
 };
+const Win_link = async (url: string) => {
+  const res = await ipcRenderer.invoke("Win_link" as WinApi, url);
+  return res;
+};
 
 // picipc
 const Pic_getPicList = async (
@@ -206,12 +210,73 @@ const Setting_setAutoConfig = async (autoConfig: AutoRenameConfig) => {
   );
   return res;
 };
+const Setting_getDefaultSetting = async () => {
+  const res = await ipcRenderer.invoke(
+    "Setting_getDefaultSetting" as SettingApi
+  );
+  return res;
+};
+const Setting_setDefaultSetting = async (
+  clearList: boolean,
+  picLoadLimit: number
+) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_setDefaultSetting" as SettingApi,
+    clearList,
+    picLoadLimit
+  );
+  return res;
+};
+const Setting_openConfigFolder = async () => {
+  const res = await ipcRenderer.invoke(
+    "Setting_openConfigFolder" as SettingApi
+  );
+  return res;
+};
+const Setting_getTopList = async () => {
+  const res = await ipcRenderer.invoke("Setting_getTopList" as SettingApi);
+  return res;
+};
+const Setting_setTopList = async (topList: Array<string>) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_setTopList" as SettingApi,
+    topList
+  );
+  return res;
+};
+const Setting_getAutoConfigList = async () => {
+  const res = await ipcRenderer.invoke(
+    "Setting_getAutoConfigList" as SettingApi
+  );
+  return res;
+};
+const Setting_setAutoConfigList = async (autoList: Array<string>) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_setAutoConfigList" as SettingApi,
+    autoList
+  );
+  return res;
+};
+const Setting_openFolder = async (folderPath: string) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_openFolder" as SettingApi,
+    folderPath
+  );
+  return res;
+};
+const Setting_getHandlePicCount = async () => {
+  const res = await ipcRenderer.invoke(
+    "Setting_getHandlePicCount" as SettingApi
+  );
+  return res;
+};
 
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
   Win_hide,
   Win_max,
   Win_copy,
+  Win_link,
   Pic_getPicList,
   Pic_renamePic,
   Pic_getPicInfo,
@@ -238,4 +303,13 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Sort_renameSortItem,
   Setting_getAutoConfig,
   Setting_setAutoConfig,
+  Setting_getDefaultSetting,
+  Setting_setDefaultSetting,
+  Setting_openConfigFolder,
+  Setting_getTopList,
+  Setting_setTopList,
+  Setting_getAutoConfigList,
+  Setting_setAutoConfigList,
+  Setting_openFolder,
+  Setting_getHandlePicCount,
 });

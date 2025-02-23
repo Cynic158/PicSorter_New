@@ -7,6 +7,7 @@ import { Observer } from "mobx-react";
 import { getFileSize } from "../../utils";
 import InputDialog from "../Dialog/InputDialog";
 import PicInfoDialog from "../Dialog/PicInfoDialog";
+import SettingDialog from "../Dialog/SettingDialog";
 import { useState } from "react";
 import winStore from "../../store/modules/win";
 import sortStore from "../../store/modules/sort";
@@ -51,6 +52,14 @@ export default function Header() {
     }
   };
 
+  const [settingDialogShow, setSettingDialogShow] = useState(false);
+  const showSettingDialog = () => {
+    setSettingDialogShow(true);
+  };
+  const hideSettingDialog = () => {
+    setSettingDialogShow(false);
+  };
+
   return (
     <Observer>
       {() => (
@@ -71,6 +80,10 @@ export default function Header() {
               hide={hidePicInfoDialog}
               picIndex={1}
             ></PicInfoDialog>
+            <SettingDialog
+              show={settingDialogShow}
+              hide={hideSettingDialog}
+            ></SettingDialog>
             <ul className="header-info">
               {picStore.viewMode == "view" &&
               picStore.picList.length > 0 &&
@@ -172,7 +185,7 @@ export default function Header() {
             </ul>
           </div>
           <ul className="header-right">
-            <li className="header-btn">
+            <li onClick={showSettingDialog} className="header-btn">
               <SvgIcon
                 svgName="setting"
                 svgSize="18px"

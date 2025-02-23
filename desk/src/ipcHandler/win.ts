@@ -1,4 +1,4 @@
-import { app, ipcMain, BrowserWindow, clipboard } from "electron";
+import { app, ipcMain, BrowserWindow, clipboard, shell } from "electron";
 import { generateErrorLog } from "../utils/index";
 
 const winHandler = (mainWindow: BrowserWindow) => {
@@ -25,6 +25,25 @@ const winHandler = (mainWindow: BrowserWindow) => {
   ipcMain.handle("Win_copy" as WinApi, async (_event, content: string) => {
     try {
       clipboard.writeText(content);
+      // 复制成功
+      return {
+        success: true,
+        data: "",
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
+    }
+  });
+
+  // 使用默认浏览器打开链接
+  ipcMain.handle("Win_link" as WinApi, async (_event, url: string) => {
+    try {
+      await shell.openExternal(url);
       // 复制成功
       return {
         success: true,

@@ -13,7 +13,8 @@ import sharp from "sharp";
 
 const picHandler = (
   getPicListSave: GetPicListSaveType,
-  setPicListSave: SetPicListSave
+  setPicListSave: SetPicListSave,
+  updateHandlePicCount: UpdateHandlePicCountType
 ) => {
   const appPath = app.getAppPath();
   const picConfigPath = pathManager.picConfigPath;
@@ -514,6 +515,8 @@ const picHandler = (
         cloneList[findPicIndex] = newPicInfo;
         // 重新设置缓存列表
         setPicListSave(cloneList);
+        // 处理+1
+        updateHandlePicCount(1);
         // 返回新的图片对象
         return {
           success: true,

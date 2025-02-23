@@ -1,6 +1,6 @@
 declare global {
   // Api类型
-  type WinApi = "Win_quit" | "Win_hide" | "Win_max" | "Win_copy";
+  type WinApi = "Win_quit" | "Win_hide" | "Win_max" | "Win_copy" | "Win_link";
   type PicApi =
     | "Pic_getPicList"
     | "Pic_renamePic"
@@ -27,7 +27,19 @@ declare global {
     | "Sort_getSortItemFolderInfo"
     | "Sort_setTopList"
     | "Sort_renameSortItem";
-  type SettingApi = "Setting_getAutoConfig" | "Setting_setAutoConfig";
+  type SettingApi =
+    | "Setting_getAutoConfig"
+    | "Setting_setAutoConfig"
+    | "Setting_getDefaultSetting"
+    | "Setting_getDefaultSetting"
+    | "Setting_setDefaultSetting"
+    | "Setting_openConfigFolder"
+    | "Setting_getTopList"
+    | "Setting_setTopList"
+    | "Setting_getAutoConfigList"
+    | "Setting_setAutoConfigList"
+    | "Setting_openFolder"
+    | "Setting_getHandlePicCount";
 
   // 其他类型
   // 通用部分
@@ -187,7 +199,10 @@ declare global {
   }
   interface SettingConfig {
     autoRename: Array<AutoRenameConfig>;
+    handlePicCount: number;
   }
+
+  type UpdateHandlePicCountType = (count: number) => Promise<void>;
 }
 
 export {};
