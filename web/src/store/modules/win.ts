@@ -119,7 +119,7 @@ const winStore = observable(
         this.runMessageLoop();
         this.messageTimer = setInterval(() => {
           this.runMessageLoop();
-        }, 5050);
+        }, 4100);
       }
     },
     // 主消息循环
@@ -141,7 +141,7 @@ const winStore = observable(
         this.transitionTimer = setTimeout(() => {
           this.clearMessage(); // 移除第一条消息
         }, 300); // 等待过渡时间
-      }, 4700); // 等待显示时间
+      }, 3700); // 等待显示时间
     },
   },
   {

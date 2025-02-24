@@ -11,6 +11,7 @@ import SettingDialog from "../Dialog/SettingDialog";
 import { useState } from "react";
 import winStore from "../../store/modules/win";
 import sortStore from "../../store/modules/sort";
+import toolStore from "../../store/modules/tool";
 
 export default function Header() {
   const [inputDialogShow, setInputDialogShow] = useState(false);
@@ -60,6 +61,17 @@ export default function Header() {
     setSettingDialogShow(false);
   };
 
+  const adjustPic = () => {
+    if (
+      picStore.picList.length > 0 &&
+      picStore.picList[1] !== null &&
+      !toolStore.adjustPicLoading &&
+      !sortStore.handlePicLoading
+    ) {
+      toolStore.adjustPic(picStore.picList[1].path);
+    }
+  };
+
   return (
     <Observer>
       {() => (
@@ -98,10 +110,23 @@ export default function Header() {
                   </li>
                   <li
                     onClick={showInputDialog}
-                    className="header-info-item icon"
+                    className="header-info-item icon withicon"
                   >
                     <SvgIcon
                       svgName="edit"
+                      svgSize="22px"
+                      hover={true}
+                      hoverColor="var(--color-blue1)"
+                      color="var(--color-black3)"
+                      clickable={true}
+                    ></SvgIcon>
+                  </li>
+                  <li
+                    onClick={adjustPic}
+                    className="header-info-item icon info"
+                  >
+                    <SvgIcon
+                      svgName="adjust"
                       svgSize="22px"
                       hover={true}
                       hoverColor="var(--color-blue1)"

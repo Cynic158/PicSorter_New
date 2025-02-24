@@ -167,6 +167,10 @@ declare global {
         success: boolean;
         data: string;
       }>;
+
+      Tool_adjustPic: (
+        picPath: string
+      ) => Promise<{ success: boolean; data: string }>;
     };
   }
 

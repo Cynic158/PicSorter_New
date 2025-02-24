@@ -7,6 +7,7 @@ import { Observer } from "mobx-react";
 import { useState } from "react";
 import picStore from "../../store/modules/pic";
 import sortStore from "../../store/modules/sort";
+import toolStore from "../../store/modules/tool";
 
 export default function ControlerHeader() {
   const [mainFolderDialogShow, setMainFolderDialogShow] = useState(false);
@@ -73,17 +74,6 @@ export default function ControlerHeader() {
       {() => (
         <div className="controler-header-container">
           <ul className="controler-header">
-            <li className="controler-header-item">
-              <div className="controler-header-item-bg"></div>
-              <div className="controler-header-item-icon">
-                <SvgIcon
-                  svgName="tool"
-                  svgSize="20px"
-                  clickable={true}
-                  color="var(--color-white2)"
-                ></SvgIcon>
-              </div>
-            </li>
             <li
               onClick={() => {
                 switchMode("view");
@@ -206,6 +196,29 @@ export default function ControlerHeader() {
                 <SvgIcon
                   svgName="info"
                   svgSize="20px"
+                  clickable={true}
+                  color="var(--color-white2)"
+                ></SvgIcon>
+              </div>
+            </li>
+            <li
+              onClick={() => {
+                toolStore.refreshAll();
+              }}
+              className={`controler-header-item${
+                !picStore.picListLoading &&
+                !sortStore.sortFolderLoading &&
+                !sortStore.handleSortItemLoading &&
+                !sortStore.handlePicLoading
+                  ? ""
+                  : " disabled"
+              }`}
+            >
+              <div className="controler-header-item-bg"></div>
+              <div className="controler-header-item-icon">
+                <SvgIcon
+                  svgName="refresh"
+                  svgSize="18px"
                   clickable={true}
                   color="var(--color-white2)"
                 ></SvgIcon>

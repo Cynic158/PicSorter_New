@@ -40,6 +40,7 @@ declare global {
     | "Setting_setAutoConfigList"
     | "Setting_openFolder"
     | "Setting_getHandlePicCount";
+  type ToolApi = "Tool_adjustPic";
 
   // 其他类型
   // 通用部分

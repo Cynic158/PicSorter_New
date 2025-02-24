@@ -196,6 +196,7 @@ const Sort_renameSortItem = async (oldName: string, newName: string) => {
   return res;
 };
 
+// settingipc
 const Setting_getAutoConfig = async (sortName: string) => {
   const res = await ipcRenderer.invoke(
     "Setting_getAutoConfig" as SettingApi,
@@ -271,6 +272,12 @@ const Setting_getHandlePicCount = async () => {
   return res;
 };
 
+// toolipc
+const Tool_adjustPic = async (picPath: string) => {
+  const res = await ipcRenderer.invoke("Tool_adjustPic" as ToolApi, picPath);
+  return res;
+};
+
 contextBridge.exposeInMainWorld("DeskApi", {
   Win_quit,
   Win_hide,
@@ -312,4 +319,5 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Setting_setAutoConfigList,
   Setting_openFolder,
   Setting_getHandlePicCount,
+  Tool_adjustPic,
 });

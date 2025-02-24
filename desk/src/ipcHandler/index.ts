@@ -3,6 +3,7 @@ import winHandler from "./win";
 import picHandler from "./pic";
 import sortHandler from "./sort";
 import settingHandler from "./setting";
+import toolHandler from "./tool";
 
 const ipcHandler = (
   mainWindow: BrowserWindow,
@@ -22,6 +23,7 @@ const ipcHandler = (
     updateHandlePicCount
   );
   settingHandler();
+  toolHandler();
 };
 
 export default ipcHandler;
