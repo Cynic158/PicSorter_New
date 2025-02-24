@@ -65,7 +65,8 @@ export default function Header() {
     if (
       picStore.picList.length > 0 &&
       picStore.picList[1] !== null &&
-      !toolStore.adjustPicLoading
+      !toolStore.adjustPicLoading &&
+      !sortStore.handlePicLoading
     ) {
       toolStore.adjustPic(picStore.picList[1].path);
     }
@@ -209,14 +210,6 @@ export default function Header() {
             </ul>
           </div>
           <ul className="header-right">
-            <li className="header-btn">
-              <SvgIcon
-                svgName="tool"
-                svgSize="20px"
-                clickable={true}
-                color="var(--color-white2)"
-              ></SvgIcon>
-            </li>
             <li onClick={showSettingDialog} className="header-btn">
               <SvgIcon
                 svgName="setting"
