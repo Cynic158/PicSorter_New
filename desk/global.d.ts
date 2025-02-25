@@ -201,6 +201,7 @@ declare global {
   interface SettingConfig {
     autoRename: Array<AutoRenameConfig>;
     handlePicCount: number;
+    showStartup: boolean;
   }
 
   type UpdateHandlePicCountType = (count: number) => Promise<void>;

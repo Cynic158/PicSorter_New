@@ -219,12 +219,14 @@ const Setting_getDefaultSetting = async () => {
 };
 const Setting_setDefaultSetting = async (
   clearList: boolean,
-  picLoadLimit: number
+  picLoadLimit: number,
+  showStartup: boolean
 ) => {
   const res = await ipcRenderer.invoke(
     "Setting_setDefaultSetting" as SettingApi,
     clearList,
-    picLoadLimit
+    picLoadLimit,
+    showStartup
   );
   return res;
 };

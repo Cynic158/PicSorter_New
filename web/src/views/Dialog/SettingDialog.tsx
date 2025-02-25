@@ -38,6 +38,7 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
   // 通用设置
   const [clearList, setClearList] = useState(true);
   const [picLoadLimit, setPicLoadLimit] = useState("100");
+  const [showStartup, setShowStartup] = useState(false);
   const [configPath, setConfigPath] = useState("");
   // 置顶配置
   const [topList, setTopList] = useState<Array<string>>([]);
@@ -49,10 +50,15 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
     setClearList(res.clearList);
     setPicLoadLimit(res.picLoadLimit);
     setConfigPath(res.configPath);
+    setShowStartup(res.showStartup);
   };
   const setDefaultSetting = async () => {
     if (!settingStore.handleSettingLoading) {
-      let res = await settingStore.setDefaultSetting(clearList, picLoadLimit);
+      let res = await settingStore.setDefaultSetting(
+        clearList,
+        picLoadLimit,
+        showStartup
+      );
       if (res) {
         winStore.setMessage({
           type: "success",
@@ -324,6 +330,20 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                         ></Inputer>
                         <div className="settingdialog-setting-item-tip">
                           在横向或者纵向图片预览模式时，为了提高性能，降低渲染压力，并不会一次性加载显示所有待分类图片，而是根据加载图片上限，显示部分图片；最低50，最高500；修改后非立即生效
+                        </div>
+                      </div>
+                      <div className="settingdialog-setting-item">
+                        <p className="settingdialog-setting-item-title">
+                          是否显示启动图
+                        </p>
+                        <Switcher
+                          value={showStartup}
+                          setValue={() => {
+                            setShowStartup(!showStartup);
+                          }}
+                        ></Switcher>
+                        <div className="settingdialog-setting-item-tip">
+                          应用打开时是否显示启动加载图片，默认不显示，怕社死请勿开启
                         </div>
                       </div>
                       <div className="settingdialog-setting-item">

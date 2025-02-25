@@ -155,6 +155,15 @@ const settingHandler = () => {
       const configForPic: PicConfig = JSON.parse(fileContentForPic);
       let picLoadLimit = configForPic.picLoadLimit.toString();
 
+      // 获取settingConfig
+      // 读取重命名配置
+      const settingPath = path.resolve(appPath, settingConfigPath);
+      // 读取当前配置文件内容
+      const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+      // 解析JSON内容
+      const settingConfig: SettingConfig = JSON.parse(settingContent);
+      let showStartup = settingConfig.showStartup;
+
       let configFilesPathVal = path.resolve(appPath, configFilesPath);
 
       return {
@@ -162,6 +171,7 @@ const settingHandler = () => {
         data: {
           clearList,
           picLoadLimit,
+          showStartup,
           configPath: configFilesPathVal,
         },
       };
@@ -178,7 +188,12 @@ const settingHandler = () => {
   // 设置通用设置
   ipcMain.handle(
     "Setting_setDefaultSetting" as SettingApi,
-    async (_event, clearList: boolean, picLoadLimit: number) => {
+    async (
+      _event,
+      clearList: boolean,
+      picLoadLimit: number,
+      showStartup: boolean
+    ) => {
       try {
         // 获取sortConfig的完整路径
         const configPath = path.resolve(appPath, sortConfigPath);
@@ -208,6 +223,20 @@ const settingHandler = () => {
         await fs.promises.writeFile(
           configPathForPic,
           JSON.stringify(cloneConfigForPic, null, 2),
+          "utf-8"
+        );
+
+        // 获取settingConfig的完整路径
+        const settingPath = path.resolve(appPath, settingConfigPath);
+        // 读取当前配置文件内容
+        const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+        // 解析JSON内容
+        const settingConfig: SettingConfig = JSON.parse(settingContent);
+        let cloneSettingConfig = cloneDeep(settingConfig);
+        cloneSettingConfig.showStartup = showStartup;
+        await fs.promises.writeFile(
+          settingPath,
+          JSON.stringify(cloneSettingConfig, null, 2),
           "utf-8"
         );
 

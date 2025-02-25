@@ -1,4 +1,5 @@
 {
   "autoRename": [],
-  "handlePicCount": 0
+  "handlePicCount": 0,
+  "showStartup": false
 }

@@ -99,6 +99,7 @@ const settingStore = observable(
           return {
             clearList: true,
             picLoadLimit: "",
+            showStartup: false,
             configPath: "",
           };
         }
@@ -109,6 +110,7 @@ const settingStore = observable(
         return {
           clearList: true,
           picLoadLimit: "",
+          showStartup: false,
           configPath: "",
         };
       } finally {
@@ -116,7 +118,11 @@ const settingStore = observable(
       }
     },
     // 设置通用设置
-    async setDefaultSetting(clearList: boolean, picLoadLimit: string) {
+    async setDefaultSetting(
+      clearList: boolean,
+      picLoadLimit: string,
+      showStartup: boolean
+    ) {
       let picLoadLimitVal = picLoadLimit.trim();
       if (picLoadLimitVal == "") {
         winStore.setMessage({
@@ -145,7 +151,8 @@ const settingStore = observable(
         this.setHandleSettingLoading(true);
         let res = await SettingApi.setDefaultSetting(
           clearList,
-          Number(picLoadLimitVal)
+          Number(picLoadLimitVal),
+          showStartup
         );
         if (res.success) {
           return true;
