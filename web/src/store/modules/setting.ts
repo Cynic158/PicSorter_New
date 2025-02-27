@@ -4,6 +4,7 @@ import SettingApi from "../../api/setting";
 import winStore from "./win";
 import { cloneDeep } from "lodash";
 import sortStore from "./sort";
+import picStore from "./pic";
 
 const settingStore = observable(
   {
@@ -339,6 +340,155 @@ const settingStore = observable(
         this.setHandleSettingLoading(false);
       }
     },
+
+    // 快捷键部分
+    shortcuts: [false, false, false, false, false, false, false],
+    setShortcuts(enables: Array<boolean>) {
+      this.shortcuts = enables;
+    },
+    allowShortcut: true,
+    setAllowShortcut(bool: boolean) {
+      this.allowShortcut = bool;
+    },
+    async getShortcut() {
+      let funcAction = "读取快捷键配置";
+      try {
+        this.setHandleSettingLoading(true);
+        let res = await SettingApi.getShortcut();
+        if (res.success) {
+          this.setShortcuts(res.data as Array<boolean>);
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data as string, funcAction);
+          this.setShortcuts([false, false, false, false, false, false, false]);
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        this.setShortcuts([false, false, false, false, false, false, false]);
+      } finally {
+        this.setHandleSettingLoading(false);
+      }
+    },
+    async setShortcut(enables: Array<boolean>) {
+      let funcAction = "设置快捷键配置";
+      try {
+        this.setHandleSettingLoading(true);
+        let res = await SettingApi.setShortcut(enables);
+        if (res.success) {
+          this.setShortcuts(enables);
+          return true;
+        } else {
+          // 报错
+          winStore.setErrorDialog(res.data, funcAction);
+          return false;
+        }
+      } catch (error) {
+        // 报错
+        let log = generateErrorLog(error);
+        winStore.setErrorDialog(log, funcAction);
+        return false;
+      } finally {
+        this.setHandleSettingLoading(false);
+      }
+    },
+    async cutPics() {
+      if (this.allowShortcut && this.shortcuts[0]) {
+        const el = document.getElementById("cutbtn") as HTMLButtonElement;
+        el.click();
+      }
+    },
+    async copyPics() {
+      if (this.allowShortcut && this.shortcuts[1]) {
+        const el = document.getElementById("copybtn") as HTMLButtonElement;
+        el.click();
+      }
+    },
+    async deletePics() {
+      if (this.allowShortcut && this.shortcuts[2]) {
+        if (
+          (picStore.viewMode == "view" && picStore.picList[1] !== null) ||
+          (picStore.viewMode != "view" &&
+            picStore.picList.length != 0 &&
+            picStore.selectingPicList.length != 0)
+        ) {
+          if (!sortStore.handlePicLoading && !picStore.picListLoading) {
+            // 先判断是单图还是多图
+            if (picStore.viewMode == "view") {
+              // 单图
+              let res = await sortStore.deletePic();
+              if (res) {
+                winStore.setMessage({
+                  type: "success",
+                  msg: "删除成功",
+                });
+              }
+            } else {
+              // 多图
+              let res = await sortStore.deletePicGroup();
+              if (res) {
+                winStore.setMessage({
+                  type: "success",
+                  msg: "删除成功",
+                });
+              }
+            }
+          }
+        }
+      }
+    },
+    async selectAllPics() {
+      if (this.allowShortcut && this.shortcuts[3]) {
+        if (
+          picStore.viewMode != "view" &&
+          picStore.picList.length > 0 &&
+          !picStore.picListLoading &&
+          !sortStore.handlePicLoading
+        ) {
+          picStore.setAllSelectingClickTimes(1);
+          picStore.allSelectingPicList();
+        }
+      }
+    },
+    async selectAllSorts() {
+      if (this.allowShortcut && this.shortcuts[4]) {
+        const el = document.getElementById("allsortsbtn") as HTMLLIElement;
+        el.click();
+      }
+    },
+    async selectSortA(index: number) {
+      if (
+        this.allowShortcut &&
+        this.shortcuts[5] &&
+        sortStore.sortFolderList.length > 0
+      ) {
+        if (index === 0) {
+          if (sortStore.sortFolderList[9]) {
+            sortStore.setSelectingSortList(sortStore.sortFolderList[9].name);
+          }
+        } else {
+          if (sortStore.sortFolderList[index - 1]) {
+            sortStore.setSelectingSortList(
+              sortStore.sortFolderList[index - 1].name
+            );
+          }
+        }
+      }
+    },
+    async selectSortB(index: number) {
+      if (
+        this.allowShortcut &&
+        this.shortcuts[6] &&
+        sortStore.sortFolderList.length > 0
+      ) {
+        if (sortStore.sortFolderList[index - 1]) {
+          sortStore.setSelectingSortList(
+            sortStore.sortFolderList[index - 1].name
+          );
+        }
+      }
+    },
   },
   {
     setGetAutoConfigLoading: action,
@@ -355,6 +505,17 @@ const settingStore = observable(
     setAutoConfigList: action,
     openFolder: action,
     getHandlePicCount: action,
+    setShortcuts: action,
+    setAllowShortcut: action,
+    getShortcut: action,
+    setShortcut: action,
+    cutPics: action,
+    copyPics: action,
+    deletePics: action,
+    selectAllPics: action,
+    selectAllSorts: action,
+    selectSortA: action,
+    selectSortB: action,
   }
 );
 

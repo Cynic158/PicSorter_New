@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Observer } from "mobx-react";
 import picStore from "../../store/modules/pic";
@@ -7,6 +7,7 @@ import TextOverflow from "react-text-overflow";
 import Loader from "../../components/Loader";
 import SvgIcon from "../../components/SvgIcon";
 import { getFileTime } from "../../utils";
+import settingStore from "../../store/modules/setting";
 
 interface PicInfoDialogProps {
   show: boolean;
@@ -40,6 +41,16 @@ const PicInfoDialog: React.FC<PicInfoDialogProps> = ({
       closeDialog();
     }
   };
+
+  useEffect(() => {
+    if (show) {
+      settingStore.setAllowShortcut(false);
+    } else {
+      settingStore.setAllowShortcut(true);
+    }
+
+    return () => {};
+  }, [show]);
 
   return ReactDOM.createPortal(
     <Observer>

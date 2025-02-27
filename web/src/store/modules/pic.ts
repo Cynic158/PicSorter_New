@@ -251,6 +251,7 @@ const picStore = observable(
         }
       } else {
         this.clearSelectingPicList();
+        this.setAllSelectingClickTimes(0);
       }
     },
 

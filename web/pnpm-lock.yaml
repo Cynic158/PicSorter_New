@@ -26,6 +26,9 @@ dependencies:
   react-flatpickr:
     specifier: ^3.10.13
     version: 3.10.13(react@18.3.1)
+  react-hotkeys-hook:
+    specifier: ^4.6.1
+    version: 4.6.1(react-dom@18.3.1)(react@18.3.1)
   react-text-overflow:
     specifier: ^1.0.2
     version: 1.0.2(react-dom@18.3.1)(react@18.3.1)
@@ -1871,6 +1874,16 @@ packages:
       flatpickr: 4.6.13
       prop-types: 15.8.1
       react: 18.3.1
+    dev: false
+
+  /react-hotkeys-hook@4.6.1(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-XlZpbKUj9tkfgPgT9gA+1p7Ey6vFIZHttUjPqpTdyT5nqQ8mHL7elxvSbaC+dpSiHUSmr21Ya1mDxBZG3aje4Q==}
+    peerDependencies:
+      react: '>=16.8.1'
+      react-dom: '>=16.8.1'
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
     dev: false
 
   /react-is@16.13.1:

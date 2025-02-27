@@ -217,9 +217,11 @@ const AutoConfigDialog: React.FC<AutoConfigDialogProps> = ({ show, hide }) => {
 
   useEffect(() => {
     if (!show) {
+      settingStore.setAllowShortcut(true);
       setSortTypeSelect(false);
       setInsertTypeSelect(false);
     } else {
+      settingStore.setAllowShortcut(false);
       settingStore.getAutoConfig().then((res) => {
         if (res.success) {
           initDialog(true, res.data as AutoRenameConfig);

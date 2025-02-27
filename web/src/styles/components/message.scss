@@ -16,6 +16,7 @@
   transition: top 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
   visibility: hidden;
   font-weight: 600;
+  user-select: none;
   &.show {
     visibility: visible;
     top: calc(var(--header-container-height) + 18px);

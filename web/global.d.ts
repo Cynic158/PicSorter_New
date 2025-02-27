@@ -169,6 +169,14 @@ declare global {
         success: boolean;
         data: string;
       }>;
+      Setting_getShortcut: () => Promise<{
+        success: boolean;
+        data: string | Array<boolean>;
+      }>;
+      Setting_setShortcut: (shortcuts: Array<boolean>) => Promise<{
+        success: boolean;
+        data: string;
+      }>;
 
       Tool_adjustPic: (
         picPath: string

@@ -273,6 +273,17 @@ const Setting_getHandlePicCount = async () => {
   );
   return res;
 };
+const Setting_getShortcut = async () => {
+  const res = await ipcRenderer.invoke("Setting_getShortcut" as SettingApi);
+  return res;
+};
+const Setting_setShortcut = async (shortcuts: Array<boolean>) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_setShortcut" as SettingApi,
+    shortcuts
+  );
+  return res;
+};
 
 // toolipc
 const Tool_adjustPic = async (picPath: string) => {
@@ -321,5 +332,7 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Setting_setAutoConfigList,
   Setting_openFolder,
   Setting_getHandlePicCount,
+  Setting_getShortcut,
+  Setting_setShortcut,
   Tool_adjustPic,
 });

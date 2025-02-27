@@ -167,6 +167,7 @@ export default function ControlerHeader() {
               </div>
             </li>
             <li
+              id="allsortsbtn"
               onClick={fullSelect}
               className={`controler-header-item${
                 sortStore.sortFolderConfig.folderPath &&

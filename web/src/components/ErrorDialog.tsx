@@ -3,6 +3,8 @@ import winStore from "../store/modules/win";
 import SvgIcon from "./SvgIcon";
 import { Observer } from "mobx-react";
 import "../styles/components/errordialog.scss";
+import { useEffect } from "react";
+import settingStore from "../store/modules/setting";
 
 export default function ErrorDialog() {
   const maskClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -21,6 +23,16 @@ export default function ErrorDialog() {
       });
     }
   };
+
+  useEffect(() => {
+    if (winStore.showErrorDialog) {
+      settingStore.setAllowShortcut(false);
+    } else {
+      settingStore.setAllowShortcut(true);
+    }
+
+    return () => {};
+  }, [winStore.showErrorDialog]);
 
   return ReactDOM.createPortal(
     <Observer>

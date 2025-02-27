@@ -446,6 +446,64 @@ const settingHandler = () => {
       };
     }
   });
+
+  // 获取快捷键配置
+  ipcMain.handle("Setting_getShortcut" as SettingApi, async () => {
+    try {
+      // 读取快捷键配置
+      const settingPath = path.resolve(appPath, settingConfigPath);
+      // 读取当前配置文件内容
+      const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+      // 解析JSON内容
+      const settingConfig: SettingConfig = JSON.parse(settingContent);
+      let shortcuts = settingConfig.shortcuts;
+      return {
+        success: true,
+        data: shortcuts,
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
+    }
+  });
+
+  // 设置快捷键配置
+  ipcMain.handle(
+    "Setting_setShortcut" as SettingApi,
+    async (_event, shortcuts: Array<boolean>) => {
+      try {
+        // 读取快捷键配置
+        const settingPath = path.resolve(appPath, settingConfigPath);
+        // 读取当前配置文件内容
+        const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+        // 解析JSON内容
+        const settingConfig: SettingConfig = JSON.parse(settingContent);
+        let cloneSettingConfig = cloneDeep(settingConfig);
+        cloneSettingConfig.shortcuts = shortcuts;
+        // 写回文件
+        await fs.promises.writeFile(
+          settingPath,
+          JSON.stringify(cloneSettingConfig, null, 2),
+          "utf-8"
+        );
+        return {
+          success: true,
+          data: "",
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
 };
 
 export default settingHandler;
