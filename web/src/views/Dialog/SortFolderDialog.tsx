@@ -9,6 +9,7 @@ import { Observer } from "mobx-react";
 import "../../styles/dialog/sortfolderdialog.scss";
 import { cloneDeep } from "lodash";
 import Loader from "../../components/Loader";
+import settingStore from "../../store/modules/setting";
 
 interface SortFolderDialogProps {
   show: boolean;
@@ -92,8 +93,10 @@ const SortFolderDialog: React.FC<SortFolderDialogProps> = ({ show, hide }) => {
 
   useEffect(() => {
     if (!show) {
+      settingStore.setAllowShortcut(true);
       setSortTypeSelect(false);
     } else {
+      settingStore.setAllowShortcut(false);
       // 克隆一份
       let cloneRes = cloneDeep(sortStore.sortFolderConfig);
       setEditingSortFolderConfig(cloneRes);

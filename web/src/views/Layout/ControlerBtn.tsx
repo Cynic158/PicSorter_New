@@ -178,6 +178,7 @@ export default function ControlerBtn() {
           <div className="controler-btn">
             <div className="controler-btn-left">
               <button
+                id="cutbtn"
                 onClick={handleCutPic}
                 className={`controler-btn-left-item${
                   (picStore.viewMode == "view" &&
@@ -204,6 +205,7 @@ export default function ControlerBtn() {
                 </div>
               </button>
               <button
+                id="copybtn"
                 onClick={handleCopyPic}
                 className={`controler-btn-left-item${
                   (picStore.viewMode == "view" &&
@@ -314,6 +316,7 @@ export default function ControlerBtn() {
               </div>
               <div className="controler-btn-right-item">
                 <button
+                  id="deletebtn"
                   onClick={handleDeletePic}
                   className={`controler-btn-right-item-delete${
                     (picStore.viewMode == "view" &&

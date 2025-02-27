@@ -1,12 +1,11 @@
-import { ipcMain, app, shell } from "electron";
+import { ipcMain, shell } from "electron";
 import { generateErrorLog, checkPathsExist } from "../utils/index";
 import pathManager from "../utils/path";
 import fs from "fs";
 import path from "path";
 import { cloneDeep } from "lodash";
 
-const settingHandler = () => {
-  const appPath = app.getAppPath();
+const settingHandler = (appPath: string) => {
   const settingConfigPath = pathManager.settingConfigPath;
   const sortConfigPath = pathManager.sortConfigPath;
   const picConfigPath = pathManager.picConfigPath;
@@ -155,6 +154,15 @@ const settingHandler = () => {
       const configForPic: PicConfig = JSON.parse(fileContentForPic);
       let picLoadLimit = configForPic.picLoadLimit.toString();
 
+      // 获取settingConfig
+      // 读取重命名配置
+      const settingPath = path.resolve(appPath, settingConfigPath);
+      // 读取当前配置文件内容
+      const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+      // 解析JSON内容
+      const settingConfig: SettingConfig = JSON.parse(settingContent);
+      let showStartup = settingConfig.showStartup;
+
       let configFilesPathVal = path.resolve(appPath, configFilesPath);
 
       return {
@@ -162,6 +170,7 @@ const settingHandler = () => {
         data: {
           clearList,
           picLoadLimit,
+          showStartup,
           configPath: configFilesPathVal,
         },
       };
@@ -178,7 +187,12 @@ const settingHandler = () => {
   // 设置通用设置
   ipcMain.handle(
     "Setting_setDefaultSetting" as SettingApi,
-    async (_event, clearList: boolean, picLoadLimit: number) => {
+    async (
+      _event,
+      clearList: boolean,
+      picLoadLimit: number,
+      showStartup: boolean
+    ) => {
       try {
         // 获取sortConfig的完整路径
         const configPath = path.resolve(appPath, sortConfigPath);
@@ -208,6 +222,20 @@ const settingHandler = () => {
         await fs.promises.writeFile(
           configPathForPic,
           JSON.stringify(cloneConfigForPic, null, 2),
+          "utf-8"
+        );
+
+        // 获取settingConfig的完整路径
+        const settingPath = path.resolve(appPath, settingConfigPath);
+        // 读取当前配置文件内容
+        const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+        // 解析JSON内容
+        const settingConfig: SettingConfig = JSON.parse(settingContent);
+        let cloneSettingConfig = cloneDeep(settingConfig);
+        cloneSettingConfig.showStartup = showStartup;
+        await fs.promises.writeFile(
+          settingPath,
+          JSON.stringify(cloneSettingConfig, null, 2),
           "utf-8"
         );
 
@@ -417,6 +445,64 @@ const settingHandler = () => {
       };
     }
   });
+
+  // 获取快捷键配置
+  ipcMain.handle("Setting_getShortcut" as SettingApi, async () => {
+    try {
+      // 读取快捷键配置
+      const settingPath = path.resolve(appPath, settingConfigPath);
+      // 读取当前配置文件内容
+      const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+      // 解析JSON内容
+      const settingConfig: SettingConfig = JSON.parse(settingContent);
+      let shortcuts = settingConfig.shortcuts;
+      return {
+        success: true,
+        data: shortcuts,
+      };
+    } catch (error) {
+      // 编写错误报告
+      let errorLog = generateErrorLog(error);
+      return {
+        success: false,
+        data: errorLog,
+      };
+    }
+  });
+
+  // 设置快捷键配置
+  ipcMain.handle(
+    "Setting_setShortcut" as SettingApi,
+    async (_event, shortcuts: Array<boolean>) => {
+      try {
+        // 读取快捷键配置
+        const settingPath = path.resolve(appPath, settingConfigPath);
+        // 读取当前配置文件内容
+        const settingContent = await fs.promises.readFile(settingPath, "utf-8");
+        // 解析JSON内容
+        const settingConfig: SettingConfig = JSON.parse(settingContent);
+        let cloneSettingConfig = cloneDeep(settingConfig);
+        cloneSettingConfig.shortcuts = shortcuts;
+        // 写回文件
+        await fs.promises.writeFile(
+          settingPath,
+          JSON.stringify(cloneSettingConfig, null, 2),
+          "utf-8"
+        );
+        return {
+          success: true,
+          data: "",
+        };
+      } catch (error) {
+        // 编写错误报告
+        let errorLog = generateErrorLog(error);
+        return {
+          success: false,
+          data: errorLog,
+        };
+      }
+    }
+  );
 };
 
 export default settingHandler;

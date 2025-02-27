@@ -13,6 +13,7 @@ declare global {
   interface GetDefaultSettingDataType {
     clearList: boolean;
     picLoadLimit: string;
+    showStartup: boolean;
     configPath: string;
   }
   interface Window {
@@ -139,7 +140,8 @@ declare global {
       }>;
       Setting_setDefaultSetting: (
         clearList: boolean,
-        picLoadLimit: number
+        picLoadLimit: number,
+        showStartup: boolean
       ) => Promise<{ success: boolean; data: string }>;
       Setting_openConfigFolder: () => Promise<{
         success: boolean;
@@ -164,6 +166,14 @@ declare global {
         data: string;
       }>;
       Setting_getHandlePicCount: () => Promise<{
+        success: boolean;
+        data: string;
+      }>;
+      Setting_getShortcut: () => Promise<{
+        success: boolean;
+        data: string | Array<boolean>;
+      }>;
+      Setting_setShortcut: (shortcuts: Array<boolean>) => Promise<{
         success: boolean;
         data: string;
       }>;

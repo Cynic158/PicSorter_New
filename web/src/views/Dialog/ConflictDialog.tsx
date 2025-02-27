@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import "../../styles/dialog/conflictdialog.scss";
 import picStore from "../../store/modules/pic";
 import Pic from "../../components/Pic";
+import settingStore from "../../store/modules/setting";
 
 interface ConflictDialogProps {
   conflictWidth: string;
@@ -34,6 +35,16 @@ const ConflictDialog: React.FC<ConflictDialogProps> = ({
 
     return () => {};
   }, [conflictPath]);
+
+  useEffect(() => {
+    if (show) {
+      settingStore.setAllowShortcut(false);
+    } else {
+      settingStore.setAllowShortcut(true);
+    }
+
+    return () => {};
+  }, [show]);
 
   return ReactDOM.createPortal(
     <div

@@ -9,6 +9,7 @@ import "../../styles/dialog/sortitemfolderdialog.scss";
 import sortStore from "../../store/modules/sort";
 import { cloneDeep } from "lodash";
 import { getFileSize } from "../../utils";
+import settingStore from "../../store/modules/setting";
 
 interface SortItemFolderDialogProps {
   show: boolean;
@@ -97,8 +98,11 @@ const SortItemFolderDialog: React.FC<SortItemFolderDialogProps> = ({
 
   useEffect(() => {
     if (show) {
+      settingStore.setAllowShortcut(false);
       setSortItemError(false);
       getSortItemFolderInfo();
+    } else {
+      settingStore.setAllowShortcut(true);
     }
 
     return () => {};

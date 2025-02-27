@@ -6,6 +6,7 @@ import picStore from "../../store/modules/pic";
 import SvgIcon from "../../components/SvgIcon";
 import Pic from "../../components/Pic";
 import Loader from "../../components/Loader";
+import settingStore from "../../store/modules/setting";
 
 interface ReplaceDialogProps {
   show: boolean;
@@ -57,7 +58,10 @@ const ReplaceDialog: React.FC<ReplaceDialogProps> = ({
 
   useEffect(() => {
     if (show) {
+      settingStore.setAllowShortcut(false);
       setApplyAll(false);
+    } else {
+      settingStore.setAllowShortcut(true);
     }
 
     return () => {};

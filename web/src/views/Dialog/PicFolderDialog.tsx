@@ -16,6 +16,7 @@ import "flatpickr/dist/themes/material_blue.css";
 import { Mandarin } from "flatpickr/dist/l10n/zh.js"; // 导入中文语言包
 import picStore from "../../store/modules/pic";
 import { getFileSizeArr, getFileSizeNumber } from "../../utils";
+import settingStore from "../../store/modules/setting";
 
 Mandarin.months.shorthand = [
   "1 月",
@@ -618,8 +619,10 @@ const PicFolderDialog: React.FC<PicFolderDialogProps> = ({ show, hide }) => {
 
   useEffect(() => {
     if (!show) {
+      settingStore.setAllowShortcut(true);
       setSortTypeSelect(false);
     } else {
+      settingStore.setAllowShortcut(false);
       let cloneRes = cloneDeep(sortStore.picFolderConfig);
       setEditingPicFolderConfig(cloneRes);
       setSelectForm(cloneRes.selectConfig);

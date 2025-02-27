@@ -9,6 +9,7 @@ import winStore from "../../store/modules/win";
 import picStore from "../../store/modules/pic";
 import { getAdaptiveResolution } from "../../utils";
 import sortStore from "../../store/modules/sort";
+import settingStore from "../../store/modules/setting";
 
 interface InputDialogProps {
   type: "renamePic" | "insertSortFolder" | "renameSortFolder";
@@ -190,6 +191,7 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
       ".inputdialog-textarea." + type
     )!;
     if (show) {
+      settingStore.setAllowShortcut(false);
       if (type == "renamePic") {
         setInputPlaceholder("请输入新的图片名称(不带文件后缀)");
         setInputTitle("重命名图片");
@@ -204,6 +206,7 @@ const InputDialog: React.FC<InputDialogProps> = ({ type, show, hide }) => {
       textareaEl.addEventListener("focus", setActive);
       textareaEl.addEventListener("blur", setInActive);
     } else {
+      settingStore.setAllowShortcut(true);
       textareaEl.removeEventListener("focus", setActive);
       textareaEl.removeEventListener("blur", setInActive);
     }

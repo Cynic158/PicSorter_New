@@ -10,6 +10,8 @@ const SettingApi = {
   setAutoConfigList: window.DeskApi?.Setting_setAutoConfigList,
   openFolder: window.DeskApi?.Setting_openFolder,
   getHandlePicCount: window.DeskApi?.Setting_getHandlePicCount,
+  getShortcut: window.DeskApi?.Setting_getShortcut,
+  setShortcut: window.DeskApi?.Setting_setShortcut,
 };
 
 export default SettingApi;

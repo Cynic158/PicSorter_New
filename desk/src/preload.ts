@@ -219,12 +219,14 @@ const Setting_getDefaultSetting = async () => {
 };
 const Setting_setDefaultSetting = async (
   clearList: boolean,
-  picLoadLimit: number
+  picLoadLimit: number,
+  showStartup: boolean
 ) => {
   const res = await ipcRenderer.invoke(
     "Setting_setDefaultSetting" as SettingApi,
     clearList,
-    picLoadLimit
+    picLoadLimit,
+    showStartup
   );
   return res;
 };
@@ -268,6 +270,17 @@ const Setting_openFolder = async (folderPath: string) => {
 const Setting_getHandlePicCount = async () => {
   const res = await ipcRenderer.invoke(
     "Setting_getHandlePicCount" as SettingApi
+  );
+  return res;
+};
+const Setting_getShortcut = async () => {
+  const res = await ipcRenderer.invoke("Setting_getShortcut" as SettingApi);
+  return res;
+};
+const Setting_setShortcut = async (shortcuts: Array<boolean>) => {
+  const res = await ipcRenderer.invoke(
+    "Setting_setShortcut" as SettingApi,
+    shortcuts
   );
   return res;
 };
@@ -319,5 +332,7 @@ contextBridge.exposeInMainWorld("DeskApi", {
   Setting_setAutoConfigList,
   Setting_openFolder,
   Setting_getHandlePicCount,
+  Setting_getShortcut,
+  Setting_setShortcut,
   Tool_adjustPic,
 });

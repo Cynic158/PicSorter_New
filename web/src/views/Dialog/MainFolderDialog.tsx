@@ -9,6 +9,7 @@ import "../../styles/dialog/mainfolderdialog.scss";
 import sortStore from "../../store/modules/sort";
 import { cloneDeep } from "lodash";
 import { getFileSize } from "../../utils";
+import settingStore from "../../store/modules/setting";
 
 interface MainFolderDialogProps {
   show: boolean;
@@ -167,9 +168,12 @@ const MainFolderDialog: React.FC<MainFolderDialogProps> = ({ show, hide }) => {
 
   useEffect(() => {
     if (show) {
+      settingStore.setAllowShortcut(false);
       setPicError(false);
       setSortError(false);
       getMainFolderInfo();
+    } else {
+      settingStore.setAllowShortcut(true);
     }
 
     return () => {};

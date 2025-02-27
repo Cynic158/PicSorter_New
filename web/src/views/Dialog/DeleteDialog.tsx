@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Observer } from "mobx-react";
 import sortStore from "../../store/modules/sort";
@@ -6,6 +6,7 @@ import picStore from "../../store/modules/pic";
 import Loader from "../../components/Loader";
 import winStore from "../../store/modules/win";
 import "../../styles/dialog/deletedialog.scss";
+import settingStore from "../../store/modules/setting";
 
 interface DeleteDialogProps {
   type: "deletePic" | "deleteSortFolder" | "deleteSortItemFolder";
@@ -78,6 +79,16 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ type, show, hide }) => {
       closeDialog();
     }
   };
+
+  useEffect(() => {
+    if (show) {
+      settingStore.setAllowShortcut(false);
+    } else {
+      settingStore.setAllowShortcut(true);
+    }
+
+    return () => {};
+  }, [show]);
 
   return ReactDOM.createPortal(
     <Observer>

@@ -39,7 +39,9 @@ declare global {
     | "Setting_getAutoConfigList"
     | "Setting_setAutoConfigList"
     | "Setting_openFolder"
-    | "Setting_getHandlePicCount";
+    | "Setting_getHandlePicCount"
+    | "Setting_getShortcut"
+    | "Setting_setShortcut";
   type ToolApi = "Tool_adjustPic";
 
   // 其他类型
@@ -201,6 +203,8 @@ declare global {
   interface SettingConfig {
     autoRename: Array<AutoRenameConfig>;
     handlePicCount: number;
+    showStartup: boolean;
+    shortcuts: Array<boolean>;
   }
 
   type UpdateHandlePicCountType = (count: number) => Promise<void>;

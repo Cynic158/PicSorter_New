@@ -1,8 +1,8 @@
 {
-  "name": "picsorter",
+  "name": "PicSorter",
   "version": "2.0.0",
   "description": "sort your pictures better",
-  "main": "main.ts",
+  "main": "dist/main.js",
   "author": "cynic",
   "license": "MIT",
   "scripts": {
@@ -32,17 +32,23 @@
       "dist/main.js",
       "dist/node_modules/**",
       "dist/ipcHandler/**",
-      "dist/preload.js"
+      "dist/preload.js",
+      "dist/utils/**"
     ],
     "directories": {
       "output": "deskdist"
     },
     "extraResources": [
       {
-        "from": "assets",
+        "from": "dist/assets",
         "to": "assets"
+      },
+      {
+        "from": "favicon.ico",
+        "to": "favicon.ico"
       }
     ],
+    "icon": "favicon.ico",
     "nsis": {
       "oneClick": false,
       "perMachine": true,

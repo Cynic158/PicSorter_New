@@ -13,6 +13,7 @@ import bilibili from "../../assets/images/bilibili.jpg";
 import qrcode from "../../assets/images/qrcode.png";
 import winStore from "../../store/modules/win";
 import settingStore from "../../store/modules/setting";
+import { cloneDeep } from "lodash";
 
 interface SettingDialogProps {
   show: boolean;
@@ -38,6 +39,7 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
   // 通用设置
   const [clearList, setClearList] = useState(true);
   const [picLoadLimit, setPicLoadLimit] = useState("100");
+  const [showStartup, setShowStartup] = useState(false);
   const [configPath, setConfigPath] = useState("");
   // 置顶配置
   const [topList, setTopList] = useState<Array<string>>([]);
@@ -49,10 +51,15 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
     setClearList(res.clearList);
     setPicLoadLimit(res.picLoadLimit);
     setConfigPath(res.configPath);
+    setShowStartup(res.showStartup);
   };
   const setDefaultSetting = async () => {
     if (!settingStore.handleSettingLoading) {
-      let res = await settingStore.setDefaultSetting(clearList, picLoadLimit);
+      let res = await settingStore.setDefaultSetting(
+        clearList,
+        picLoadLimit,
+        showStartup
+      );
       if (res) {
         winStore.setMessage({
           type: "success",
@@ -63,8 +70,11 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
   };
   useEffect(() => {
     if (show) {
+      settingStore.setAllowShortcut(false);
       setActiveIndex(0);
       getDefaultSetting();
+    } else {
+      settingStore.setAllowShortcut(true);
     }
 
     return () => {};
@@ -148,6 +158,89 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
   const getHandlePicCount = async () => {
     let res = await settingStore.getHandlePicCount();
     setHandlePicCount(res);
+  };
+
+  // 快捷键部分
+  interface keyType {
+    value: string;
+    enable: boolean;
+  }
+  const [shortcutKeys, setShortcutKeys] = useState<Array<keyType>>([
+    {
+      value: "X",
+      enable: false,
+    },
+    {
+      value: "C",
+      enable: false,
+    },
+    {
+      value: "D",
+      enable: false,
+    },
+    {
+      value: "Ctrl + A",
+      enable: false,
+    },
+    {
+      value: "Shift + A",
+      enable: false,
+    },
+  ]);
+  const switchShortcutKeysEnable = (index: number) => {
+    let cloneShortcutKeys = cloneDeep(shortcutKeys);
+    cloneShortcutKeys[index].enable = !cloneShortcutKeys[index].enable;
+    setShortcutKeys(cloneShortcutKeys);
+  };
+  const [sortShortcutKeysAEnable, setSortShortcutKeysAEnable] = useState(false);
+  const sortShortcutKeysA = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+  const [sortShortcutKeysBEnable, setSortShortcutKeysBEnable] = useState(false);
+  const sortShortcutKeysB = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
+
+  const getShortcut = () => {
+    let cloneShortcuts = cloneDeep(settingStore.shortcuts);
+    setShortcutKeys([
+      {
+        value: "X",
+        enable: cloneShortcuts[0],
+      },
+      {
+        value: "C",
+        enable: cloneShortcuts[1],
+      },
+      {
+        value: "D",
+        enable: cloneShortcuts[2],
+      },
+      {
+        value: "Ctrl + A",
+        enable: cloneShortcuts[3],
+      },
+      {
+        value: "Shift + A",
+        enable: cloneShortcuts[4],
+      },
+    ]);
+    setSortShortcutKeysAEnable(cloneShortcuts[5]);
+    setSortShortcutKeysBEnable(cloneShortcuts[6]);
+  };
+
+  const setShortcut = async () => {
+    if (!settingStore.handleSettingLoading) {
+      let mapBools = shortcutKeys.map((item) => item.enable);
+      let shortcuts = [
+        ...mapBools,
+        sortShortcutKeysAEnable,
+        sortShortcutKeysBEnable,
+      ];
+      let res = await settingStore.setShortcut(shortcuts);
+      if (res) {
+        winStore.setMessage({
+          type: "success",
+          msg: "设置成功",
+        });
+      }
+    }
   };
 
   return ReactDOM.createPortal(
@@ -236,6 +329,7 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                       activeIndex != 3
                     ) {
                       setActiveIndex(3);
+                      getShortcut();
                     }
                   }}
                   className={`settingdialog-nav-item${
@@ -324,6 +418,20 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                         ></Inputer>
                         <div className="settingdialog-setting-item-tip">
                           在横向或者纵向图片预览模式时，为了提高性能，降低渲染压力，并不会一次性加载显示所有待分类图片，而是根据加载图片上限，显示部分图片；最低50，最高500；修改后非立即生效
+                        </div>
+                      </div>
+                      <div className="settingdialog-setting-item">
+                        <p className="settingdialog-setting-item-title">
+                          是否显示启动图
+                        </p>
+                        <Switcher
+                          value={showStartup}
+                          setValue={() => {
+                            setShowStartup(!showStartup);
+                          }}
+                        ></Switcher>
+                        <div className="settingdialog-setting-item-tip">
+                          应用打开时是否显示启动加载图片，默认不显示，怕社死请勿开启
                         </div>
                       </div>
                       <div className="settingdialog-setting-item">
@@ -506,6 +614,366 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                 {activeIndex == 3 ? (
                   <div className="settingdialog-setting">
                     <p className="settingdialog-setting-title">快捷键配置</p>
+                    <div className="settingdialog-setting-main">
+                      <div className="settingdialog-setting-item">
+                        <p className="settingdialog-setting-item-title">
+                          剪切图片
+                        </p>
+                        <div className="settingdialog-setting-item-shortcut">
+                          <div className="settingdialog-setting-item-shortcut-key">
+                            {shortcutKeys[0].value}
+                          </div>
+                          <Switcher
+                            value={shortcutKeys[0].enable}
+                            setValue={() => {
+                              switchShortcutKeysEnable(0);
+                            }}
+                          ></Switcher>
+                        </div>
+                        <div className="settingdialog-setting-item-tip">
+                          将选中的图片剪切到选中的分类
+                        </div>
+                      </div>
+                      <div className="settingdialog-setting-item">
+                        <p className="settingdialog-setting-item-title">
+                          复制图片
+                        </p>
+                        <div className="settingdialog-setting-item-shortcut">
+                          <div className="settingdialog-setting-item-shortcut-key">
+                            {shortcutKeys[1].value}
+                          </div>
+                          <Switcher
+                            value={shortcutKeys[1].enable}
+                            setValue={() => {
+                              switchShortcutKeysEnable(1);
+                            }}
+                          ></Switcher>
+                        </div>
+                        <div className="settingdialog-setting-item-tip">
+                          将选中的图片复制到选中的分类
+                        </div>
+                      </div>
+                      <div className="settingdialog-setting-item">
+                        <p className="settingdialog-setting-item-title">
+                          删除图片
+                        </p>
+                        <div className="settingdialog-setting-item-shortcut">
+                          <div className="settingdialog-setting-item-shortcut-key">
+                            {shortcutKeys[2].value}
+                          </div>
+                          <Switcher
+                            value={shortcutKeys[2].enable}
+                            setValue={() => {
+                              switchShortcutKeysEnable(2);
+                            }}
+                          ></Switcher>
+                        </div>
+                        <div className="settingdialog-setting-item-tip">
+                          将选中的图片移动到回收站，快捷键所触发的删除图片不会弹出提示框
+                        </div>
+                      </div>
+                      <div className="settingdialog-setting-item">
+                        <p className="settingdialog-setting-item-title">
+                          全选图片
+                        </p>
+                        <div className="settingdialog-setting-item-shortcut">
+                          <div className="settingdialog-setting-item-shortcut-key">
+                            {shortcutKeys[3].value}
+                          </div>
+                          <Switcher
+                            value={shortcutKeys[3].enable}
+                            setValue={() => {
+                              switchShortcutKeysEnable(3);
+                            }}
+                          ></Switcher>
+                        </div>
+                        <div className="settingdialog-setting-item-tip">
+                          选中全部图片，仅横图或者纵图模式生效
+                        </div>
+                      </div>
+                      <div className="settingdialog-setting-item">
+                        <p className="settingdialog-setting-item-title">
+                          全选分类
+                        </p>
+                        <div className="settingdialog-setting-item-shortcut">
+                          <div className="settingdialog-setting-item-shortcut-key">
+                            {shortcutKeys[4].value}
+                          </div>
+                          <Switcher
+                            value={shortcutKeys[4].enable}
+                            setValue={() => {
+                              switchShortcutKeysEnable(4);
+                            }}
+                          ></Switcher>
+                        </div>
+                        <div className="settingdialog-setting-item-tip">
+                          选中全部分类
+                        </div>
+                      </div>
+
+                      <div className="settingdialog-setting-item">
+                        <p className="settingdialog-setting-item-title">
+                          选中第1~10个分类
+                        </p>
+                        <div className="settingdialog-setting-item-shortcut">
+                          <Switcher
+                            value={sortShortcutKeysAEnable}
+                            setValue={() => {
+                              setSortShortcutKeysAEnable(
+                                !sortShortcutKeysAEnable
+                              );
+                            }}
+                          ></Switcher>
+                        </div>
+                        <div className="settingdialog-setting-item-shortcut-sort-title">
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              N
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              快捷键
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              N
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              快捷键
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          className={`settingdialog-setting-item-shortcut-sort${
+                            sortShortcutKeysAEnable ? "" : " disabled"
+                          }`}
+                        >
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              1
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysA[0]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              2
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysA[1]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              3
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysA[2]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              4
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysA[3]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              5
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysA[4]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              6
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysA[5]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              7
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysA[6]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              8
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysA[7]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              9
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysA[8]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              10
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysA[9]}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="settingdialog-setting-item-tip">
+                          {"选中第N个分类（如果存在），仅单键，默认为数字键"}
+                        </div>
+                      </div>
+
+                      <div className="settingdialog-setting-item">
+                        <p className="settingdialog-setting-item-title">
+                          选中第11~20个分类
+                        </p>
+                        <div className="settingdialog-setting-item-shortcut">
+                          <Switcher
+                            value={sortShortcutKeysBEnable}
+                            setValue={() => {
+                              setSortShortcutKeysBEnable(
+                                !sortShortcutKeysBEnable
+                              );
+                            }}
+                          ></Switcher>
+                        </div>
+                        <div className="settingdialog-setting-item-shortcut-sort-title">
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              N
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              快捷键
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              N
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              快捷键
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          className={`settingdialog-setting-item-shortcut-sort${
+                            sortShortcutKeysBEnable ? "" : " disabled"
+                          }`}
+                        >
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              11
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysB[0]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              12
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysB[1]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              13
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysB[2]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              14
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysB[3]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              15
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysB[4]}
+                            </div>
+                          </div>
+
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              16
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysB[5]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              17
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysB[6]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              18
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysB[7]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              19
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysB[8]}
+                            </div>
+                          </div>
+                          <div className="settingdialog-setting-item-shortcut-sort-item">
+                            <div className="settingdialog-setting-item-shortcut-sort-item-index">
+                              20
+                            </div>
+                            <div className="settingdialog-setting-item-shortcut-sort-item-key">
+                              {sortShortcutKeysB[9]}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="settingdialog-setting-item-tip">
+                          {"选中第N个分类（如果存在），仅单键，默认为Q-P"}
+                        </div>
+                      </div>
+
+                      <div className="settingdialog-setting-apply">
+                        <button
+                          onClick={setShortcut}
+                          className={`settingdialog-setting-apply-btn${
+                            settingStore.handleSettingLoading ? " loading" : ""
+                          }`}
+                        >
+                          <span className="settingdialog-setting-apply-btn-text">
+                            应用
+                          </span>
+                          <div className="settingdialog-setting-apply-btn-loading">
+                            <Loader width="18px"></Loader>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <></>
