@@ -1,4 +1,4 @@
-import { ipcMain, app, shell } from "electron";
+import { ipcMain, shell } from "electron";
 import {
   checkPathsExist,
   generateErrorLog,
@@ -14,9 +14,9 @@ import sharp from "sharp";
 const picHandler = (
   getPicListSave: GetPicListSaveType,
   setPicListSave: SetPicListSave,
-  updateHandlePicCount: UpdateHandlePicCountType
+  updateHandlePicCount: UpdateHandlePicCountType,
+  appPath: string
 ) => {
-  const appPath = app.getAppPath();
   const picConfigPath = pathManager.picConfigPath;
   const sortConfigPath = pathManager.sortConfigPath;
 

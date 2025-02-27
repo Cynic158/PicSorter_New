@@ -7,7 +7,8 @@ import pathManager from "./utils/path";
 import express from "express";
 
 // 获取要读取的pic目录路径
-const appPath = app.getAppPath();
+let appPath = app.getAppPath();
+appPath = path.resolve(appPath, "../"); // 打包环境
 const iconPath = pathManager.iconPath;
 const sortConfigPath = pathManager.sortConfigPath;
 const settingConfigPath = pathManager.settingConfigPath;
@@ -104,8 +105,8 @@ function createMainWindow() {
   });
 
   // 加载应用的ui
-  mainWindow.loadURL("http://127.0.0.1:5173/");
-  // mainWindow.loadURL("http://127.0.0.1:7777/");
+  // mainWindow.loadURL("http://127.0.0.1:5173/");
+  mainWindow.loadURL("http://127.0.0.1:7777/");
 
   mainWindow.on("ready-to-show", () => {
     if (showStartup) {
@@ -181,7 +182,8 @@ function createMainWindow() {
     setPicListSave,
     resetPicStatic,
     resetSortStatic,
-    updateHandlePicCount
+    updateHandlePicCount,
+    appPath
   );
 
   function createTray(mainWindow: BrowserWindow) {

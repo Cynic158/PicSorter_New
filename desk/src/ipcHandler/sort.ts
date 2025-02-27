@@ -15,9 +15,9 @@ const sortHandler = (
   resetSortStatic: ResetSortStaticType,
   getPicListSave: GetPicListSaveType,
   setPicListSave: SetPicListSave,
-  updateHandlePicCount: UpdateHandlePicCountType
+  updateHandlePicCount: UpdateHandlePicCountType,
+  appPath: string
 ) => {
-  const appPath = app.getAppPath();
   const sortConfigPath = pathManager.sortConfigPath;
   const settingConfigPath = pathManager.settingConfigPath;
 

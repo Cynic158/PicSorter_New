@@ -1,12 +1,11 @@
-import { ipcMain, app, shell } from "electron";
+import { ipcMain, shell } from "electron";
 import { generateErrorLog, checkPathsExist } from "../utils/index";
 import pathManager from "../utils/path";
 import fs from "fs";
 import path from "path";
 import { cloneDeep } from "lodash";
 
-const settingHandler = () => {
-  const appPath = app.getAppPath();
+const settingHandler = (appPath: string) => {
   const settingConfigPath = pathManager.settingConfigPath;
   const sortConfigPath = pathManager.sortConfigPath;
   const picConfigPath = pathManager.picConfigPath;
