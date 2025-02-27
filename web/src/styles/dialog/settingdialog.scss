@@ -1,0 +1,433 @@
+.settingdialog-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: var(--sortfolderdialog-container-index);
+  background-color: var(--color-black5);
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+  &.show {
+    visibility: visible;
+    opacity: 1;
+    .settingdialog-main {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+  .settingdialog-main {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.7);
+    transition: all 0.3s ease;
+    width: 720px;
+    height: 600px;
+    padding: 14px 28px 24px 28px;
+    border-radius: 8px;
+    background-color: var(--color-black6);
+    box-shadow: 0 0 8px 4px rgba($color: #000000, $alpha: 0.2);
+    .settingdialog-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-white6);
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+    .settingdialog-form {
+      width: 100%;
+      display: flex;
+      .settingdialog-nav-container {
+        display: flex;
+        flex-direction: column;
+        margin-right: 8px;
+        .settingdialog-nav-item {
+          display: flex;
+          align-items: center;
+          color: var(--color-white8);
+          height: 36px;
+          width: 136px;
+          border-left: 4px solid transparent;
+          padding-left: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          span {
+            margin-left: 8px;
+          }
+          &.active {
+            border-left: 4px solid var(--color-blue2);
+            background-color: var(--color-white9);
+          }
+        }
+      }
+      .settingdialog-setting-container {
+        height: 520px;
+        flex: 1;
+        background-color: var(--color-white9);
+        border-radius: 4px;
+        border-left: 4px solid var(--color-blue2);
+        .settingdialog-setting {
+          display: flex;
+          flex-direction: column;
+          padding: 8px 12px;
+          .settingdialog-setting-title {
+            color: var(--color-white2);
+            font-size: 20px;
+            margin-bottom: 8px;
+          }
+          .settingdialog-setting-main {
+            width: 100%;
+            height: 460px;
+            overflow-y: scroll;
+            .settingdialog-setting-item {
+              display: flex;
+              flex-direction: column;
+              width: 100%;
+              background-color: var(--color-white9);
+              padding: 8px 12px;
+              border-radius: 4px;
+              margin-bottom: 16px;
+              .settingdialog-setting-item-title {
+                color: var(--color-white2);
+                margin-bottom: 4px;
+              }
+              .settingdialog-setting-item-shortcut {
+                display: flex;
+                align-items: center;
+                .settingdialog-setting-item-shortcut-key {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  height: 24px;
+                  width: 120px;
+                  background-color: var(--color-black1);
+                  border-radius: 4px;
+                  margin-right: 12px;
+                  color: var(--color-white2);
+                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                  user-select: none;
+                  font-weight: 600;
+                }
+              }
+              .settingdialog-setting-item-shortcut-sort-title {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-top: 1px solid var(--color-white7);
+                border-bottom: 1px solid var(--color-white7);
+                color: var(--color-white7);
+                margin-top: 8px;
+                .settingdialog-setting-item-shortcut-sort-item {
+                  display: flex;
+                  align-items: center;
+                  font-size: 14px;
+                  .settingdialog-setting-item-shortcut-sort-item-index {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 48px;
+                    height: 24px;
+                    margin-right: 12px;
+                    user-select: none;
+                    font-weight: 600;
+                  }
+                  .settingdialog-setting-item-shortcut-sort-item-key {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 24px;
+                    width: 120px;
+                    user-select: none;
+                    font-weight: 600;
+                  }
+                }
+              }
+              .settingdialog-setting-item-shortcut-sort {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                transition: opacity 0.3s ease;
+                &.disabled {
+                  opacity: 0.5;
+                }
+                .settingdialog-setting-item-shortcut-sort-item {
+                  display: flex;
+                  align-items: center;
+                  margin-top: 8px;
+                  font-size: 14px;
+                  & .settingdialog-setting-item-shortcut-sort-item-index {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 48px;
+                    height: 24px;
+                    border-radius: 4px;
+                    margin-right: 12px;
+                    user-select: none;
+                    font-weight: 600;
+                    background-color: var(--color-black1);
+                    color: var(--color-white2);
+                  }
+                  .settingdialog-setting-item-shortcut-sort-item-key {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 24px;
+                    width: 120px;
+                    background-color: var(--color-black1);
+                    border-radius: 4px;
+                    color: var(--color-white2);
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    user-select: none;
+                    font-weight: 600;
+                  }
+                }
+              }
+              .settingdialog-setting-item-path {
+                color: var(--color-white6);
+                max-width: 85%;
+                width: max-content;
+                position: relative;
+                cursor: pointer;
+                &::after {
+                  content: "";
+                  position: absolute;
+                  bottom: 1px; /* 位置 */
+                  left: 0;
+                  right: 0;
+                  height: 1.5px; /* 下划线粗细 */
+                  background-color: var(--color-white6); /* 下划线颜色 */
+                  pointer-events: none;
+                }
+              }
+              .settingdialog-setting-item-tip {
+                margin-top: 8px;
+                font-size: 14px;
+                color: var(--color-white7);
+                border-top: 1px solid var(--color-white7);
+                padding-top: 4px;
+                text-align: justify;
+              }
+            }
+            .settingdialog-setting-apply {
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: right;
+              &.withtext {
+                justify-content: space-between;
+              }
+              .settingdialog-setting-apply-text {
+                color: var(--color-white6);
+                font-size: 14px;
+                text-decoration: underline;
+                cursor: pointer;
+              }
+              .settingdialog-setting-apply-btn {
+                width: 62px;
+                height: 34px;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: var(--color-blue2);
+                color: var(--color-white2);
+                transition: all 0.2s ease;
+                position: relative;
+                &:hover {
+                  background-color: var(--color-blue4);
+                }
+                &:active {
+                  background-color: var(--color-blue3);
+                }
+                &.loading {
+                  background-color: var(--color-blue3) !important;
+                  cursor: wait;
+                  .settingdialog-setting-apply-btn-text {
+                    opacity: 0;
+                    transform: scale(0.5);
+                  }
+                  .settingdialog-setting-apply-btn-loading {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1);
+                  }
+                }
+                .settingdialog-setting-apply-btn-text {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  transform: scale(1);
+                  transition: all 0.3s ease;
+                }
+                .settingdialog-setting-apply-btn-loading {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  position: absolute;
+                  left: 50%;
+                  top: 50%;
+                  transform: translate(-50%, -50%) scale(0.5);
+                  z-index: var(--sortfolderdialog-btn-loading-index);
+                  opacity: 0;
+                  transition: all 0.3s ease;
+                }
+              }
+            }
+            .settingdialog-setting-top-tip {
+              width: 100%;
+              padding: 8px;
+              color: var(--color-white6);
+              background-color: var(--color-white9);
+              border-radius: 4px;
+              margin-bottom: 16px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              .settingdialog-setting-top-tip-text {
+                display: flex;
+                flex-direction: column;
+              }
+              .settingdialog-setting-top-tip-btn {
+                text-decoration: underline;
+                cursor: pointer;
+              }
+            }
+            .settingdialog-setting-top-item {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              height: 36px;
+              width: 100%;
+              padding: 0 8px;
+              background-color: var(--color-white9);
+              border-radius: 4px;
+              margin-bottom: 8px;
+              .settingdialog-setting-top-left {
+                color: var(--color-white6);
+                max-width: 85%;
+                position: relative;
+                cursor: pointer;
+                &::after {
+                  content: "";
+                  position: absolute;
+                  bottom: 1px; /* 位置 */
+                  left: 0;
+                  right: 0;
+                  height: 1.5px; /* 下划线粗细 */
+                  background-color: var(--color-white6); /* 下划线颜色 */
+                  pointer-events: none;
+                }
+              }
+              .settingdialog-setting-top-right {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: 12px;
+              }
+            }
+            .settingdialog-setting-help-item {
+              display: flex;
+              align-items: center;
+              background-color: var(--color-white9);
+              padding: 12px 16px;
+              border-radius: 4px;
+              margin-bottom: 16px;
+              .settingdialog-setting-help-item-left {
+                width: 100px;
+                height: 100px;
+                border-radius: 50px;
+                overflow: hidden;
+                margin-right: 16px;
+                img {
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                }
+              }
+              .settingdialog-setting-help-item-right {
+                display: flex;
+                flex-direction: column;
+                .settingdialog-setting-help-item-right-name {
+                  font-size: 22px;
+                  color: var(--color-white2);
+                  .tip {
+                    margin-left: 8px;
+                    color: var(--color-white6);
+                  }
+                }
+                .settingdialog-setting-help-item-right-number {
+                  font-size: 18px;
+                  color: var(--color-white8);
+                  margin-bottom: 24px;
+                  margin-left: 1px;
+                  .number {
+                    color: var(--color-white7);
+                    text-decoration: underline;
+                    cursor: pointer;
+                  }
+                }
+                .settingdialog-setting-help-item-right-desc {
+                  font-size: 14px;
+                  color: var(--color-white6);
+                  border-top: 1px solid var(--color-black12);
+                  padding-top: 4px;
+                  user-select: none;
+                  width: 330px;
+                }
+              }
+            }
+            .settingdialog-setting-support-item {
+              display: flex;
+              align-items: center;
+              width: 100%;
+              background-color: var(--color-white9);
+              padding: 8px 12px;
+              border-radius: 4px;
+              margin-bottom: 12px;
+              color: var(--color-white6);
+              &.block {
+                display: block;
+                text-align: justify;
+              }
+              &.qrcode {
+                width: max-content;
+                padding: 12px;
+                transition: all 0.3s ease;
+                opacity: 0;
+                transform: translateY(-8px);
+                &.show {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+              .btn {
+                color: var(--color-black8);
+                text-decoration: underline;
+                cursor: pointer;
+                margin-left: 12px;
+              }
+              img {
+                width: 180px;
+                height: 180px;
+                border-radius: 4px;
+              }
+              .settingdialog-setting-support-item-text {
+                margin-left: 8px;
+                span {
+                  color: var(--color-blue5);
+                  margin: 0 8px;
+                }
+                .tip {
+                  color: var(--color-black8);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

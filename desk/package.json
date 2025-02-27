@@ -1,18 +1,19 @@
 {
-  "name": "picsorter",
+  "name": "PicSorter",
   "version": "2.0.0",
   "description": "sort your pictures better",
-  "main": "main.ts",
+  "main": "dist/main.js",
   "author": "cynic",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "start": "yarn build && nodemon --exec electron ./dist/main.js --watch ./ --ext .js,.css,.ts",
+    "build": "tsc && node copy.js",
+    "start": "nodemon",
     "app:dist": "yarn build && electron-builder"
   },
   "devDependencies": {
     "@types/electron": "^1.6.12",
     "@types/express": "^5.0.0",
+    "@types/lodash": "^4.17.13",
     "@types/node": "^22.10.1",
     "electron": "^26.1.0",
     "electron-builder": "^24.6.4",
@@ -21,7 +22,9 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "image-size": "^1.0.2",
+    "image-size": "^1.2.0",
+    "lodash": "^4.17.21",
+    "sharp": "^0.33.5",
     "wrap-ansi": "7.0.0"
   },
   "build": {
@@ -29,17 +32,23 @@
       "dist/main.js",
       "dist/node_modules/**",
       "dist/ipcHandler/**",
-      "dist/preload.js"
+      "dist/preload.js",
+      "dist/utils/**"
     ],
     "directories": {
       "output": "deskdist"
     },
     "extraResources": [
       {
-        "from": "assets",
+        "from": "dist/assets",
         "to": "assets"
+      },
+      {
+        "from": "favicon.ico",
+        "to": "favicon.ico"
       }
     ],
+    "icon": "favicon.ico",
     "nsis": {
       "oneClick": false,
       "perMachine": true,

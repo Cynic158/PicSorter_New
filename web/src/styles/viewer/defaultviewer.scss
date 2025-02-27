@@ -1,0 +1,216 @@
+.defaultviewer-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  .defaultviewer-loading,
+  .defaultviewer-error,
+  .defaultviewer-main {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.7);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    &.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      visibility: visible;
+    }
+  }
+  .defaultviewer-error {
+    z-index: 2;
+    width: 600px;
+    height: 600px;
+  }
+  .defaultviewer-prev-container,
+  .defaultviewer-next-container {
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 120px;
+      border-radius: 8px;
+      background-color: var(--color-black14);
+      transition: background-color 0.3s ease;
+      &:hover {
+        background-color: var(--color-black10);
+      }
+    }
+    &.disabled {
+      button {
+        cursor: not-allowed;
+        * {
+          cursor: not-allowed !important;
+        }
+        &:hover {
+          background-color: var(--color-black14) !important;
+        }
+      }
+    }
+  }
+  .defaultviewer-prev-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 5;
+    width: 100px;
+    height: 100%;
+    overflow: hidden;
+    &:hover {
+      .prev {
+        transform: translateX(0);
+      }
+    }
+    .prev {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.5s ease;
+      transform: translateX(-100px);
+      background: linear-gradient(to right, var(--color-blue6), transparent);
+    }
+    &.disabled {
+      .prev {
+        background: linear-gradient(to right, var(--color-blue7), transparent);
+      }
+    }
+  }
+  .defaultviewer-next-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 5;
+    width: 100px;
+    height: 100%;
+    overflow: hidden;
+    &:hover {
+      .next {
+        transform: translateX(0);
+      }
+    }
+    .next {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.5s ease;
+      transform: translateX(100px);
+      background: linear-gradient(to left, var(--color-blue6), transparent);
+    }
+    &.disabled {
+      .next {
+        background: linear-gradient(to left, var(--color-blue7), transparent);
+      }
+    }
+  }
+  .defaultviewer-preview-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 36px;
+    border-radius: 0 4px 4px 0;
+    transition: width 0.5s ease, opacity 0.3s ease;
+    opacity: 0.5;
+    &:hover {
+      opacity: 1;
+    }
+    &.show {
+      width: 100%;
+      opacity: 1 !important;
+      .defaultviewer-preview-fold-main {
+        left: 0 !important;
+      }
+    }
+    z-index: 6;
+    height: 72px;
+    background-color: var(--color-black1);
+    padding: 6px 0;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+    .defaultviewer-preview-main {
+      height: 100%;
+      width: calc(100% - 44px);
+      overflow-x: scroll;
+      display: inline-block;
+      margin-left: 8px;
+      .defaultviewer-preview-item-container {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        // min-width: 1400px;
+        width: max-content;
+      }
+    }
+    .defaultviewer-preview-fold-container {
+      height: 100%;
+      width: 36px;
+      display: inline-block;
+      background-color: var(--color-black1);
+      overflow: hidden;
+      cursor: pointer;
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 2;
+      .defaultviewer-preview-fold-main {
+        display: flex;
+        align-items: center;
+        width: 72px;
+        min-width: 72px;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: -36px;
+        transition: left 0.5s ease;
+        .defaultviewer-preview-fold {
+          height: 100%;
+          width: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+  }
+  .defaultviewer-main {
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    .defaultviewer-zoom-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      .defaultviewer-zoom {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: move;
+        .defaultviewer-zoom-pic {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          // 启用硬件加速
+          transform: translate3d(0, 0, 0);
+        }
+      }
+    }
+  }
+}
