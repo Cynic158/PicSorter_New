@@ -627,9 +627,12 @@ const autoRenamer = async (
       let initSerial = 0;
       if (serialItemIndex != -1 && resolveGroup.length > 0) {
         // 需要提供序号
-        let serialGroup = resolveGroup.map((item) =>
-          Number(item.split(config.separator)[serialItemIndex])
-        );
+        let serialGroup = resolveGroup.map((item) => {
+          let itemWithoutExt = path.parse(item).name;
+          return Number(
+            itemWithoutExt.split(config.separator)[serialItemIndex]
+          );
+        });
         let maxSerial = Math.max(...serialGroup);
         initSerial = maxSerial + 1;
       }
