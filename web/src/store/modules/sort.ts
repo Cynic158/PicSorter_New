@@ -566,6 +566,8 @@ const sortStore = observable(
           }
         } else {
           // 报错
+          // 获取一次分类列表
+          this.getSortFolderList();
           winStore.setErrorDialog(res.data as string, funcAction);
           return {
             success: false,
@@ -574,6 +576,8 @@ const sortStore = observable(
         }
       } catch (error) {
         // 报错
+        // 获取一次分类列表
+        this.getSortFolderList();
         let log = generateErrorLog(error);
         winStore.setErrorDialog(log, funcAction);
         return {
@@ -618,6 +622,7 @@ const sortStore = observable(
             };
           }
         } else {
+          this.getSortFolderList();
           picStore.getPicList(true);
           // 报错
           winStore.setErrorDialog(res.data as string, funcAction);
@@ -628,6 +633,8 @@ const sortStore = observable(
         }
       } catch (error) {
         // 报错
+        this.getSortFolderList();
+        picStore.getPicList(true);
         let log = generateErrorLog(error);
         winStore.setErrorDialog(log, funcAction);
         return {
@@ -671,6 +678,7 @@ const sortStore = observable(
           }
         } else {
           // 报错
+          this.getSortFolderList();
           winStore.setErrorDialog(res.data as string, funcAction);
           return {
             success: false,
@@ -679,6 +687,7 @@ const sortStore = observable(
         }
       } catch (error) {
         // 报错
+        this.getSortFolderList();
         let log = generateErrorLog(error);
         winStore.setErrorDialog(log, funcAction);
         return {
@@ -732,6 +741,7 @@ const sortStore = observable(
             };
           }
         } else {
+          this.getSortFolderList();
           picStore.getPicList(true);
           // 报错
           winStore.setErrorDialog(res.data as string, funcAction);
@@ -742,6 +752,8 @@ const sortStore = observable(
         }
       } catch (error) {
         // 报错
+        this.getSortFolderList();
+        picStore.getPicList(true);
         let log = generateErrorLog(error);
         winStore.setErrorDialog(log, funcAction);
         return {
