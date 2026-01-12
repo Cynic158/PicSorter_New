@@ -1,6 +1,6 @@
 {
   "name": "PicSorter",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "sort your pictures better",
   "main": "dist/main.js",
   "author": "cynic",
@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc && node copy.js",
     "start": "nodemon",
-    "app:dist": "yarn build && electron-builder"
+    "app:dist": "pnpm run build && electron-builder"
   },
   "devDependencies": {
     "@types/electron": "^1.6.12",
