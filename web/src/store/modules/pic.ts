@@ -4,21 +4,28 @@ import { generateErrorLog } from "../../utils";
 import PicApi from "../../api/pic";
 import sortStore from "./sort";
 import { cloneDeep } from "lodash";
-import { picStaticPath, sortStaticPath } from "../../utils/config";
 
 // 全选点击定时器
 let allSelectingClickTimeout: ReturnType<typeof setTimeout>;
 
 const picStore = observable(
   {
+    picPath: "http://127.0.0.1:7777/pic",
+    sortPath: "http://127.0.0.1:7777/sort",
+    setBaseStaticPath() {
+      runInAction(() => {
+        this.picPath = "http://127.0.0.1:" + window.location.port + "/pic";
+        this.sortPath = "http://127.0.0.1:" + window.location.port + "/sort";
+      });
+    },
     getPicUrl(picPath: string, folder: "pic" | "sort") {
       let picUrl = "";
       if (folder == "pic") {
         let rootPath = sortStore.picFolderConfig.folderPath;
-        picUrl = picStaticPath + picPath.replace(rootPath, "");
+        picUrl = this.picPath + picPath.replace(rootPath, "");
       } else {
         let rootPath = sortStore.sortFolderConfig.folderPath;
-        picUrl = sortStaticPath + picPath.replace(rootPath, "");
+        picUrl = this.sortPath + picPath.replace(rootPath, "");
       }
       picUrl = picUrl.replace(/\\/g, "/");
       return picUrl;
@@ -279,6 +286,7 @@ const picStore = observable(
     setAllSelectingClickTimes: action,
     allSelectingPicList: action,
     setZoomPercent: action,
+    setBaseStaticPath: action,
   }
 );
 

@@ -1045,11 +1045,11 @@ const SettingDialog: React.FC<SettingDialogProps> = ({ show, hide }) => {
                             <span>主页：</span>
                             <span
                               onClick={() => {
-                                winStore.openLink("https://b23.tv/ZQK3str");
+                                winStore.openLink("https://space.bilibili.com/241287406");
                               }}
                               className="number"
                             >
-                              {"https://b23.tv/ZQK3str"}
+                              {"https://space.bilibili.com/241287406"}
                             </span>
                           </div>
                           <div className="settingdialog-setting-help-item-right-desc">

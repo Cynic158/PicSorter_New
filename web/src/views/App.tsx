@@ -24,6 +24,7 @@ export default function App() {
     sortStore.getSortFolderList();
     picStore.getPicList(true);
     settingStore.getShortcut();
+    picStore.setBaseStaticPath();
   };
   useEffect(() => {
     initDesk();

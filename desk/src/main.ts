@@ -5,10 +5,14 @@ import fs from "fs";
 import path from "path";
 import pathManager from "./utils/path";
 import express from "express";
+import portfinder from "portfinder";
 
 // 获取要读取的pic目录路径
 let appPath = app.getAppPath();
-appPath = path.resolve(appPath, "../"); // 打包环境
+// 打包环境
+appPath = path.resolve(appPath, "../");
+// dev环境
+// appPath = path.resolve(appPath, "./");
 const iconPath = pathManager.iconPath;
 const sortConfigPath = pathManager.sortConfigPath;
 const settingConfigPath = pathManager.settingConfigPath;
@@ -51,7 +55,7 @@ function createStartupWindow() {
   startupWindow.center();
 }
 
-function createMainWindow() {
+async function createMainWindow() {
   // 先提供一个无效默认的地址
   let picStaticPath = path.resolve(appPath, "./pic");
   let sortStaticPath = path.resolve(appPath, "./sort");
@@ -83,8 +87,10 @@ function createMainWindow() {
   server.use("/sort", (req, res, next) => {
     express.static(sortStaticPath)(req, res, next);
   });
-  server.listen(7777, "127.0.0.1", () => {
-    console.log("local server start at: http://127.0.0.1:7777");
+  portfinder.basePort = 7777;
+  let portRes = await portfinder.getPortPromise();
+  server.listen(portRes, "127.0.0.1", () => {
+    console.log(`local server start at: http://127.0.0.1:${portRes}`);
   });
 
   // 创建主窗口
@@ -105,8 +111,8 @@ function createMainWindow() {
   });
 
   // 加载应用的ui
-  // mainWindow.loadURL("http://127.0.0.1:5173/");
-  mainWindow.loadURL("http://127.0.0.1:7777/");
+  // mainWindow.loadURL("http://127.0.0.1:7777/");
+  mainWindow.loadURL(`http://127.0.0.1:${portRes}/`);
 
   mainWindow.on("ready-to-show", () => {
     if (showStartup) {
