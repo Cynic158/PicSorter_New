@@ -28,6 +28,8 @@ const picStore = observable(
         picUrl = this.sortPath + picPath.replace(rootPath, "");
       }
       picUrl = picUrl.replace(/\\/g, "/");
+      // 转义，处理#导致图片无法识别的情况
+      picUrl = picUrl.replace(/#/g, "%23");
       return picUrl;
     },
     viewMode: "view" as viewType,
@@ -61,7 +63,7 @@ const picStore = observable(
     async getPicList(
       refresh: boolean = false,
       currentPicPath?: string | null,
-      preload?: viewType
+      preload?: viewType,
     ) {
       let funcAction = "获取图片组";
       try {
@@ -77,7 +79,7 @@ const picStore = observable(
             let previewRes = await PicApi.getPicList("total", false);
             if (previewRes.success) {
               this.setPreviewList(
-                (previewRes.data as GetPicListDataType).picList
+                (previewRes.data as GetPicListDataType).picList,
               );
             } else {
               this.setPreviewList([]);
@@ -93,7 +95,7 @@ const picStore = observable(
             this.setPicList((res.data as GetPicListDataType).picList);
             if (refresh) {
               sortStore.setPicFolderConfig(
-                (res.data as GetPicListDataType).config
+                (res.data as GetPicListDataType).config,
               );
             }
           });
@@ -188,7 +190,7 @@ const picStore = observable(
           if (res.success) {
             resetList(
               (res.data as PicInfoDataType).dpi,
-              (res.data as PicInfoDataType).bitDepth
+              (res.data as PicInfoDataType).bitDepth,
             );
             return true;
           } else {
@@ -287,7 +289,7 @@ const picStore = observable(
     allSelectingPicList: action,
     setZoomPercent: action,
     setBaseStaticPath: action,
-  }
+  },
 );
 
 export default picStore;
